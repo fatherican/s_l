@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <typeAliases>
+         <!--用户的别名-->
+        <typeAlias alias="user" type="cn.njcit.domain.user.User"/>
+        <typeAlias alias="teacher" type="cn.njcit.domain.user.Teacher"/>
+        <typeAlias alias="student" type="cn.njcit.domain.user.Student"/>
+
+    </typeAliases>
+
+
+
+
+    <mappers>
+        <mapper resource="cn/njcit/dao/user/impl/Mapper_user.xml"/>
+    </mappers>
+</configuration>
