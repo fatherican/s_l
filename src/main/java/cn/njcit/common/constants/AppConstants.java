@@ -12,14 +12,21 @@ public class AppConstants {
     public static final int OTHER_ERROR=400;//参数错误、等等
 
     /* *************系统总的居中角色，学生、辅导员、学管处**********/
-    public static final Integer STUDENT_ROLE=0;
+    public static final Integer STUDENT_ROLE=0;//学生角色
 
-    public static final Integer INSTRUCTOR__ROLE=1;
+    public static final Integer INSTRUCTOR__ROLE=1;//辅导员角色
 
-    public static final Integer STUDENT_PIPE_ROLE=2;
+    public static final Integer STUDENT_PIPE_ROLE=2;//学管处角色
+
+
+    /* *************请假的类型（课程、天次）************************************/
+    public static final Integer LEAVE_CLASS=0;//课程请假
+
+    public static final Integer LEAVE_DAY=1;//天次请假
+
 
     /**
-     * ubgw-core相关的配置信息
+     * 项目的相关的配置信息
      */
     public static Properties appConfig;
 

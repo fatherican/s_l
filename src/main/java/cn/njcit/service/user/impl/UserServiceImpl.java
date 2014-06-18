@@ -39,15 +39,15 @@ public class UserServiceImpl implements UserService{
         if(user!=null){
             //将查询出来的学生信息或老师信息缓存到redis中
             String userId = user.getUserId();
+            String userJson = "";
             if(isStudent){
                 Student student = (Student) user;
-                String studentJson = JSON.toJSONString(student);
-                stringRedisTemplate.opsForValue().set("stu_"+userId,studentJson,Long.parseLong(AppConstants.appConfig.getProperty("redis.expireTime")));
+                userJson = JSON.toJSONString(student);
             }else{
                 Teacher teacher = (Teacher) user;
-                String teacherJson = JSON.toJSONString(teacher);
-                stringRedisTemplate.opsForValue().set("tea_" + userId, teacherJson, Long.parseLong(AppConstants.appConfig.getProperty("redis.expireTime")));
+                userJson = JSON.toJSONString(teacher);
             }
+            stringRedisTemplate.opsForValue().set(userId, userJson, Long.parseLong(AppConstants.appConfig.getProperty("redis.expireTime")));
         }
         return user;
     }
