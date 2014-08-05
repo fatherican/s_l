@@ -3,18 +3,18 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
          version="2.5">
 
-	<display-name>student leave Application</display-name>
+    <display-name>student leave Application</display-name>
 
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>
-            classpath*:/META-INF/context/appContext-core.xml,
-            classpath*:/META-INF/context/appContext-redis.xml,
-            classpath*:/META-INF/mybatis-config/Mybatis-bean.xml
+            classpath*:/META-INF/context/appContext-*.xml
+            <!--,-->
+            <!--classpath*:/META-INF/mybatis-config/Mybatis-*.xml-->
         </param-value>
     </context-param>
 
-<!--监听器-->
+    <!--监听器-->
     <!-- 加载Spring ApplicationContext -->
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
@@ -23,12 +23,12 @@
     <listener>
         <listener-class>org.springframework.web.util.IntrospectorCleanupListener</listener-class>
     </listener>
-    
 
 
 
-<!--过滤器-->
-     <!--编码转换-->
+
+    <!--过滤器-->
+    <!--编码转换-->
     <filter>
         <filter-name>encodingFilter</filter-name>
         <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
@@ -47,20 +47,29 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
-<!--Servlet-->
+    <!--Servlet-->
     <!--请求分发-->
     <servlet>
-		<servlet-name>mvc-dispatcher</servlet-name>
-		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <servlet-name>mvc-dispatcher</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <init-param>
             <param-name>contextConfigLocation</param-name>
             <param-value>classpath*:/META-INF/mvc/mvc-dispatcher-servlet.xml</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
-	</servlet>
+    </servlet>
 
-	<servlet-mapping>
-		<servlet-name>mvc-dispatcher</servlet-name>
-		<url-pattern>*.do</url-pattern>
-	</servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>mvc-dispatcher</servlet-name>
+        <url-pattern>*.do</url-pattern>
+    </servlet-mapping>
+
+
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+
+
+
 </web-app>

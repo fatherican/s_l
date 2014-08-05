@@ -2,6 +2,8 @@ package cn.njcit.controller.user;
 
 import cn.njcit.common.constants.AppConstants;
 import cn.njcit.common.exception.ParameterException;
+import cn.njcit.common.exception.ServiceException;
+import cn.njcit.common.exception.SessionOutException;
 import cn.njcit.common.util.CommonUtil;
 import cn.njcit.common.util.encrypt.MD5Util;
 import cn.njcit.domain.user.User;
@@ -24,8 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 public class UserController {
 
     @Autowired
-    public UserService userService;
-
+    private UserService userService;
 
     /**
      *用户登录
@@ -33,7 +34,7 @@ public class UserController {
      * @return
      */
     @RequestMapping(value = "/loginIn", produces = {"application/json;charset=UTF-8"})
-    public @ResponseBody String logIn(HttpServletRequest request) {
+    public @ResponseBody String logIn(HttpServletRequest request) throws ServiceException {
         User reqUser = new User();
         String errorMessage = "";
         boolean isError = false;
@@ -58,7 +59,7 @@ public class UserController {
         }
         if(StringUtils.isEmpty(token)){
             isError=true;
-            errorMessage+="不合法用户 \t ";
+            errorMessage+="非法用户 \t ";
         }
         if(StringUtils.isEmpty(requestTime)){
             isError=true;
@@ -66,7 +67,7 @@ public class UserController {
         }
         if(!neededToken.equals(token)){
             isError=true;
-            errorMessage+="不合法用户 \t ";
+            errorMessage+="非法用户 \t ";
         }
 
         if(isError){
@@ -79,10 +80,10 @@ public class UserController {
         try{
             User dbUser = userService.logIn(reqUser);
             if(dbUser!=null){
-                String jsonStr = JSON.toJSONString(dbUser);
-                return CommonUtil.ajaxReturn(AppConstants.SUCCESS,jsonStr,null);
+//                String jsonStr = JSON.toJSONString(dbUser);
+                return CommonUtil.ajaxReturn(AppConstants.SUCCESS,dbUser,null);
             }else{
-                return CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR,"''","用户名或密码错误");
+                return CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR,"","用户名或密码错误");
             }
         }catch (ParameterException e){
            return CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR,"",e.getMessage());

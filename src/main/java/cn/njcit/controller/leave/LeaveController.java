@@ -1,16 +1,26 @@
 package cn.njcit.controller.leave;
 
 import cn.njcit.common.constants.AppConstants;
+import cn.njcit.common.exception.ServiceException;
 import cn.njcit.common.util.CommonUtil;
-import cn.njcit.common.util.UID;
 import cn.njcit.common.util.encrypt.MD5Util;
+import cn.njcit.domain.leave.Leave;
+import cn.njcit.service.leave.LeaveService;
+import cn.njcit.service.user.UserService;
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.commons.lang.time.DateUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,6 +29,12 @@ import java.util.Map;
 @Controller
 @RequestMapping("/leave")
 public class LeaveController {
+
+    @Autowired
+    private LeaveService leaveService;
+
+    @Autowired
+    private UserService userService;
 
 
     /**
@@ -29,13 +45,15 @@ public class LeaveController {
      * @return
      */
     @RequestMapping(value = "addLeave", produces = {"application/json;charset=UTF-8"})
-    public @ResponseBody String addLeave(HttpServletRequest request){
+    public @ResponseBody String addLeave(HttpServletRequest request) throws ServiceException {
         boolean isError = false;//传递参数是否出错
         StringBuffer errorMessage = new StringBuffer();
 
         Map reqMap = new HashMap();
         String userId = request.getParameter("userId");
+        reqMap.put("userId",userId);
         String leaveType = request.getParameter("leaveType");//请假类型
+        reqMap.put("leaveType",leaveType);
         String token = request.getParameter("token");
         String key = AppConstants.appConfig.getProperty("app.key");
         String neededToken = MD5Util.md5Hex(userId + key);
@@ -48,34 +66,67 @@ public class LeaveController {
             isError=true;
             errorMessage.append("不合法用户\t");
         }
-        String studentNote = request.getParameter("student_note");//学生的备注信息
-
+        String studentNote = request.getParameter("studentNote");//学生的备注信息
+        reqMap.put("studentNote",studentNote);
+        String studentMobile = request.getParameter("studentMobile");
+        reqMap.put("studentMobile",studentMobile);
+        /*==================课程请假  所需要的的参数**/
+        String courseIndex = request.getParameter("courseIndex");//所请假的节次
+        String[] teacherNames = request.getParameterValues("teacherName");
+        String[] courseNames = request.getParameterValues("courseName");//课程名
+        String leaveDate = request.getParameter("leaveDate");//请假日期
+        /*==================天数请假类型 所需要的参数==============**/
+        String leaveStartDate = request.getParameter("leaveStartDate");//所请假的开始日期
+        String leaveEndDate = request.getParameter("leaveEndDate");//所请假的结束日期
+        String leaveDays = request.getParameter("leaveDays");//请假天数
         if(AppConstants.LEAVE_CLASS==Integer.parseInt(leaveType)){//课程请假
-            reqMap.put("leaveType",leaveType);
-            String courseIndex = request.getParameter("courseIndex");//所请假的
+            if(StringUtils.isEmpty(courseIndex)){
+                isError=true;
+                errorMessage.append("请假节次为空\t");
+                return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+            }
+            if(StringUtils.isEmpty(courseIndex)){
+                isError=true;
+                errorMessage.append("请假课程为空\t");
+                return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+            }
+            if(StringUtils.isEmpty(leaveDate)){
+                isError=true;
+                errorMessage.append("请假日期为空\t");
+                return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+            }
             reqMap.put("courseIndex",courseIndex);
-            String teacherName = request.getParameter("teacher_name");
-            reqMap.put("teacherName",teacherName);
-            String studentMobile = request.getParameter("student_mobile");
-            reqMap.put("studentMobile",studentMobile);
-            String courseName = request.getParameter("course_name");//课程名
-            reqMap.put("courseName",courseName);
-
+            reqMap.put("teacherName",arrayToString(teacherNames));
+            reqMap.put("courseName",arrayToString(courseNames));
+            reqMap.put("leaveDate",leaveDate);
         }else if(AppConstants.LEAVE_DAY==Integer.parseInt(leaveType)){//天数请假
-
-
-
-
+            if(StringUtils.isEmpty(leaveStartDate)){
+                isError=true;
+                errorMessage.append("请假开始日期为空\t");
+                return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+            }
+            if(StringUtils.isEmpty(leaveEndDate)){
+                isError=true;
+                errorMessage.append("请假结束日期为空\t");
+                return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+            }
+            if(StringUtils.isEmpty(leaveDays)){
+                isError=true;
+                errorMessage.append("请假天数为空\t");
+                return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+            }
+            reqMap.put("leaveStartDate",leaveStartDate);
+            reqMap.put("leaveDate",leaveStartDate);
+            reqMap.put("leaveStartDate",leaveEndDate);
+            reqMap.put("leaveDays",leaveDays);
         }else{
             errorMessage.append("请假类型不匹配\t");
             return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
         }
 
+        int leaveId = leaveService.addLeave(reqMap);
 
-
-
-
-        return null;
+        return  CommonUtil.ajaxReturn(AppConstants.SUCCESS,leaveId+"","请假success");
     }
 
 
@@ -91,8 +142,72 @@ public class LeaveController {
      * @return
      */
     @RequestMapping(value = "studentGetLeaveList", produces = {"application/json;charset=UTF-8"})
-    public @ResponseBody String getLeaveList(HttpServletRequest request){
-        return null;
+    public @ResponseBody String getLeaveList(HttpServletRequest request) throws ParseException {
+        StringBuffer errorMessage = new StringBuffer();
+        Map reqMap = new HashMap();
+        String requestType = request.getParameter("studentQueryLeaveListType");//请求的列表数据类型  1://待审批   2://最新审批 3://审批列表时间段查询
+        String userId = request.getParameter("userId");
+        reqMap.put("userId",userId);
+        reqMap.put("studentId",userId);
+        String token = request.getParameter("token");
+        String key = AppConstants.appConfig.getProperty("app.key");
+        String neededToken = MD5Util.md5Hex(userId + key);
+
+        if(!neededToken.equals(token)){
+            errorMessage.append("不合法用户\t");
+            return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+        }
+        if(StringUtils.isEmpty(requestType)){
+            errorMessage.append("请求列表数据类型为空\t");
+            return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+        }
+
+        String startTime = request.getParameter("startTime");//格式yyyy-MM-dd hh:mm:ss
+        String endTime = request.getParameter("endTime");//格式yyyy-MM-dd hh:mm:ss
+        String pageNum = request.getParameter("pageNum");//页码
+        String pageSize = request.getParameter("pageSize");//每页显示的条数
+        if(StringUtils.isEmpty(pageNum)){
+            errorMessage.append("页码不允许为空\t");
+            return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+        }
+        if(StringUtils.isEmpty(pageSize)){
+            pageSize = "20";
+            return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+        }
+        reqMap.put("pageNum",pageNum);
+        reqMap.put("pageSize",pageSize);
+        int requestTypeNum = Integer.parseInt(requestType);
+        List<Leave> queryResultList = null;
+        switch (requestTypeNum){
+            case 1://待审批
+                String approved = "0";//未审批
+                reqMap.put("approved",false);
+                reqMap.put("studentId",userId);
+                queryResultList = leaveService.queryLeaveList(reqMap);
+                break;
+            case 2://最新审批（最近一周的审批结果，包括已审批和未审批）
+                reqMap.put("studentId",userId);
+                reqMap.put("createTimeStart", DateFormatUtils.format(DateUtils.addWeeks(new Date(),-1),"yyyy-MM-dd HH:mm:ss"));
+                reqMap.put("createTimeEnd", DateFormatUtils.format(new Date(),"yyyy-MM-dd HH:mm:ss"));
+                queryResultList = leaveService.queryLeaveList(reqMap);
+                break;
+            case 3://审批列表时间段查询
+                reqMap.put("studentId",userId);
+                if(StringUtils.isEmpty(startTime)){
+                    errorMessage.append("开始时间不允许为空\t");
+                    return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+                }
+                if(StringUtils.isEmpty(endTime)){
+                    errorMessage.append("结束时间不允许为空\t");
+                    return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+                }
+                reqMap.put("createTimeStart", DateFormatUtils.format(DateUtils.addWeeks(DateUtils.parseDate(startTime,new String[]{"yyyy-MM-dd HH:mm:ss"}),-1),"yyyy-MM-dd HH:mm:ss"));
+                reqMap.put("createTimeEnd", DateFormatUtils.format(DateUtils.parseDate(endTime, new String[]{"yyyy-MM-dd HH:mm:ss"}), "yyyy-MM-dd HH:mm:ss"));
+                queryResultList = leaveService.queryLeaveList(reqMap);
+                break;
+        }
+
+        return  CommonUtil.ajaxReturn(AppConstants.SUCCESS, JSON.toJSONString(queryResultList),"查询success");
     }
 
 
@@ -102,29 +217,103 @@ public class LeaveController {
      * @return
      */
     @RequestMapping(value = "delLeaveItem", produces = {"application/json;charset=UTF-8"})
-    public @ResponseBody String delLeaveItem(HttpServletRequest request){
-        return null;
+    public @ResponseBody String delLeaveItem(HttpServletRequest request) {
+        Map reqMap = new HashMap();
+        StringBuffer errorMessage = new StringBuffer();
+        String userId = request.getParameter("userId");
+        String leaveId = request.getParameter("leaveId");
+        reqMap.put("userId",userId);
+        reqMap.put("leaveId",leaveId);
+        String token = request.getParameter("token");
+        String key = AppConstants.appConfig.getProperty("app.key");
+        String neededToken = MD5Util.md5Hex(userId + key);
+        if(!neededToken.equals(token)){
+            errorMessage.append("不合法用户\t");
+            return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+        }
+        if(StringUtils.isEmpty(leaveId)){
+            errorMessage.append("请假条目ID为空\t");
+            return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+        }
+        int count = 0;
+        try {
+            count = leaveService.delLeaveItem(reqMap);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", e.getMessage());
+        }
+        return  CommonUtil.ajaxReturn(AppConstants.SUCCESS, leaveId, "请假条目已经删除");
     }
 
      /**
-     *辅导员审批
+     *辅导员或学管处审批
      * @param request
      * @return
      */
      @RequestMapping(value = "instructorApproval", produces = {"application/json;charset=UTF-8"})
     public @ResponseBody String instructorApproval(HttpServletRequest request){
-        return null;
-    }
-
-    /**
+         Map reqMap = new HashMap();
+         StringBuffer errorMessage = new StringBuffer();
+         String userId = request.getParameter("userId");
+         String leaveId = request.getParameter("leaveId");
+         String note = request.getParameter("note");//备注信息
+         reqMap.put("userId",userId);
+         reqMap.put("leaveId",leaveId);
+         reqMap.put("note",note);
+         String token = request.getParameter("token");
+         String key = AppConstants.appConfig.getProperty("app.key");
+         String neededToken = MD5Util.md5Hex(userId + key);
+         if(!neededToken.equals(token)){
+             errorMessage.append("不合法用户\t");
+             return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+         }
+         if(StringUtils.isEmpty(userId)){
+             errorMessage.append("用户编号为空\t");
+             return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+         }
+         if(StringUtils.isEmpty(leaveId)){
+             errorMessage.append("请假条目ID为空\t");
+             return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+         }
+         int count = leaveService.updateLeaveApprovedState(reqMap);
+         if(count>0){
+             return  CommonUtil.ajaxReturn(AppConstants.SUCCESS, "","success");
+         }
+         return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "","fail");
+     }
+/*
+    *//**
      *学管处审批
      * @param request
      * @return
-     */
+     *//*
     @RequestMapping(value ="studentPipeApproval", produces = {"application/json;charset=UTF-8"})
     public @ResponseBody String studentPipeApproval(HttpServletRequest request){
-        return null;
-    }
+        Map reqMap = new HashMap();
+        StringBuffer errorMessage = new StringBuffer();
+        String userId = request.getParameter("userId");
+        String leaveId = request.getParameter("leaveId");
+        String note = request.getParameter("note");//备注信息
+        reqMap.put("userId",userId);
+        reqMap.put("leaveId",leaveId);
+        reqMap.put("note",note);
+        String token = request.getParameter("token");
+        String key = AppConstants.appConfig.getProperty("app.key");
+        String neededToken = MD5Util.md5Hex(userId + key);
+        if(!neededToken.equals(token)){
+            errorMessage.append("不合法用户\t");
+            return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+        }
+        if(StringUtils.isEmpty(leaveId)){
+            errorMessage.append("请假条目ID为空\t");
+            return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+        }
+        int count = leaveService.updateLeaveApprovedState(reqMap);
+        if(count>0){
+            return  CommonUtil.ajaxReturn(AppConstants.SUCCESS, "","success");
+        }
+        return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "","fail");
+    }*/
 
 
     /**
@@ -133,7 +322,60 @@ public class LeaveController {
      * @return
      */
     @RequestMapping(value ="studentSickLeave", produces = {"application/json;charset=UTF-8"})
-    public @ResponseBody String studentSickLeave(HttpServletRequest request){
+    public @ResponseBody String studentSickLeave(HttpServletRequest request) throws ServiceException {
+        Map reqMap = new HashMap();
+        StringBuffer errorMessage = new StringBuffer();
+        String userId = request.getParameter("userId");
+        String leaveId = request.getParameter("leaveId");
+        reqMap.put("userId",userId);
+        reqMap.put("leaveId",leaveId);
+        String token = request.getParameter("token");
+        String key = AppConstants.appConfig.getProperty("app.key");
+        String neededToken = MD5Util.md5Hex(userId + key);
+        if(!neededToken.equals(token)){
+            errorMessage.append("不合法用户\t");
+            return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+        }
+        if(StringUtils.isEmpty(userId)){
+            errorMessage.append("用户编号为空\t");
+            return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+        }
+        if(StringUtils.isEmpty(leaveId)){
+            errorMessage.append("请假条目ID为空\t");
+            return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+        }
+        int count = leaveService.sickLeave(reqMap);
+        if(count>0){
+            return  CommonUtil.ajaxReturn(AppConstants.SUCCESS, "","success");
+        }
+        return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "","fail");
+    }
+
+
+    /**
+     *获得该老师(辅导员和学管处)负责的班级
+     * @param request
+     * @return
+     */
+    @RequestMapping(value ="getTeacherManagedClass", produces = {"application/json;charset=UTF-8"})
+    public @ResponseBody String getTeacherManagedClass(HttpServletRequest request){
+        Map reqMap = new HashMap();
+        StringBuffer errorMessage = new StringBuffer();
+        String userId = request.getParameter("userId");
+        reqMap.put("userId",userId);
+        String token = request.getParameter("token");
+        String key = AppConstants.appConfig.getProperty("app.key");
+        String neededToken = MD5Util.md5Hex(userId + key);
+        if(!neededToken.equals(token)){
+            errorMessage.append("不合法用户\t");
+            return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+        }
+        if(StringUtils.isEmpty(userId)){
+            errorMessage.append("用户编号为空\t");
+            return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+        }
+        List<Map> classes = userService.getTeacherManagedClass(reqMap);
+
         return null;
     }
 
@@ -147,19 +389,67 @@ public class LeaveController {
      */
     @RequestMapping(value ="teacherGetLeaveList", produces = {"application/json;charset=UTF-8"})
     public @ResponseBody String teacherGetLeaveList(HttpServletRequest request){
-        return null;
-    }
+        Map reqMap = new HashMap();
+        StringBuffer errorMessage = new StringBuffer();
+        String viewType = request.getParameter("viewType");//请假列表查看类型，1 是按时间查看 2是按照班级查看
+        reqMap.put("viewType",viewType);
+        String userId = request.getParameter("userId");
+        reqMap.put("userId",userId);
+        String pageNum = request.getParameter("pageNum");//页码
+        reqMap.put("pageNum",pageNum);
+        String pageSize = request.getParameter("pageSize");//每页显示的条目
+        reqMap.put("pageSize",pageSize);
+        /*=========根据班级类型来查看请假列表==============*/
+        String classId = request.getParameter("classId");
+        reqMap.put("classId",classId);
+         /*=========根据时间段来查看请假列表==============*/
+        String startTime = request.getParameter("startTime");
+        reqMap.put("startTime",startTime);
+        String endTime = request.getParameter("endTime");
+        reqMap.put("endTime",endTime);
 
-    /**
-     *获得该老师负责的班级
-     * @param request
-     * @return
-     */
-    @RequestMapping(value ="getTeacherManagedClass", produces = {"application/json;charset=UTF-8"})
-    public @ResponseBody String getTeacherManagedClass(HttpServletRequest request){
-        return null;
-    }
+        String token = request.getParameter("token");
+        String key = AppConstants.appConfig.getProperty("app.key");
+        String neededToken = MD5Util.md5Hex(userId + key);
+        if(!neededToken.equals(token)){
+            errorMessage.append("不合法用户\t");
+            return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+        }
+        if(StringUtils.isEmpty(userId)){
+            errorMessage.append("用户编号为空\t");
+            return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+        }
+        if(StringUtils.isEmpty(viewType)){
+            errorMessage.append("列表查看类型为空，1 是按时间查看 2是按照班级查看\t");
+            return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+        }
+        if(StringUtils.isEmpty(pageNum) || !pageNum.matches("\\d*")  || Integer.parseInt(pageNum)<0){
+            errorMessage.append("页码不允许为空且必须大于0\t");
+            return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+        }
+        if(StringUtils.isEmpty(pageSize) || !pageSize.matches("\\d*")  || Integer.parseInt(pageSize)<0){
+            errorMessage.append("每页显示条目数不允许为空且必须大于0\t");
+            return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+        }
 
+        if("1".equals(viewType)){//按照时间查看
+            if(StringUtils.isEmpty(startTime)){
+                errorMessage.append("开始时间不允许为空\t");
+                return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+            }
+            if(StringUtils.isEmpty(endTime)){
+                errorMessage.append("结束时间不允许为空\t");
+                return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+            }
+        }else if("2".equals(viewType)){//按班级查看
+            if(StringUtils.isEmpty(classId)){
+                errorMessage.append("班级不允许为空\t");
+                return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+            }
+        }
+        List<Leave> leaveList = leaveService.getTeacherMangagedLeaveList(reqMap);
+        return  CommonUtil.ajaxReturn(AppConstants.SUCCESS,  JSON.toJSONString(leaveList),"成功");
+    }
 
 
     /**
@@ -168,13 +458,59 @@ public class LeaveController {
      * @return
      */
     @RequestMapping(value ="teacherGetStudentSickedLeaveList", produces = {"application/json;charset=UTF-8"})
-    public @ResponseBody String teacherGetStudentSickedLeaveList(HttpServletRequest request){
-        return null;
+    public @ResponseBody String teacherGetStudentSickedLeaveList(HttpServletRequest request) {
+        Map reqMap = new HashMap();
+        StringBuffer errorMessage = new StringBuffer();
+        String userId = request.getParameter("userId");
+        reqMap.put("userId",userId);
+        String pageNum = request.getParameter("pageNum");//页码
+        reqMap.put("pageNum",pageNum);
+        String pageSize = request.getParameter("pageSize");//每页显示的条目
+        reqMap.put("pageSize",pageSize);
+
+        String token = request.getParameter("token");
+        String key = AppConstants.appConfig.getProperty("app.key");
+        String neededToken = MD5Util.md5Hex(userId + key);
+        if(!neededToken.equals(token)){
+            errorMessage.append("不合法用户\t");
+            return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+        }
+        if(StringUtils.isEmpty(userId)){
+            errorMessage.append("用户编号为空\t");
+            return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+        }
+        if(StringUtils.isEmpty(pageNum) || !pageNum.matches("\\d*")  || Integer.parseInt(pageNum)<0){
+            errorMessage.append("页码不允许为空且必须大于0\t");
+            return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+        }
+        if(StringUtils.isEmpty(pageSize) || !pageSize.matches("\\d*")  || Integer.parseInt(pageSize)<0){
+            errorMessage.append("每页显示条目数不允许为空且必须大于0\t");
+            return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+        }
+
+        List<Leave> leaveList = leaveService.getSickedLeaveList(reqMap);
+        return  CommonUtil.ajaxReturn(AppConstants.SUCCESS,  JSON.toJSONString(leaveList),"成功");
     }
 
 
+    /**
+     * 将字符串数组，转换成 如下格式 “aaaa,bbbb,cccc”
+     * @param arrarys
+     * @return
+     */
+    private String arrayToString(String arrarys[]){
+        StringBuffer strs = new StringBuffer();
+        if(arrarys!=null && arrarys.length>0){
+            for(int i=0;i<arrarys.length;i++){
+                if(i==0){
+                    strs.append(arrarys[i]);
+                }else{
+                    strs.append(","+arrarys[i]);
+                }
 
-
-
+            }
+        }
+        return strs.toString();
+    }
 
 }

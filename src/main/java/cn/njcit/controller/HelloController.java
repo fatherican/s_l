@@ -1,7 +1,8 @@
-package cn.njcit;
+package cn.njcit.controller;
 
+import cn.njcit.service.user.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -14,7 +15,7 @@ import java.io.PrintWriter;
 @RequestMapping("/")
 public class HelloController {
 
-	@RequestMapping(value ="recharge/callback.htm")
+	@RequestMapping(value ="recharge/callback")
 	public @ResponseBody String printWelcome(HttpServletRequest request,HttpServletResponse response) throws IOException {
         String  remoteIp = getRemoteIp(request);
         System.out.println("飞机票  接收到推送的信息,服务器IP:"+remoteIp);

@@ -3,17 +3,16 @@
 <mapper namespace="cn.njcit.dao.user.UserDao">
 
     <!--获得基本用户的信息-->
-    <select id="getUser" parameterType="user" resultType="user" >
-
+    <select id="getUser" parameterType="cn.njcit.domain.user.User" resultType="cn.njcit.domain.user.User" >
 
 
 
     </select>
 
     <!--获得教师的信息-->
-    <select id="getTeacher" parameterType="user"  resultType="teacher">
+    <select id="getTeacher" parameterType="cn.njcit.domain.user.User"  resultType="cn.njcit.domain.user.User">
         select t.teacher_id userId,t.teacher_name name,t.teacher_work_num userNo,
-               t.colleage_id colleageId
+               t.colleage_id colleageId,t.role role
         from  tb_teacher as t
         where 1=1
         <if test="userId!=null and userId!=''">
@@ -33,7 +32,7 @@
     </select>
 
     <!--获得学生的信息-->
-    <select id="getStudent"  parameterType="user"   resultType="student">
+    <select id="getStudent"  parameterType="cn.njcit.domain.user.User"   resultType="cn.njcit.domain.user.User">
         select t.student_id userId,t.student_num userNo,t.student_name name,
                t.colleage_id colleageId,t.professional_id professionalId,t.class_id classId
         from  tb_student as t
@@ -50,6 +49,16 @@
         <if test="name!=null and name!=''">
             and  t.student_name=#{name}
         </if>
+    </select>
+    <select id="getClassesByTeacherId" parameterType="map" resultType="java.util.Map">
+        select tc.class_id,tc.class_name
+        from tb_teacher tt left join tb_teacher_managed_class tmc on tt.teacher_id=tmc.teacher_id left join tb_class tc on tmc.class_id=tc.class_id
+        where tt.teacher_id=#{teacherId}
+    </select>
+    <select id="getClassesByColleageId" parameterType="map" resultType="java.util.Map">
+        select class_id,class_name
+        from tb_class
+        where colleage_id=#{colleageId}
     </select>
 
 

@@ -4,11 +4,6 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <bean id="userDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
-        <property name="mapperInterface" value="cn.njcit.dao.user.UserDao"></property>
-        <property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
-    </bean>
-
 
 
 </beans>

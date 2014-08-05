@@ -1,22 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
-    <context:component-scan base-package="cn.njcit.service.**" />
-    
-    <!--加载系统的配置文件-->
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="ignoreResourceNotFound" value="true"/>
-        <property name="locations">
-            <value>classpath*:/config/config.properties</value>
-        </property>
-    </bean>
-
-    <!--文件上传-->
-    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
-
-
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
     <!-- 配置数据源 -->
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName" value="${datasource1.driverClassName}"></property>
@@ -25,29 +11,71 @@
         <property name="password" value="${datasource1.password}"></property>
     </bean>
 
+
+    <!--配置事物-->
     <bean id="transactionManager"
           class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource" />
     </bean>
+
+
+    <!--<context:annotation-config />-->
+    <!-- 开启事务注解驱动 -->
+    <tx:annotation-driven transaction-manager="transactionManager" />
+    <!--<context:component-scan base-package="cn.njcit.dao" />-->
+    <!--<context:component-scan base-package="cn.njcit.dao.**.impl" />-->
+    <context:component-scan base-package="cn.njcit.service.**.impl" />
+    <context:component-scan base-package="cn.njcit.core.redis" />
+
+
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-        <property name="configLocation" value="classpath:/META-INF/mybatis-config/MyBatis-Configuration.xml"></property>
         <property name="dataSource" ref="dataSource" />
+        <property  name="mapperLocations" >
+            <list>
+                <value>classpath:cn/njcit/dao/user/impl/Mapper_user.xml</value>
+                <value>classpath:cn/njcit/dao/leave/impl/Mapper_leave.xml</value>
+            </list>
+        </property>
+        <!--<property name="configLocation" value="classpath:/META-INF/mybatis-config/MyBatis-Configuration.xml"></property>-->
+    </bean>
+    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="sqlSessionFactory" />
+    </bean>
+
+
+    <bean id="userDaoImpl" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="cn.njcit.dao.user.UserDao"></property>
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+    </bean>
+
+    <bean id="leaveDaoImpl" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="cn.njcit.dao.leave.LeaveDao"></property>
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
     </bean>
 
 
 
 
+    <!--加载系统的配置文件-->
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="ignoreResourceNotFound" value="true"/>
+        <property name="locations">
+            <list>
+                <value>classpath*:/config/config.properties</value>
+                <!-- 正式环境配置 -->
+                <!--<value>file:${CATALINA_BASE}/appconf/config.properties</value>-->
+            </list>
+        </property>
+        <property name="searchSystemEnvironment" value="true" />
+        <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+    </bean>
 
-
-
-
-
-
-
-
-
-    <!-- 加载本地的配置文件 -->
-    <bean id="salePropertyConfigurer" class="cn.njcit.common.AppConfigurer">
+    <!--文件上传-->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
+    <!--全局处理异常信息-->
+    <bean id="exceptionHandler" class="cn.njcit.common.exception.ExceptionHandler"/>
+    <!-- 加载项目的配置文件 -->
+    <bean id="propertyConfigurer" class="cn.njcit.common.AppConfigurer">
         <property name="locations">
             <list>
                 <!-- 本地配置 -->

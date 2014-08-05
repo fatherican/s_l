@@ -11,6 +11,8 @@ public class AppConstants {
 
     public static final int OTHER_ERROR=400;//参数错误、等等
 
+    public static final int SESSION_ERROR=300;//参数错误、等等
+
     /* *************系统总的居中角色，学生、辅导员、学管处**********/
     public static final Integer STUDENT_ROLE=0;//学生角色
 

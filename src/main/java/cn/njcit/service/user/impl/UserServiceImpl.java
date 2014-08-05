@@ -2,15 +2,17 @@ package cn.njcit.service.user.impl;
 
 import cn.njcit.common.constants.AppConstants;
 import cn.njcit.common.exception.ParameterException;
+import cn.njcit.common.exception.ServiceException;
+import cn.njcit.core.redis.RedisInstance;
 import cn.njcit.dao.user.UserDao;
-import cn.njcit.domain.user.Student;
-import cn.njcit.domain.user.Teacher;
 import cn.njcit.domain.user.User;
 import cn.njcit.service.user.UserService;
-import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * 用户相关的操作
@@ -21,11 +23,15 @@ public class UserServiceImpl implements UserService{
 
     @Autowired
     private UserDao userDao;
+
+    @Autowired
+    private RedisInstance redisInstance;
+
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
     @Override
-    public User logIn(User reqUser)  throws ParameterException {
+    public User logIn(User reqUser) throws ParameterException, ServiceException {
         //如果用户查找成功，清空user中的密码，然后，返回User对象。并且把user放入redis。
         //根据角色类型来标记redis的key 。老师是tea_userId  学生是 stu_userId
         boolean isStudent=false;
@@ -35,20 +41,36 @@ public class UserServiceImpl implements UserService{
             isStudent=true;
         }else if(AppConstants.INSTRUCTOR__ROLE.equals(reqUser.getRole())||AppConstants.STUDENT_PIPE_ROLE.equals(reqUser.getRole())){//辅导员
             user = userDao.getTeacher(reqUser);
+            if(user.getRole()!=reqUser.getRole()){
+                throw new ServiceException("权限不对");
+            }
         }
         if(user!=null){
+            user.setRole(reqUser.getRole());
             //将查询出来的学生信息或老师信息缓存到redis中
             String userId = user.getUserId();
             String userJson = "";
-            if(isStudent){
-                Student student = (Student) user;
-                userJson = JSON.toJSONString(student);
-            }else{
-                Teacher teacher = (Teacher) user;
-                userJson = JSON.toJSONString(teacher);
-            }
-            stringRedisTemplate.opsForValue().set(userId, userJson, Long.parseLong(AppConstants.appConfig.getProperty("redis.expireTime")));
+            redisInstance.saveUserInfo(userId,user);
         }
         return user;
+    }
+
+
+    @Override
+    public List<Map> getTeacherManagedClass(Map reqMap) {
+        List<Map> classes = null;
+        String userId = (String) reqMap.get("userId");
+        User user  = redisInstance.getUserInfo(userId);
+        int role = user.getRole();
+        if(AppConstants.INSTRUCTOR__ROLE==role){//辅导员角色
+            //辅导员，根据教师编号来获取其负责的班级
+            reqMap.put("teacherId",userId);
+            classes = userDao.getClassesByTeacherId(reqMap);
+        }else if(AppConstants.STUDENT_PIPE_ROLE==role){//学管处角色
+            Integer colleageId = user.getColleageId();
+            reqMap.put("colleageId",colleageId);
+            classes = userDao.getClassesByColleageId(reqMap);
+        }
+        return classes;
     }
 }

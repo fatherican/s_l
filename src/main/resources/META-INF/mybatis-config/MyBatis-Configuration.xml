@@ -3,18 +3,17 @@
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
 
-    <typeAliases>
-         <!--用户的别名-->
-        <typeAlias alias="user" type="cn.njcit.domain.user.User"/>
-        <typeAlias alias="teacher" type="cn.njcit.domain.user.Teacher"/>
-        <typeAlias alias="student" type="cn.njcit.domain.user.Student"/>
-
-    </typeAliases>
+    <!--<typeAliases>-->
+         <!--&lt;!&ndash;用户的别名&ndash;&gt;-->
+        <!--<typeAlias alias="user" type="cn.njcit.domain.user.User"/>-->
+        <!--<typeAlias alias="leave" type="cn.njcit.domain.leave.Leave"/>-->
+    <!--</typeAliases>-->
 
 
 
 
-    <mappers>
-        <mapper resource="cn/njcit/dao/user/impl/Mapper_user.xml"/>
-    </mappers>
+    <!--<mappers>-->
+        <!--<mapper resource="cn/njcit/dao/user/impl/Mapper_user.xml"/>-->
+        <!--<mapper resource="cn/njcit/dao/leave/impl/Mapper_leave.xml"/>-->
+    <!--</mappers>-->
 </configuration>
