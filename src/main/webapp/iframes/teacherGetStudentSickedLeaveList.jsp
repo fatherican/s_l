@@ -22,7 +22,7 @@
   <script type="text/javascript">
 		$(document).ready(function(){
             window.parent.changeToken("userId + key");
-            window.parent.changeAddress("leave/studentGetLeaveList")
+            window.parent.changeAddress("leave/teacherGetStudentSickedLeaveList")
             $("#submitBT").bind("click",function(){
                 $("#prevId").html("");
                 var host = $(window.parent.document.getElementById("host")).html();
@@ -30,7 +30,7 @@
                 $.ajax({
                     type: "POST",
                     dataType: "html",
-                    url:host+"/leave/studentGetLeaveList.do",
+                    url:host+"/leave/teacherGetStudentSickedLeaveList.do",
                     data: $('#subForm').serialize(),
                     success: function (result) {
                         var strresult=result;
@@ -55,12 +55,7 @@
         <strong>说明</strong>
     </div>
     <div class="alert alert-info">
-        学生获得请假列表。
-        包括：</br>
-         1：待审批</br>
-         2：最新审批（最近一周的审批结果，包括已审批和未审批）</br>
-         3：审批列表时间段查询</br>
-         4:获得已审批未销假列表
+        老师获得学生的销假列表
     </div>
 	<div class="alert alert-info">
 		<strong>请求参数</strong>

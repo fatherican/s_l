@@ -138,6 +138,7 @@ public class LeaveController {
      * 1：待审批
      * 2：最新审批（最近一周的审批结果，包括已审批和未审批）
      * 3：审批列表时间段查询
+     * 4:获得已审批未销假列表
      * @param request
      * @return
      */
@@ -180,8 +181,7 @@ public class LeaveController {
         List<Leave> queryResultList = null;
         switch (requestTypeNum){
             case 1://待审批
-                String approved = "0";//未审批
-                reqMap.put("approved",false);
+                reqMap.put("approvedStates",new String[]{"-1","2"});//-1 未审批  , 2辅导员已审批等待学管处审批
                 reqMap.put("studentId",userId);
                 queryResultList = leaveService.queryLeaveList(reqMap);
                 break;
@@ -201,6 +201,14 @@ public class LeaveController {
                     errorMessage.append("结束时间不允许为空\t");
                     return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
                 }
+                reqMap.put("createTimeStart", DateFormatUtils.format(DateUtils.addWeeks(DateUtils.parseDate(startTime,new String[]{"yyyy-MM-dd HH:mm:ss"}),-1),"yyyy-MM-dd HH:mm:ss"));
+                reqMap.put("createTimeEnd", DateFormatUtils.format(DateUtils.parseDate(endTime, new String[]{"yyyy-MM-dd HH:mm:ss"}), "yyyy-MM-dd HH:mm:ss"));
+                queryResultList = leaveService.queryLeaveList(reqMap);
+                break;
+            case 4://获得已审批未销假列表
+                reqMap.put("approved","1");//已审批
+                reqMap.put("leaveSicked","0");//未销假
+                reqMap.put("studentId",userId);
                 reqMap.put("createTimeStart", DateFormatUtils.format(DateUtils.addWeeks(DateUtils.parseDate(startTime,new String[]{"yyyy-MM-dd HH:mm:ss"}),-1),"yyyy-MM-dd HH:mm:ss"));
                 reqMap.put("createTimeEnd", DateFormatUtils.format(DateUtils.parseDate(endTime, new String[]{"yyyy-MM-dd HH:mm:ss"}), "yyyy-MM-dd HH:mm:ss"));
                 queryResultList = leaveService.queryLeaveList(reqMap);
@@ -375,8 +383,7 @@ public class LeaveController {
             return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
         }
         List<Map> classes = userService.getTeacherManagedClass(reqMap);
-
-        return null;
+        return  CommonUtil.ajaxReturn(AppConstants.SUCCESS, classes,"success");
     }
 
     /**
@@ -454,6 +461,8 @@ public class LeaveController {
 
     /**
      *老师获得学生的销假列表
+     * 1:按照班级来查看
+     * 2：按照时间来查看
      * @param request
      * @return
      */

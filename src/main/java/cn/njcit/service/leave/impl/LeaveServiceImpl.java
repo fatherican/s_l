@@ -121,19 +121,19 @@ public class LeaveServiceImpl implements LeaveService {
                 String leaveType = leaveItem.getLeaveType();//请假类型
                 if(leaveType.equals(String.valueOf(AppConstants.LEAVE_DAY))){//天次请假
                     if(Integer.parseInt(days)>Integer.parseInt(AppConstants.appConfig.getProperty("leave.needSecondApprovedDays"))){
-                        reqMap.put("approved",1);//辅导员已审批，学管处未审批
+                        reqMap.put("approved",2);//辅导员已审批，学管处未审批
                     }else{
-                        reqMap.put("approved",2);//辅导员已审批，无需学管处审批
+                        reqMap.put("approved",1);//辅导员已审批，无需学管处审批
                     }
                 }else{
-                    reqMap.put("approved",2);//辅导员已审批，无需学管处审批
+                    reqMap.put("approved",1);//辅导员已审批，无需学管处审批
                 }
             count = leaveDao.updateLeaveApprovedState(reqMap);
         }else  if(user.getRole().equals(AppConstants.STUDENT_PIPE_ROLE)){//学管处角色
             reqMap.put("role",AppConstants.STUDENT_PIPE_ROLE);
             //修改   学管处审批状态 和  总审批状态,并添加上备注信息
             reqMap.put("studentPipeApproved",true);
-            reqMap.put("approved",2);//学管处审批
+            reqMap.put("approved",1);//学管处审批
             count = leaveDao.updateLeaveApprovedState(reqMap);
         }
         return count;
@@ -150,7 +150,7 @@ public class LeaveServiceImpl implements LeaveService {
             throw new  ServiceException("当前请假条不属于该用户!!!");
         }else{
             String approved = leaveItem.getApproved();
-            if("2".equals(approved)){//已经审批成果的  请假条目，才允许被销假
+            if("1".equals(approved)){//已经审批成果的  请假条目，才允许被销假
                 reqMap.put("leaveSicked",true);
                 reqMap.put("leaveSickDate",DateFormatUtils.format(new Date(),"yyyy-MM-dd HH:mm:ss"));
                 count = leaveDao.sickLeave(reqMap);
@@ -234,7 +234,7 @@ public class LeaveServiceImpl implements LeaveService {
                   reqMap.put("colleageId",colleageId);
             }
             leaveList  = leaveDao.getSickLeaveList(reqMap);
-            //TODO   converLeaveList(leaveList);
+            converLeaveList(leaveList);
         }
         return leaveList;
     }
@@ -268,6 +268,11 @@ public class LeaveServiceImpl implements LeaveService {
                         Date leave_sick_date =DateUtils.parseDate(leave.getLeaveSickDate(), new String[]{"yyyy-MM-dd HH:mm:ss.S"});
                         String leave_sick_dateStr =  DateFormatUtils.format(leave_sick_date, "yyyy-MM-dd HH:mm:ss");
                         leave.setLeaveSickDate(leave_sick_dateStr);
+                    }
+                    if(leave.getLeaveDate()!=null &&  StringUtils.isNotEmpty(leave.getLeaveDate())){
+                        Date leave_date =DateUtils.parseDate(leave.getLeaveDate(), new String[]{"yyyy-MM-dd HH:mm:ss.S"});
+                        String leave_dateStr =  DateFormatUtils.format(leave_date, "yyyy-MM-dd");
+                        leave.setLeaveDate(leave_dateStr);
                     }
                 }
             }

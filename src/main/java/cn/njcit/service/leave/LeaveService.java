@@ -24,6 +24,7 @@ public interface LeaveService {
      *reqMap中存放字段：
      * ①studentId   ②approved (是否已审核的标记) ③createTime  (createTimeStart  , createTimeEnd)
      *④pageNum(页码) ⑤pageSize(每页显示条数)
+     * ⑥approvedStates (审批状态) ，⑦leaveSicked 销假状态(0 未 销假 1 已销假)
      * @param reqMap
      */
     List<Leave> queryLeaveList(Map reqMap);

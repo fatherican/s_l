@@ -27,6 +27,9 @@ public class AppConstants {
     public static final Integer LEAVE_DAY=1;//天次请假
 
 
+
+
+
     /**
      * 项目的相关的配置信息
      */
