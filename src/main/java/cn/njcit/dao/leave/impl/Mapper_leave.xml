@@ -138,6 +138,9 @@
         <if test="colleageId!=null and colleageId!=''">
             and colleage_id=#{colleageId}
         </if>
+        <if test="approved!=null and approved!=''">
+            and approved=#{approved}
+        </if>
         <if test="classes!=null and classes!=''">
             and class_id in
             <foreach collection="classes" item="item" separator="," open="(" close=")">
@@ -159,10 +162,18 @@
         <if test="endTime!=null and endTime!=''">
             and #{endTime}>=create_time
         </if>
-        order by create_time desc
         <if test="leaveSicked!=null and leaveSicked!=''">
             and leave_sicked=#{leaveSicked}
         </if>
+        <choose>
+            <when test="orderBy!=null and orderBy!=''">
+                order by orderBy
+            </when>
+            <otherwise>
+                order by create_time desc
+            </otherwise>
+        </choose>
+
     </select>
     <select id="getSickLeaveList" parameterType="map" resultType="cn.njcit.domain.leave.Leave">
         select  leave_id  as leaveId, student_id as studentId,  student_name as studentName,

@@ -200,14 +200,20 @@ public class LeaveServiceImpl implements LeaveService {
               reqMap.put("classes",classIds);
             }else if(user.getRole()==AppConstants.STUDENT_PIPE_ROLE){//学管处角色
                 Integer colleageId = user.getColleageId();
-                reqMap.put("colleageId",colleageId);
+                reqMap.put("colleageId",colleageId);//只查看自己负责的学院
+                reqMap.put("approved",2);//只查看，需要学管处 审批的列表
             }
 
         }else if("2".equals(viewType)){//按照班级查看
-
+            if(user.getRole().equals(AppConstants.INSTRUCTOR__ROLE)) {//辅导员角色
+                reqMap.put("approved","-1");//只查看，未审批的请假列表
+            }else if (user.getRole()==AppConstants.STUDENT_PIPE_ROLE){//学管处角色
+                reqMap.put("approved",2);//只查看，需要学管处 审批的列表
+            }
         }
+        reqMap.put("orderBy","create_time");
         List<Leave> leaveList = leaveDao.getLeaveList(reqMap);
-        //TODO   converLeaveList(leaveList);
+        converLeaveList(leaveList);
         return leaveList;
     }
 
