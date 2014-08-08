@@ -99,6 +99,9 @@ public class LeaveController {
             reqMap.put("teacherName",arrayToString(teacherNames));
             reqMap.put("courseName",arrayToString(courseNames));
             reqMap.put("leaveDate",leaveDate);
+            //设置开始和结束日期都为请假日期当天
+            reqMap.put("leaveStartDate",leaveDate);
+            reqMap.put("leaveEndDate",leaveDate);
         }else if(AppConstants.LEAVE_DAY==Integer.parseInt(leaveType)){//天数请假
             if(StringUtils.isEmpty(leaveStartDate)){
                 isError=true;
@@ -460,14 +463,14 @@ public class LeaveController {
 
 
     /**
-     *老师获得学生的销假列表
+     *老师（包括，辅导员和学管处）获得学生的销假列表
      * 1:按照班级来查看
      * 2：按照时间来查看
      * @param request
      * @return
      */
     @RequestMapping(value ="teacherGetStudentSickedLeaveList", produces = {"application/json;charset=UTF-8"})
-    public @ResponseBody String teacherGetStudentSickedLeaveList(HttpServletRequest request) {
+    public @ResponseBody String teacherGetStudentSickedLeaveList(HttpServletRequest request) throws ParseException {
         Map reqMap = new HashMap();
         StringBuffer errorMessage = new StringBuffer();
         String userId = request.getParameter("userId");
@@ -495,6 +498,52 @@ public class LeaveController {
         if(StringUtils.isEmpty(pageSize) || !pageSize.matches("\\d*")  || Integer.parseInt(pageSize)<0){
             errorMessage.append("每页显示条目数不允许为空且必须大于0\t");
             return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+        }
+
+
+        String viewType = request.getParameter("viewType");//查看类型 1 按照时间查看 2按照班级查看
+        String leaveSicked = request.getParameter("leaveSicked");//销假状态 0 未销假  1 已销假
+        if(StringUtils.isEmpty(viewType)){
+            errorMessage.append("查看类型为空0\t");
+            return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+        }
+        if(StringUtils.isEmpty(leaveSicked)){
+            errorMessage.append("销假状态为空0\t");
+            return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+        }
+        reqMap.put("viewType",viewType);
+        reqMap.put("leaveSicked",leaveSicked);
+        reqMap.put("currentDate",DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        if ("1".equals(leaveSicked)){//1 已销假 只能查看当前三天销假的数据，按照销假时间倒序排序
+            reqMap.put("leaveSickDateStart", DateFormatUtils.format(DateUtils.addDays(new Date(), -3),"yyyy-MM-dd HH:mm:ss"));
+            reqMap.put("leaveSickDateEnd", DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss"));
+            reqMap.put("leave_sicked","1");
+        }else if("0".equals(leaveSicked)){//未销假，但是时间已经到了销假的时间
+            reqMap.put("leave_sicked",0);
+            reqMap.put("leaveEndDate",DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
+        }
+        if("1".equals(viewType)){//按时间查看并且销假状态为未销假，此时必须要传递startTime  和 endTime
+            if("0".equals(leaveSicked)){//0 未销假  ,查询从startTime 到 endTime 时间段，并且未销假 的条目，时间，按照请假时间正序排序
+                String startTime = request.getParameter("startTime");
+                String endTime = request.getParameter("endTime");
+                if(StringUtils.isEmpty(startTime)){
+                    errorMessage.append("开始时间不允许为空\t");
+                    return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+                }
+                if(StringUtils.isEmpty(endTime)){
+                    errorMessage.append("结束时间不允许为空\t");
+                    return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+                }
+                reqMap.put("createTimeStart", startTime);
+                reqMap.put("createTimeEnd",endTime);
+            }
+        }else{//按班级查看
+            String classId = request.getParameter("classId");
+            if(StringUtils.isEmpty(classId)){
+                errorMessage.append("开始时间不允许为空\t");
+                return  CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+            }
+            reqMap.put("classId",classId);
         }
 
         List<Leave> leaveList = leaveService.getSickedLeaveList(reqMap);

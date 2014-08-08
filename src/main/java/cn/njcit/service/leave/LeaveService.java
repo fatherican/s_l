@@ -68,6 +68,7 @@ public interface LeaveService {
 
     /**
      * 获得销假列表,该方法间接调用 getLeaveList
+     * ①viewType(1 按照时间查看 2按照班级查看) ②sicked(0 未销假  1 已销假)
      * @param reqMap
      * @return
      */

@@ -144,7 +144,15 @@
                 #{item}
             </foreach>
         </if>
-
+        <if test="beginTime!=null and beginTime!=''">
+            and create_time>=#{beginTime}
+        </if>
+        <if test="endTime!=null and endTime!=''">
+            and #{endTime}>=create_time
+        </if>
+        <if test="leaveSicked!=null and leaveSicked!=''">
+            and leave_sicked=#{leaveSicked}
+        </if>
         <choose>
             <when test="start!=null and end==null ">
                 limit #{start},#{end}
@@ -153,16 +161,9 @@
                 limit 20
             </otherwise>
         </choose>
-        <if test="beginTime!=null and beginTime!=''">
-            and create_time>=#{beginTime}
-        </if>
-        <if test="endTime!=null and endTime!=''">
-            and #{endTime}>=create_time
-        </if>
+
         order by create_time desc
-        <if test="leaveSicked!=null and leaveSicked!=''">
-            and leave_sicked=#{leaveSicked}
-        </if>
+
     </select>
     <select id="getSickLeaveList" parameterType="map" resultType="cn.njcit.domain.leave.Leave">
         select  leave_id  as leaveId, student_id as studentId,  student_name as studentName,
@@ -175,8 +176,8 @@
                 create_time as createTime,leave_sicked as leaveSicked,leave_sick_date as leaveSickDate,
                 leave_date as leaveDate
         from tb_leave
-        where 1=1
-        <if test="leave_sicked!=null and leave_sicked!=''">
+        where approved=1
+        <if test="leaveSicked!=null and leaveSicked!=''">
             and leave_sicked=#{leaveSicked}
         </if>
         <if test="colleageId!=null and colleageId!=''">
@@ -188,11 +189,31 @@
                 #{item.class_id}
             </foreach>
         </if>
+        <if test="classId!=null">
+            and class_id =#{classId}
+        </if>
+        <if test="classId!=null">
+            and class_id =#{classId}
+        </if>
+        <if test="leave_sicked==1"><!-- 已销假只查询最近三天的销假记录-->
+           and leave_sick_date >#{leaveSickDateStart} and #{leaveSickDateEnd}>leave_sick_date
+        </if>
+        <if test="leave_sicked==0"><!-- 未销假只查询已经审批的请假列表-,并且当前日期大于截止日期的假条-->
+            and #{leaveEndDate}>leave_end_date
+        </if>
+        <choose>
+            <when test="start!=null and end==null ">
+                limit #{start},#{end}
+            </when>
+            <otherwise>
+                limit 20
+            </otherwise>
+        </choose>
         <if test="leave_sicked==1"><!-- 已经销假的，那么就按照 销假日期排序，倒序排序-->
           order by leave_sick_date desc
         </if>
         <if test="leave_sicked==1"><!-- 未销假的，那么就按照 请假日期 ，倒序排序-->
-            order by leave_date desc
+            order by create_time desc
         </if>
     </select>
 </mapper>

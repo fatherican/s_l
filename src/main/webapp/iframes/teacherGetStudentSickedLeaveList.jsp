@@ -101,10 +101,22 @@
                     <td style="width:10%"></td>
                 </tr>
                 <tr>
+                    <td style="width:10%">请求类型</td>
+                    <td style="width:10%">viewType</td>
+                    <td style="width:10%">1</td>
+                    <td style="width:10%"> 1 按照时间查看 2按照班级查看</td>
+                </tr>
+                <tr>
+                    <td style="width:10%">销假状态 </td>
+                    <td style="width:10%">leaveSicked</td>
+                    <td style="width:10%">0</td>
+                    <td style="width:10%">  0 未销假  1 已销假</td>
+                </tr>
+                <tr>
                     <td colspan="4" style="background:red;">上面的字段对 所有的请求列表数据类型  都适用 </td>
                 </tr>
                 <tr>
-                    <td colspan="4"  style="background:green;text-align: center;">，下面的字段只针对 3（审批列表时间段查询）有效</td>
+                    <td colspan="4"  style="background:green;text-align: center;">如果按照时间查看/td>
                 </tr>
                 <tr>
                     <td style="width:10%">查询开始时间</td>
