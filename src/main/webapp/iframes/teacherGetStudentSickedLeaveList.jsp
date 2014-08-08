@@ -70,12 +70,6 @@
                     <th>备注</th>
                 </tr>
                 <tr>
-                    <td style="width:10%" >请求的列表数据类型</td>
-                    <td style="width:10%">studentQueryLeaveListType</td>
-                    <td style="width:10%">1</td>
-                    <td style="width:10%"> 1:待审批   2:最新审批 3:审批列表时间段查询</td>
-                </tr>
-                <tr>
                     <td style="width:10%">用户ID</td>
                     <td style="width:10%">userId</td>
                     <td style="width:10%">1</td>
@@ -116,7 +110,7 @@
                     <td colspan="4" style="background:red;">上面的字段对 所有的请求列表数据类型  都适用 </td>
                 </tr>
                 <tr>
-                    <td colspan="4"  style="background:green;text-align: center;">如果按照时间查看/td>
+                    <td colspan="4"  style="background:green;text-align: center;">如果按照时间查看,对于已经销假的列表，下面俩个字段没有用，因为只查询3天的</td>
                 </tr>
                 <tr>
                     <td style="width:10%">查询开始时间</td>
@@ -129,6 +123,15 @@
                     <td style="width:10%">endTime</td>
                     <td style="width:10%">2014-09-03  00:00:00</td>
                     <td style="width:10%">格式yyyy-MM-dd hh:mm:ss</td>
+                </tr>
+                <tr>
+                    <td colspan="4"  style="background:green;text-align: center;">按照班级查看</td>
+                </tr>
+                <tr>
+                    <td style="width:10%">班级ID</td>
+                    <td style="width:10%">classId</td>
+                    <td style="width:10%">1</td>
+                    <td style="width:10%"></td>
                 </tr>
 
 			</thead>
@@ -143,26 +146,6 @@
 	<div>
 		<form class="form-inline" name="subForm" method="post" id="subForm">
 			<div class="input-prepend">
-            <p>
-                <span class="add-on">leaveType</span>
-                <select onchange="changeLeaveType();" id="studentQueryLeaveListType" name="studentQueryLeaveListType">
-                    <option value="1">待审批 [1]</option>
-                    <option value="2">最新审批[2]</option>
-                    <option value="3">审批列表时间段查询[3]</option>
-                    <option value="4">获得已审批未销假列表[4]</option>
-                </select>
-                <script type="text/javascript">
-                    $('#studentQueryLeaveListType').change(function() {
-                        var checkIndex=$(this).get(0).selectedIndex;
-                        if(checkIndex==2){//显示时间段参数
-                            $("#oeruidP").show();
-                        }else{//隐藏时间段参数
-                            $("#oeruidP").hide();
-                        }
-                    });
-
-                </script>
-            </p>
 			<p>
 				<span class="add-on">userId</span>
 					<input class="span2" type="text" name="userId" value='1'/>
@@ -173,12 +156,44 @@
                 <span class="add-on">pageSize</span>
                  <input class="span2" type="text" name="pageSize" value='10' />
             </p>
-            <p id="oeruidP" style="display: none;">
+            <p>
+                <span class="add-on">viewType</span>
+                <select onchange="changeLeaveType();" id="viewType" name="viewType">
+                    <option value="1">按照时间查看[1]</option>
+                    <option value="2">按照班级查看[2]</option>
+                </select>
+                <script type="text/javascript">
+                    $('#viewType').change(function() {
+                        var checkIndex=$(this).get(0).selectedIndex;
+                        if(checkIndex==0){//显示时间段参数
+                            $("#timeP").show();
+                            $("#classP").hide();
+                        }else{//隐藏时间段参数
+                            $("#classP").show();
+                            $("#timeP").hide();
+                        }
+                    });
+                </script>
+            </p>
+
+            <p>
+                <span class="add-on">leaveSicked</span>
+                <select  id="leaveSicked" name="leaveSicked">
+                    <option value="0">未销假[0]</option>
+                    <option value="1">已销假[1]</option>
+                </select>
+            </p>
+            <p id="timeP" >
                 <span class="add-on">startTime</span>
                     <input class="span2" type="text" name="startTime" value='2014-03-03 00:00:00'/>
                 <span class="add-on">endTime</span>
                     <input class="span2" type="text" name="endTime" value='2014-09-03  00:00:00' />
             </p>
+            <p id="classP" style="display: none;">
+                <span class="add-on">classId</span>
+                <input class="span2" type="text" name="classId" value='1'/>
+            </p>
+
                 <p><input type="button" value="提交"  id="submitBT" class="btn" /></p>
 			</div>
 		</form>
