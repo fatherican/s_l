@@ -94,8 +94,8 @@
 			<span onclick="changeIframe('instructorApproval');"><a href="#" class="btn">审批</a></span>
 			<span onclick="changeIframe('studentSickLeave');"><a href="#" class="btn">销假</a></span>
 			<span onclick="changeIframe('getTeacherManagedClass');"><a href="#" class="btn">老师(辅导员和学管处)负责的班级</a></span>
-			<span onclick="changeIframe('teacherGetLeaveList');"><a href="#" class="btn">老师查看请假列表</a></span>
-			<span><a href="#" class="btn">测试</a></span>
+			<span onclick="changeIframe('teacherGetLeaveList');"><a href="#" class="btn">老师查看审批列表</a></span>
+			<span  onclick="changeIframe('teacherGetStudentSickedLeaveList');"><a href="#" class="btn">老师获得销假列表</a></span>
 			<span><a href="#" class="btn">测试</a></span>
 			<span><a href="#" class="btn">测试</a></span>
 			<span><a href="#" class="btn">测试</a></span>

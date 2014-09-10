@@ -4,18 +4,18 @@
 
 
     <insert id="addLeave" parameterType="map" >
-      insert into tb_leave
-      (
-       student_id,student_name,class_id,
-       professional_id,colleage_id,need_second_approve,
-       instructor_note,student_pipe_note,leave_type,
-       course_index,teacher_name,student_mobile,
-       course_name,leave_days,student_note,
-       leave_start_date,leave_end_date,leave_date,
+        insert into tb_leave
+        (
+        student_id,student_name,class_id,
+        professional_id,colleage_id,need_second_approve,
+        instructor_note,student_pipe_note,leave_type,
+        course_index,teacher_name,student_mobile,
+        course_name,leave_days,student_note,
+        leave_start_date,leave_end_date,leave_date,
         create_time
-       )
-      value
-      (
+        )
+        value
+        (
         #{userId},#{name},#{classId},
         #{professionalId},#{colleageId},#{needSecondApprove},
         #{instructorNote},#{studentPipeNote},#{leaveType},
@@ -23,27 +23,27 @@
         #{courseName},#{leaveDays},#{studentNote},
         #{leaveStartDate},#{leaveEndDate},#{leaveDate},
         #{createTime}
-      )
+        )
         <selectKey resultType="java.lang.Short" order="AFTER" keyProperty="leaveId">
             SELECT LAST_INSERT_ID()
         </selectKey>
     </insert>
 
     <select id="queryLeaveList" resultType="cn.njcit.domain.leave.Leave" parameterType="map">
-          select leave_id  as leaveId, student_id as studentId,  student_name as studentName,
-                class_id as classId,professional_id as professionalId, colleage_id as colleageId,
-                need_second_approve as needSecondApprove,instructor_approved as instructorApproved,student_pipe_approved as studentPipeApproved,
-                approved as approved,instructor_note as instructorNote,student_pipe_note as studentPipeNote,
-                leave_type as leaveType,course_index as courseIndex,teacher_name as teacherName,
-                student_mobile as studentMobile,course_name as courseName,leave_days as leaveDays,
-                student_note as studentNote,leave_start_date as leaveStartDate,leave_end_date as leaveEndDate,
-                create_time as createTime,leave_sicked as leaveSicked,leave_sick_date as leaveSickDate,
-                leave_date as leaveDate
+        select leave_id  as leaveId, student_id as studentId,  student_name as studentName,
+        class_id as classId,professional_id as professionalId, colleage_id as colleageId,
+        need_second_approve as needSecondApprove,instructor_approved as instructorApproved,student_pipe_approved as studentPipeApproved,
+        approved as approved,instructor_note as instructorNote,student_pipe_note as studentPipeNote,
+        leave_type as leaveType,course_index as courseIndex,teacher_name as teacherName,
+        student_mobile as studentMobile,course_name as courseName,leave_days as leaveDays,
+        student_note as studentNote,leave_start_date as leaveStartDate,leave_end_date as leaveEndDate,
+        create_time as createTime,leave_sicked as leaveSicked,leave_sick_date as leaveSickDate,
+        leave_date as leaveDate
         from tb_leave
-          where 1=1
-          <if test="studentId!=null and studentId!=''">
-              and student_id=#{studentId}
-          </if>
+        where 1=1
+        <if test="studentId!=null and studentId!=''">
+            and student_id=#{studentId}
+        </if>
         <if test="approved!=null and approved!=''">
             and approved=#{approved}
         </if>
@@ -122,14 +122,14 @@
 
     <select id="getLeaveList" parameterType="map" resultType="cn.njcit.domain.leave.Leave">
         select leave_id  as leaveId, student_id as studentId,  student_name as studentName,
-                class_id as classId,professional_id as professionalId, colleage_id as colleageId,
-                need_second_approve as needSecondApprove,instructor_approved as instructorApproved,student_pipe_approved as studentPipeApproved,
-                approved as approved,instructor_note as instructorNote,student_pipe_note as studentPipeNote,
-                leave_type as leaveType,course_index as courseIndex,teacher_name as teacherName,
-                student_mobile as studentMobile,course_name as courseName,leave_days as leaveDays,
-                student_note as studentNote,leave_start_date as leaveStartDate,leave_end_date as leaveEndDate,
-                create_time as createTime,leave_sicked as leaveSicked,leave_sick_date as leaveSickDate,
-                leave_date as leaveDate
+        class_id as classId,professional_id as professionalId, colleage_id as colleageId,
+        need_second_approve as needSecondApprove,instructor_approved as instructorApproved,student_pipe_approved as studentPipeApproved,
+        approved as approved,instructor_note as instructorNote,student_pipe_note as studentPipeNote,
+        leave_type as leaveType,course_index as courseIndex,teacher_name as teacherName,
+        student_mobile as studentMobile,course_name as courseName,leave_days as leaveDays,
+        student_note as studentNote,leave_start_date as leaveStartDate,leave_end_date as leaveEndDate,
+        create_time as createTime,leave_sicked as leaveSicked,leave_sick_date as leaveSickDate,
+        leave_date as leaveDate
         from tb_leave
         where 1=1
         <if test="classId!=null and classId!=''">
@@ -138,24 +138,12 @@
         <if test="colleageId!=null and colleageId!=''">
             and colleage_id=#{colleageId}
         </if>
-        <if test="approved!=null and approved!=''">
-            and approved=#{approved}
-        </if>
         <if test="classes!=null and classes!=''">
             and class_id in
             <foreach collection="classes" item="item" separator="," open="(" close=")">
                 #{item}
             </foreach>
         </if>
-
-        <choose>
-            <when test="start!=null and end==null ">
-                limit #{start},#{end}
-            </when>
-            <otherwise>
-                limit 20
-            </otherwise>
-        </choose>
         <if test="beginTime!=null and beginTime!=''">
             and create_time>=#{beginTime}
         </if>
@@ -165,29 +153,29 @@
         <if test="leaveSicked!=null and leaveSicked!=''">
             and leave_sicked=#{leaveSicked}
         </if>
+        order by create_time desc
         <choose>
-            <when test="orderBy!=null and orderBy!=''">
-                order by orderBy
+            <when test="start!=null and end!=null ">
+                limit #{start},#{end}
             </when>
             <otherwise>
-                order by create_time desc
+                limit 20
             </otherwise>
         </choose>
-
     </select>
     <select id="getSickLeaveList" parameterType="map" resultType="cn.njcit.domain.leave.Leave">
         select  leave_id  as leaveId, student_id as studentId,  student_name as studentName,
-                class_id as classId,professional_id as professionalId, colleage_id as colleageId,
-                need_second_approve as needSecondApprove,instructor_approved as instructorApproved,student_pipe_approved as studentPipeApproved,
-                approved as approved,instructor_note as instructorNote,student_pipe_note as studentPipeNote,
-                leave_type as leaveType,course_index as courseIndex,teacher_name as teacherName,
-                student_mobile as studentMobile,course_name as courseName,leave_days as leaveDays,
-                student_note as studentNote,leave_start_date as leaveStartDate,leave_end_date as leaveEndDate,
-                create_time as createTime,leave_sicked as leaveSicked,leave_sick_date as leaveSickDate,
-                leave_date as leaveDate
+        class_id as classId,professional_id as professionalId, colleage_id as colleageId,
+        need_second_approve as needSecondApprove,instructor_approved as instructorApproved,student_pipe_approved as studentPipeApproved,
+        approved as approved,instructor_note as instructorNote,student_pipe_note as studentPipeNote,
+        leave_type as leaveType,course_index as courseIndex,teacher_name as teacherName,
+        student_mobile as studentMobile,course_name as courseName,leave_days as leaveDays,
+        student_note as studentNote,leave_start_date as leaveStartDate,leave_end_date as leaveEndDate,
+        create_time as createTime,leave_sicked as leaveSicked,leave_sick_date as leaveSickDate,
+        leave_date as leaveDate
         from tb_leave
-        where 1=1
-        <if test="leave_sicked!=null and leave_sicked!=''">
+        where approved=1
+        <if test="leaveSicked!=null and leaveSicked!=''">
             and leave_sicked=#{leaveSicked}
         </if>
         <if test="colleageId!=null and colleageId!=''">
@@ -199,11 +187,34 @@
                 #{item.class_id}
             </foreach>
         </if>
+        <if test="classId!=null and classId!=''">
+            and class_id =#{classId}
+        </if>
+        <if test="leave_sicked==1"><!-- 已销假只查询最近三天的销假记录-->
+            and leave_sick_date >#{leaveSickDateStart} and #{leaveSickDateEnd}>leave_sick_date
+        </if>
+        <if test="leave_sicked==0"><!-- 未销假只查询已经审批的请假列表-,并且当前日期大于截止日期的假条-->
+            and #{leaveEndDate}>leave_end_date
+        </if>
+        <if test="createTimeStart!=null and createTimeStart!=''">
+            and create_time>=#{createTimeStart}
+        </if>
+        <if test="createTimeEnd!=null and createTimeEnd!=''">
+            and #{createTimeEnd}>=create_time
+        </if>
         <if test="leave_sicked==1"><!-- 已经销假的，那么就按照 销假日期排序，倒序排序-->
-          order by leave_sick_date desc
+            order by leave_sick_date desc
         </if>
-        <if test="leave_sicked==1"><!-- 未销假的，那么就按照 请假日期 ，倒序排序-->
-            order by leave_date desc
+        <if test="leave_sicked==0"><!-- 未销假的，那么就按照 请假日期 ，倒序排序-->
+            order by create_time desc
         </if>
+        <choose>
+            <when test="start!=null and end!=null ">
+                limit #{start},#{end}
+            </when>
+            <otherwise>
+                limit 20
+            </otherwise>
+        </choose>
     </select>
 </mapper>

@@ -40,7 +40,7 @@ public class LeaveServiceImpl implements LeaveService {
     @Override
     public int addLeave(Map reqMap) throws ServiceException {
         String leaveType = (String) reqMap.get("leaveType");//请假类型
-        reqMap.put("createTime", DateFormatUtils.format(new Date(),"yyyy-MM-dd"));
+        reqMap.put("createTime", DateFormatUtils.format(new Date(),"yyyy-MM-dd HH:mm:ss"));
         reqMap.put("needSecondApprove",false);//给予是否需要第二次审批一个默认值
        if(AppConstants.LEAVE_DAY==Integer.parseInt(leaveType)) {//天数请假
            String leaveDays = (String) reqMap.get("leaveDays");//请假天数
@@ -197,7 +197,8 @@ public class LeaveServiceImpl implements LeaveService {
                   classIds[i]= (String) map.get("class_id");
                   i++;
               }
-              reqMap.put("classes",classIds);
+              if(classIds!=null && classIds.length>0)
+                reqMap.put("classes",classIds);
             }else if(user.getRole()==AppConstants.STUDENT_PIPE_ROLE){//学管处角色
                 Integer colleageId = user.getColleageId();
                 reqMap.put("colleageId",colleageId);//只查看自己负责的学院
@@ -219,6 +220,8 @@ public class LeaveServiceImpl implements LeaveService {
 
     @Override
     public List<Leave> getSickedLeaveList(Map reqMap) {
+        //所有的销假，都是基于 老师已经审批的基础上
+
         String pageNum = (String) reqMap.get("pageNum");
         String pageSize = (String) reqMap.get("pageSize");
         Integer start = (Integer.parseInt(pageNum)-1)*(Integer.parseInt(pageSize));
@@ -229,19 +232,21 @@ public class LeaveServiceImpl implements LeaveService {
         String userId = (String) reqMap.get("userId");
         User user = redisInstance.getUserInfo(userId);
         Integer role = user.getRole();
-        if(role!=AppConstants.STUDENT_ROLE){
-            reqMap.put("leave_sicked",1);
-            if(role==AppConstants.INSTRUCTOR__ROLE){//当前用户辅导员角色
-                  reqMap.put("teacherId",user.getUserId());
-                  List<Map> classesList = userDao.getClassesByTeacherId(reqMap);
-                  reqMap.put("classList",classesList);
-            }else if(role==AppConstants.STUDENT_PIPE_ROLE){//学管处角色
-                  Integer colleageId = user.getColleageId();
-                  reqMap.put("colleageId",colleageId);
+        if("1".equals(reqMap.get("viewType"))){//按照时间查看，此时必须先获得该老师负责的班级
+            if(role!=AppConstants.STUDENT_ROLE){
+                if(role==AppConstants.INSTRUCTOR__ROLE){//当前用户辅导员角色
+                    reqMap.put("teacherId",user.getUserId());
+                    List<Map> classesList = userDao.getClassesByTeacherId(reqMap);
+                    reqMap.put("classList",classesList);
+                }else if(role==AppConstants.STUDENT_PIPE_ROLE){//学管处角色
+                    Integer colleageId = user.getColleageId();
+                    reqMap.put("colleageId",colleageId);
+                }
             }
-            leaveList  = leaveDao.getSickLeaveList(reqMap);
-            converLeaveList(leaveList);
         }
+
+        leaveList  = leaveDao.getSickLeaveList(reqMap);
+        converLeaveList(leaveList);
         return leaveList;
     }
 

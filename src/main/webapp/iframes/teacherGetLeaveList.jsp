@@ -143,7 +143,7 @@
 			<div class="input-prepend">
             <p>
                 <span class="add-on">viewType</span>
-                <select  id="studentQueryLeaveListType" name="studentQueryLeaveListType">
+                <select  id="studentQueryLeaveListType" name="viewType">
                     <option value="1">按时间查看 [1]</option>
                     <option value="2">按照班级查看[2]</option>
                 </select>
@@ -153,18 +153,20 @@
                         if(checkIndex==0){//显示时间段参数
                             $("#oeruidP").show();
                             $("#classP").hide();
+                            $("#classId").val("");
                         }else{//隐藏时间段参数
                             $("#oeruidP").hide();
                             $("#classP").show();
+                            $("#classId").val("1");
                         }
                     });
                 </script>
             </p>
 			<p>
 				<span class="add-on">userId</span>
-					<input class="span2" type="text" name="userId" value='1'/>
+					<input class="span2" type="text" name="userId" value='201407261644000001'/>
                 <span class="add-on">token</span>
-                    <input class="span2" type="text" name="token" value='eeafb716f93fa090d7716749a6eefa72' />
+                    <input class="span2" type="text" name="token" value='0b7403611d4ad964cc4c2b6cffbc87f1' />
                 <span class="add-on">pageNum</span>
                     <input class="span2" type="text" name="pageNum" value='1' />
                 <span class="add-on">pageSize</span>
@@ -180,7 +182,7 @@
             <%--按照班级来查询--%>
             <p id="classP" style="display: none;">
                 <span class="add-on">classId</span>
-                    <input class="span2" type="text" name="classId" value='1'/>
+                    <input class="span2" type="text" name="classId" id="classId" value=''/>
             </p>
                 <p><input type="button" value="提交"  id="submitBT" class="btn" /></p>
 			</div>
