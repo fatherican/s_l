@@ -47,4 +47,9 @@ public class TestController {
     }
 
 
+    @RequestMapping("loginPage")
+    public String loginPage(HttpServletRequest reqeust,HttpServletResponse response){
+
+        return "/web/login";
+    }
 }

@@ -26,5 +26,31 @@ public class CommonUtil {
         return JSON.toJSONString(map);
     }
 
+    /**
+     * 封装Ajax返回
+     * @param data         返回的数据
+     * @return
+     */
+    public static Map ajaxSuccess(Object data){
+        Map map = new HashMap();
+        map.put("code","200");
+        map.put("data",data);
+        map.put("msg","");
+        return map;
+    }
+
+
+    /**
+     * 封装Ajax返回
+     * @param data         返回的数据
+     * @return
+     */
+    public static Map ajaxFail(Object data,String message){
+        Map map = new HashMap();
+        map.put("code","500");
+        map.put("data",data);
+        map.put("msg",message==null?"":message);
+        return map;
+    }
 
 }

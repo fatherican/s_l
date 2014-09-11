@@ -20,9 +20,9 @@
 //import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 //import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 //
-////@RunWith(SpringJUnit4ClassRunner.class)
-////@WebAppConfiguration
-////@ContextConfiguration("file:src/main/webapp/WEB-INF/mvc-dispatcher-servlet.xml")
+//@RunWith(SpringJUnit4ClassRunner.class)
+//@WebAppConfiguration
+//@ContextConfiguration("file:src/main/resources/META-INF/context/appContext-core.xml")
 //public class AppTests {
 //   /* private MockMvc mockMvc;
 //
