@@ -34,7 +34,7 @@
     <!--获得学生的信息-->
     <select id="getStudent"  parameterType="cn.njcit.domain.user.User"   resultType="cn.njcit.domain.user.User">
         select t.student_id userId,t.student_num userNo,t.student_name name,
-               t.colleage_id colleageId,t.professional_id professionalId,t.class_id classId
+               t.colleage_id colleageId,t.professional_id professionalId,t.class_id classId,t.class_name className
         from  tb_student as t
         where 1=1
         <if test="userId!=null and userId!=''">

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.njcit.web.dao.leave.WebLeaveDao">
+
+
+    <select id="queryLeave" resultType="cn.njcit.web.controller.leave.LeaveItem" parameterType="cn.njcit.web.controller.leave.leaveQueryForm">
+        select
+        student_id  studentId, user_no  userNo,
+        student_name  studentName,class_name  className,
+        professional_id  , colleage_id  , need_second_approve  ,
+        instructor_approved  , student_pipe_approved  , approved  ,
+        instructor_note  , student_pipe_note  , leave_type  ,
+        course_index  , teacher_name  , student_mobile  ,
+        course_name  , leave_days  , student_note  ,
+        leave_start_date  , leave_end_date  , create_time  ,
+        leave_sicked  , leave_sick_date  , leave_date
+        from tb_leave tl left join tb_colleage on
+
+
+
+    </select>
+</mapper>

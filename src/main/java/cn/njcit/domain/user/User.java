@@ -18,6 +18,7 @@ public class User implements Serializable{
 
     //学生应该有的字段
     private Integer classId;//班级ID
+    private String class_name;
     private Integer professionalId;//专业Id
 
 
@@ -86,5 +87,9 @@ public class User implements Serializable{
 
     public void setProfessionalId(Integer professionalId) {
         this.professionalId = professionalId;
+    }
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
     }
 }

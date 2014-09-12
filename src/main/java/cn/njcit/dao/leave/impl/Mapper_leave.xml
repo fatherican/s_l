@@ -6,22 +6,22 @@
     <insert id="addLeave" parameterType="map" >
         insert into tb_leave
         (
-        student_id,student_name,class_id,
+        student_id,student_name,class_id,user_no,
         professional_id,colleage_id,need_second_approve,
         instructor_note,student_pipe_note,leave_type,
         course_index,teacher_name,student_mobile,
         course_name,leave_days,student_note,
-        leave_start_date,leave_end_date,leave_date,
+        leave_start_date,leave_end_date,leave_date,class_name,
         create_time
         )
         value
         (
-        #{userId},#{name},#{classId},
+        #{userId},#{name},#{classId},#{userNo},
         #{professionalId},#{colleageId},#{needSecondApprove},
         #{instructorNote},#{studentPipeNote},#{leaveType},
         #{courseIndex},#{teacherName},#{studentMobile},
         #{courseName},#{leaveDays},#{studentNote},
-        #{leaveStartDate},#{leaveEndDate},#{leaveDate},
+        #{leaveStartDate},#{leaveEndDate},#{leaveDate},#{className},
         #{createTime}
         )
         <selectKey resultType="java.lang.Short" order="AFTER" keyProperty="leaveId">

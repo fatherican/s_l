@@ -53,4 +53,17 @@ public class CommonUtil {
         return map;
     }
 
+
+
+
+
+    public static Map reurnDataTable(int total ,Object data,String error){
+        Map map = new HashMap();
+        map.put("recordsTotal",total);
+        map.put("data",data);
+        if(error!=null){
+            map.put("error",error);
+        }
+        return map;
+    }
 }
