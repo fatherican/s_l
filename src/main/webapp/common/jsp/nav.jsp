@@ -3,10 +3,33 @@
     <!-- jQuery Version 1.11.0 -->
     <script src="/resources/bootstrap-sb-admin/js/jquery-1.11.0.js"></script>
     <script type="text/javascript">
+        String.prototype.endWith=function(str){
+            var reg=new RegExp(str+"$");
+            return reg.test(this);
+        }
+
         function showUpdatePasswordModal(){
             $("#updatePasswordModal").modal();
         }
         $(document).ready(function(){
+            //设置active class
+            var hrefVal = location.href;
+            if(hrefVal.endWith("webLeave/checkedIndex.do")){//已审批列表
+                $("#webLeaveCheckA").addClass("active");
+                $("#webLeaveLi").addClass("active");
+            }else if(hrefVal.endWith("webLeave/index.do")){//未审批界面
+                $("#webLeaveUncheckA").addClass("active");
+                $("#webLeaveLi").addClass("active");
+            }else if(hrefVal.endWith("webUser/studentManagerIndex.do")){//学生管理界面
+                $("#webUserLi").addClass("active");
+                $("#webUserStudentA").addClass("active");
+            }else if(hrefVal.endWith("webUser/teacherManagerIndex.do")){//学生管理界面
+                $("#webUserLi").addClass("active");
+                $("#webUserTeacherA").addClass("active");
+            }
+
+
+
             $("#updatePasswordBT").click(function(){
                 var oldPasswordVal = $("#oldPassword").val();
                 var passwordVal = $("#password").val();
@@ -27,17 +50,17 @@
                     type: "POST",
                     dataType: "json",
                     url: "/webUser/updatePassword.do",
-                    data: $('#objForm').serialize(),
+                    data: $('#passwordForm').serialize(),
                     beforeSend:function(){
                         //使form表单不可用
-                        $('#formFieldset').attr("disabled",true);
+                        $('#passwordFormFieldset').attr("disabled",true);
                     },
                     success: function (data) {
-                        $('#formFieldset').attr("disabled",false);
+                        $('#passwordFormFieldset').attr("disabled",false);
                         var code = data["code"];
                         if(code=='200'){
                             $("#updatePasswordModal").modal('hide');
-                            $("#objForm")[0].reset();
+                            $("#passwordForm")[0].reset();
                             alert("密码修改成功");
                             return;
                         }else{
@@ -94,20 +117,27 @@
     <div class="navbar-default sidebar" role="navigation">
         <div class="sidebar-nav navbar-collapse">
             <ul class="nav" id="side-menu">
-                <li class="active">
+                <li id="webLeaveLi">
                     <a href="#"><i class="fa fa-edit fa-fw"></i> 假条审核<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level">
                         <li>
-                            <a class="active" href="#"> 未审批</a>
+                            <a  id="webLeaveUncheckA" href="/webLeave/index.do"> 未审批</a>
                         </li>
                         <li>
-                            <a href="#"> 已审批</a>
+                            <a id="webLeaveCheckA"  href="/webLeave/checkedIndex.do"> 已审批</a>
                         </li>
                     </ul>
-                    <!-- /.nav-second-level -->
                 </li>
-                <li>
-                    <a href="index.jsp"><i class="fa fa-dashboard fa-fw"></i> 人员管理</a>
+                <li id="webUserLi">
+                    <a href="#"><i class="fa fa-dashboard fa-fw"></i> 人员管理<span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level">
+                        <li>
+                            <a  id="webUserStudentA" href="/webUser/studentManagerIndex.do">学生管理</a>
+                        </li>
+                        <li>
+                            <a id="webUserTeacherA"  href="/webUser/teacherManagerIndex.do">教师管理</a>
+                        </li>
+                    </ul>
                 </li>
                 <li>
                     <a href="tables.html"><i class="fa fa-files-o  fa-fw"></i> 信息导入</a>
@@ -129,8 +159,8 @@
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
                 <h4 class="modal-title" id="myModalLabel">修改密码</h4>
             </div>
-            <form class="form-horizontal" id="objForm" name="objForm" role="form" >
-                <fieldset id="formFieldset">
+            <form class="form-horizontal" id="passwordForm" name="passwordForm" role="form" >
+                <fieldset id="passwordFormFieldset">
                     <div class="modal-body">
 
                             <div class="form-group">

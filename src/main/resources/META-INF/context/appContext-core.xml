@@ -33,7 +33,7 @@
             <list>
                 <value>classpath:cn/njcit/dao/user/impl/Mapper_user.xml</value>
                 <value>classpath:cn/njcit/dao/leave/impl/Mapper_leave.xml</value>
-                <value>classpath:cn/njcit/web/dao/user/impl/Mapper_user.xml</value>
+                <value>classpath:cn/njcit/web/dao/user/impl/Mapper_web_user.xml</value>
                 <value>classpath:cn/njcit/web/dao/leave/impl/Mapper_web_leave.xml</value>
             </list>
         </property>

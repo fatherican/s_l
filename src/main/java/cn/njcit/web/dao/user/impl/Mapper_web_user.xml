@@ -69,11 +69,51 @@
         from tb_teacher tb
         where tb.teacher_work_num=#{userNo} and tb.password=#{password}
     </select>
+    <select id="queryStudentList" parameterType="cn.njcit.web.controller.user.UserQueryForm" resultType="cn.njcit.domain.user.User">
+        select  student_id userId,
+                student_num userNo,
+                student_name   name ,
+                colleage_id   colleageId,
+                colleage_name    colleageName,
+                class_id    classId,
+                class_name   className
+         from tb_student
+        where 1=1
+        <include refid="queryStudentWhereStateMent"/>
+        <if test="orderByName!=null and orderByName!=''">
+            order by ${orderByName} ${orderByOrder}
+        </if>
+        limit #{start},#{length}
+    </select>
+    <select id="queryStudentCount" parameterType="cn.njcit.web.controller.user.UserQueryForm"  resultType="java.lang.Integer">
+        select count(1)
+        from tb_student
+        where 1=1
+        <include refid="queryStudentWhereStateMent"/>
+    </select>
+
+
+    <sql id="queryStudentWhereStateMent">
+        <if test="managedClassList!=null">
+            and class_id in
+            <foreach item="item" collection="managedClassList" separator="," open="(" close=")" index="">
+                #{item.class_id}
+            </foreach>
+        </if>
+        <if test="colleageId!=null and colleageId!=''">
+            and colleage_id =#{colleageId}
+        </if>
+    </sql>
 
     <!--更新密码-->
     <update id="updatePassword" parameterType="cn.njcit.web.controller.user.UserQueryForm">
         update  tb_teacher
         set password=#{password}
         where teacher_id=#{userId}
+    </update>
+    <update id="resetStudentPassword" parameterType="cn.njcit.domain.user.User">
+        update tb_student
+        set password=#{password}
+        where student_id=#{userId}
     </update>
 </mapper>

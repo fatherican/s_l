@@ -1,22 +1,120 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.njcit.web.dao.leave.WebLeaveDao">
+    <update id="checkLeave" parameterType="cn.njcit.web.controller.leave.LeaveCheckForm">
+        update tb_leave
+        <set>
+            approved=#{finalApproved,jdbcType=VARCHAR},
+            <if test="role==1">  <!--辅导员-->
+                instructor_approved = #{approved,jdbcType=VARCHAR},
+                instructor_note = #{note,jdbcType=VARCHAR},
+                instructor_approved_date=#{approvedDate},
+                instructor_id=#{userId},
+            </if>
+            <if test="role==2">  <!-- 学管处-->
+                student_pipe_approved = #{approved,jdbcType=VARCHAR},
+                student_pipe_note = #{note,jdbcType=VARCHAR},
+                student_pipe_approved_date=#{approvedDate},
+                student_pipe_id=#{userId},
+            </if>
+            <if test="role==3">  <!-- 学管处-->
+                instructor_approved = #{approved,jdbcType=VARCHAR},
+                instructor_note = #{note,jdbcType=VARCHAR},
+                instructor_approved_date=#{approvedDate},
+                instructor_id=#{userId},
+                student_pipe_approved = #{approved,jdbcType=VARCHAR},
+                student_pipe_note = #{note,jdbcType=VARCHAR},
+                student_pipe_approved_date=#{approvedDate},
+                student_pipe_id=#{userId},
+            </if>
+        </set>
+        where leave_id=#{leaveId}
+    </update>
 
 
     <select id="queryLeave" resultType="cn.njcit.web.controller.leave.LeaveItem" parameterType="cn.njcit.web.controller.leave.leaveQueryForm">
         select
-        student_id  studentId, user_no  userNo,
-        student_name  studentName,class_name  className,
-        professional_id  , colleage_id  , need_second_approve  ,
-        instructor_approved  , student_pipe_approved  , approved  ,
-        instructor_note  , student_pipe_note  , leave_type  ,
-        course_index  , teacher_name  , student_mobile  ,
-        course_name  , leave_days  , student_note  ,
-        leave_start_date  , leave_end_date  , create_time  ,
-        leave_sicked  , leave_sick_date  , leave_date
-        from tb_leave tl left join tb_colleage on
+        tl.student_id  studentId, tl.user_no  userNo,tl.leave_id leaveId,
+        tl.student_name  studentName,tl.class_name  className,tc.colleage_name colleageName,
+        tl.leave_type  leaveType,tl.leave_start_date  leaveStartDate, tl.leave_end_date  leaveEndDate,
+        tl.leave_days  leaveDays,tl.course_index  courseIndex,tl.create_time  createTime,
+        tl.student_note  studentNote,tl.instructor_note  instructorNote,tl.student_pipe_note studentPipeNote,
+        tl.approved  approved,
+        tl.colleage_id  colleageId, tl.need_second_approve  needSecondApprove,
+        tl.instructor_approved  instructorApproved, tl.student_pipe_approved  studentPipeApproved,
+        tl.teacher_name teacherName, tl.student_mobile  studentMobile,
+        tl.course_name  courseName,
+        tl.leave_sicked  leaveSicked, tl.leave_sick_date  leaveSickDate, tl.leave_date,
+        tl.instructor_approved_date  instructorApprovedDate,tl.student_pipe_approved_date studentPipeApprovedDate,
+        tl.instructor_id instructorId,tl.student_pipe_id studentPipeId
 
+        from tb_leave tl left join tb_colleage  tc on tl.colleage_id=tc.colleage_id
 
+        where 1=1
+        <include refid="queryLeaveWhereStatement"/>
+        <if test="orderByName!=null and orderByName!=''">
+            order by ${orderByName} ${orderByOrder}
+        </if>
+        limit #{start},#{length}
 
     </select>
+    <select id="queryLeaveCount" resultType="java.lang.Integer" parameterType="cn.njcit.web.controller.leave.leaveQueryForm">
+        select count(1)
+        from tb_leave tl left join tb_colleage  tc on tl.colleage_id=tc.colleage_id
+        where 1=1
+        <include refid="queryLeaveWhereStatement"/>
+
+    </select>
+
+
+    <sql id="queryLeaveWhereStatement">
+        <if test="userNo!=null and userNo!=''">
+            and tl.user_no =#{userNo}
+        </if>
+        <if test="studentName!=null and studentName!=''">
+            and tl.student_name =#{studentName}
+        </if>
+        <if test="colleageName!=null and colleageName!=''">
+            and tc.colleage_name =#{colleageName}
+        </if>
+        <if test="leaveType!=null and leaveType!=''">
+            and tl.leave_type =#{leaveType}
+        </if>
+        <if test="leaveSicked!=null and leaveSicked!=''">
+            and tl.leave_sicked=#{leaveSicked}
+        </if>
+        <if test="approved!=null and approved!=''">
+            and tl.approved=#{approved}
+        </if>
+        <if test="instructorApproved!=null and instructorApproved!=''">
+            and tl.instructor_approved=#{instructorApproved}
+        </if>
+        <if test="instructorNotApproved!=null and instructorNotApproved!=''">
+            and tl.instructor_approved!=#{instructorNotApproved}
+        </if>
+        <if test="studentPipeApproved!=null and studentPipeApproved!=''">
+            and tl.student_pipe_approved=#{studentPipeApproved}
+        </if>
+        <if test="studentNotPipeApproved!=null and studentNotPipeApproved!=''">
+            and tl.student_pipe_approved!=#{studentNotPipeApproved}
+        </if>
+
+        <if test="colleageId!=null and colleageId!=''">
+            and tl.colleage_id =#{colleageId}
+        </if>
+
+        <if test="classesList!=null">
+            and tl.class_id in
+            <foreach item="item" collection="classesList" separator="," open="(" close=")" index="">
+                #{item.class_id}
+            </foreach>
+        </if>
+        <if test="approvedStates!=null">
+            and tl.approved in
+            <foreach item="item" collection="approvedStates" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+        </if>
+
+    </sql>
 </mapper>

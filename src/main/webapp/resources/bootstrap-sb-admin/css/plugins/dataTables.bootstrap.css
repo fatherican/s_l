@@ -22,8 +22,9 @@ div.dataTables_info {
 }
 
 div.dataTables_paginate {
-    float: right;
+    /*float: right;*/
     margin: 0;
+    text-align: center;
 }
 
 div.dataTables_paginate ul.pagination {

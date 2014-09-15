@@ -190,7 +190,7 @@ public class LeaveServiceImpl implements LeaveService {
               String teacherId = user.getUserId();
               Map teacherMap = new HashMap();
               teacherMap.put("teacherId",teacherId);
-              List<Map> classes = userDao.getClassesByTeacherId(reqMap);
+              List<Map> classes = userDao.getClassesByTeacherId(teacherMap);
               int i=0;
               String classIds[] = new String[classes.size()];
               for(Map map : classes){

@@ -3,6 +3,7 @@ package cn.njcit.domain.user;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by YK on 2014-06-15.
@@ -15,13 +16,14 @@ public class User implements Serializable{
     private String password;
     private Integer role;//角色
     private Integer colleageId;//学院ID
-
+    private String colleageName;
     //学生应该有的字段
     private Integer classId;//班级ID
-    private String class_name;
+    private String className;//班级名称
     private Integer professionalId;//专业Id
 
-
+    private String token;
+//    private List<SClass> managedClassList;
     public String getUserId() {
         if(StringUtils.isEmpty(userId)) return "";
         return userId;
@@ -91,5 +93,37 @@ public class User implements Serializable{
 
     public static long getSerialVersionUID() {
         return serialVersionUID;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
+//    public List<SClass> getManagedClassList() {
+//        return managedClassList;
+//    }
+//
+//    public void setManagedClassList(List<SClass> managedClassList) {
+//        this.managedClassList = managedClassList;
+//    }
+
+    public String getColleageName() {
+        return colleageName;
+    }
+
+    public void setColleageName(String colleageName) {
+        this.colleageName = colleageName;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

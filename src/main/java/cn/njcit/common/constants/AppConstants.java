@@ -20,6 +20,9 @@ public class AppConstants {
 
     public static final Integer STUDENT_PIPE_ROLE=2;//学管处角色
 
+    public static final Integer ADMIN_ROLE=3;//超级管理员角色
+
+
 
     /* *************请假的类型（课程、天次）************************************/
     public static final Integer LEAVE_CLASS=0;//课程请假

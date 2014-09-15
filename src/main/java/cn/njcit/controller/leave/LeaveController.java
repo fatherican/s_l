@@ -120,7 +120,7 @@ public class LeaveController {
             }
             reqMap.put("leaveStartDate",leaveStartDate);
             reqMap.put("leaveDate",leaveStartDate);
-            reqMap.put("leaveStartDate",leaveEndDate);
+            reqMap.put("leaveEndDate",leaveEndDate);
             reqMap.put("leaveDays",leaveDays);
         }else{
             errorMessage.append("请假类型不匹配\t");

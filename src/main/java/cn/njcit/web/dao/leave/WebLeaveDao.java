@@ -1,5 +1,6 @@
 package cn.njcit.web.dao.leave;
 
+import cn.njcit.web.controller.leave.LeaveCheckForm;
 import cn.njcit.web.controller.leave.LeaveItem;
 import cn.njcit.web.controller.leave.leaveQueryForm;
 
@@ -11,4 +12,8 @@ import java.util.List;
 public interface WebLeaveDao {
 
     List<LeaveItem> queryLeave(leaveQueryForm webQueryForm);
+
+    int queryLeaveCount(leaveQueryForm webQueryForm);
+
+    int checkLeave(LeaveCheckForm leaveItem);
 }
