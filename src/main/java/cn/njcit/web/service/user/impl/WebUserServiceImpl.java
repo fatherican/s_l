@@ -4,12 +4,15 @@ import cn.njcit.common.constants.AppConstants;
 import cn.njcit.common.util.encrypt.MD5Util;
 import cn.njcit.dao.user.UserDao;
 import cn.njcit.domain.user.User;
-import cn.njcit.web.controller.user.UserQueryForm;
+import cn.njcit.web.controller.user.*;
 import cn.njcit.web.dao.user.WebUserDao;
 import cn.njcit.web.service.user.WebUserService;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -70,4 +73,107 @@ public class WebUserServiceImpl implements WebUserService{
         int count  = webUserDao.resetStudentPassword(updateUser);
         return count;
     }
+
+    @Override
+    public List<Colleage> getColleages() {
+        List<Colleage> colleageList = webUserDao.getColleages();
+        return colleageList;
+    }
+
+    @Override
+    public List<TClass> getClasses(Colleage colleage) {
+        List<TClass> classList = webUserDao.getClasses(colleage);
+        return classList;
+    }
+
+    @Override
+    public int addStudent(Student student) {
+        student.setCreateTime(DateFormatUtils.format(new Date(),"yyyy-MM-dd HH:mm:ss"));
+        student.setPassword(MD5Util.md5Hex(student.getPassword()));
+        int count = webUserDao.addStudent(student);
+        return count;
+    }
+
+    @Override
+    public int deleteStudent(String studentId) {
+        int count = webUserDao.deleteStudent(studentId);
+        return count;
+    }
+
+    @Override
+    public int editStudent(Student student) {
+        int count = webUserDao.editStudent(student);
+        return count;
+    }
+
+    @Override
+    public List<User> queryTeacherList(UserQueryForm userQueryForm, User user) {
+        userQueryForm = initTeacherListForm(userQueryForm,user);
+        if(user.getRole().intValue()!=AppConstants.STUDENT_PIPE_ROLE.intValue() && user.getRole().intValue()!=AppConstants.ADMIN_ROLE){// 既不是学管处又不是管理员
+            return null;
+        }
+        List<User> users = webUserDao.queryTeacherList(userQueryForm);
+        if(users!=null){
+            for(User userItem : users){
+                //对每一个用户生成一个token,当对该用户进行编辑操作时需要验证token
+                //加密  sessionUserId+updateUserId+key
+                userItem.setToken(MD5Util.md5Hex(user.getUserId()+userItem.getUserId()+AppConstants.appConfig.getProperty("app.key")));
+            }
+        }
+        return users;
+    }
+
+    @Override
+    public int queryTeacherCount(UserQueryForm userQueryForm, User user) {
+        userQueryForm = initTeacherListForm(userQueryForm,user);
+        if(user.getRole().intValue()!=AppConstants.STUDENT_PIPE_ROLE.intValue() && user.getRole().intValue()!=AppConstants.ADMIN_ROLE){// 既不是学管处又不是管理员
+            return 0;
+        }
+        int count  = webUserDao.queryTeacherCount(userQueryForm);
+
+        return count;
+    }
+
+    /*初始化查询教师列表的Form*/
+    private UserQueryForm initTeacherListForm(UserQueryForm userQueryForm, User user){
+        if(user.getRole().intValue()==AppConstants.STUDENT_PIPE_ROLE.intValue()){//学管处
+            userQueryForm.setColleageId(String.valueOf(user.getColleageId()));
+            userQueryForm.setRole(String.valueOf(AppConstants.INSTRUCTOR__ROLE));//学管处只允许查看辅导员老师的信息
+        }else if(user.getRole().intValue()==AppConstants.ADMIN_ROLE){//管理员角色
+            List<String> roles = new ArrayList<String>();
+            roles.add(AppConstants.INSTRUCTOR__ROLE.toString());
+            roles.add(AppConstants.STUDENT_PIPE_ROLE.toString());
+            userQueryForm.setRoles(roles);
+        }
+        return userQueryForm;
+    }
+
+    @Override
+    public int resetTeacherPassword(User updateUser) {
+        updateUser.setPassword(MD5Util.md5Hex(updateUser.getPassword()));
+        int count  = webUserDao.resetTeacherPassword(updateUser);
+        return count;
+    }
+
+    @Override
+    public int deleteTeacher(String teacherId) {
+        int count = webUserDao.deleteTeacher(teacherId);
+        return count;
+    }
+
+    @Override
+    public int editTeacher(Teacher teacher) {
+        int count = webUserDao.editTeacher(teacher);
+        return count;
+    }
+
+    @Override
+    public int addTeacher(Teacher teacher) {
+        teacher.setCreateTime(DateFormatUtils.format(new Date(),"yyyy-MM-dd HH:mm:ss"));
+        teacher.setPassword(MD5Util.md5Hex(teacher.getPassword()));
+        int count = webUserDao.addTeacher(teacher);
+        return count;
+    }
+
+
 }

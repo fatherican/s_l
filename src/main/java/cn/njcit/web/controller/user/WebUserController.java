@@ -11,6 +11,7 @@ import cn.njcit.web.domain.DataTableForm;
 import cn.njcit.web.service.user.WebUserService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -180,9 +181,7 @@ public class WebUserController {
 
     /**
      * 重置学生密码
-     * @param userQueryForm
      * @param request
-     * @param respons
      * @return
      */
     @RequestMapping(value = "/resetStudentPassword",method = RequestMethod.POST)
@@ -204,6 +203,110 @@ public class WebUserController {
 
     }
 
+
+    /**
+     *获得所有的学院
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping("/getColleages")
+    public @ResponseBody Map  getColleages(HttpServletRequest request,HttpServletResponse response){
+        List<Colleage> colleageList = webUserService.getColleages();
+
+        return CommonUtil.ajaxSuccess(colleageList);
+    }
+
+
+    /**
+     * 获得学院下的某个班级
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "/getClasses")
+    public @ResponseBody Map  getClasses(Colleage colleage,HttpServletRequest request,HttpServletResponse response){
+        List<TClass> classList = webUserService.getClasses(colleage);
+        return CommonUtil.ajaxSuccess(classList);
+    }
+
+
+
+    /**
+     * 新增一个学生
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "/addStudent")
+    public @ResponseBody Map  addStudent(Student student,HttpServletRequest request,HttpServletResponse response){
+        student.setPassword("123456");
+        try{
+            int count  = webUserService.addStudent(student);
+            if(count>0){
+                return CommonUtil.ajaxSuccess(student);
+            }else{
+                return CommonUtil.ajaxFail(null,"学生信息添加失败，请联系管理员");
+            }
+        }catch(DuplicateKeyException dke){//插入重复数据学号
+            return CommonUtil.ajaxFail(null,"该学号已存在，不能重复添加");
+        }
+    }
+
+    /**
+     * 删除学生
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "/deleteStudent")
+    public @ResponseBody Map  deleteStudent(HttpServletRequest request,HttpServletResponse response){
+        String token = request.getParameter("token");
+        String studentId = request.getParameter("studentId");
+        User sessionUser = (User) request.getSession().getAttribute("user");
+        String confirmToken =MD5Util.md5Hex(sessionUser.getUserId()+studentId+AppConstants.appConfig.getProperty("app.key"));
+        if(!confirmToken.equals(token)){
+            return CommonUtil.ajaxFail(null,"不合法");
+        }
+        int count  = webUserService.deleteStudent(studentId);
+        if(count>0){
+            return CommonUtil.ajaxSuccess(null);
+        }else{
+            return CommonUtil.ajaxFail(null,"删除失败");
+        }
+    }
+
+    /**
+     * 编辑学生信息
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "/editStudent")
+    public @ResponseBody Map  editStudent(Student student,HttpServletRequest request,HttpServletResponse response){
+        String token = request.getParameter("token");
+        String studentId = request.getParameter("studentId");
+        User sessionUser = (User) request.getSession().getAttribute("user");
+        String confirmToken =MD5Util.md5Hex(sessionUser.getUserId()+studentId+AppConstants.appConfig.getProperty("app.key"));
+        if(!confirmToken.equals(token)){
+            return CommonUtil.ajaxFail(null,"不合法");
+        }
+        try{
+            int count  = webUserService.editStudent(student);
+            if(count>0){
+                return CommonUtil.ajaxSuccess(null);
+            }else{
+                return CommonUtil.ajaxFail(null,"学生信息编辑失败,请联系管理员");
+            }
+        }catch(DuplicateKeyException dke){//插入重复数据学号
+            return CommonUtil.ajaxFail(null,"该学号已存在");
+        }
+    }
+
+
+
+
+
     /**
      * 老师管理界面首页
      * @param request
@@ -217,8 +320,111 @@ public class WebUserController {
 
 
 
+    @RequestMapping(value = "/teacherList",method = RequestMethod.POST)
+    public @ResponseBody Map  teacherList(UserQueryForm userQueryForm, HttpServletRequest request,HttpServletResponse response){
+        //初始化datatable
+        userQueryForm.initDataTable(request);
+        User user = (User) request.getSession().getAttribute("user");
+        //设置自己负责的学院  或  班级
+        Object managedColleageIdOB = request.getSession().getAttribute("managedColleageId");
+        String managedColleageId = managedColleageIdOB==null?null:managedColleageIdOB.toString();
+        userQueryForm.setColleageId(managedColleageId);
+        Object managedClassesOB = request.getSession().getAttribute("managedClasses");
+        List<Map> classesList = managedClassesOB==null?null: (List<Map>) managedClassesOB;
+        userQueryForm.setManagedClassList(classesList);
+        //查询学生列表
+        List<User> userList  = webUserService.queryTeacherList(userQueryForm, user);
+        int totalCount  = webUserService.queryTeacherCount(userQueryForm,user);
+        return CommonUtil.reurnDataTable(totalCount, userList, null);
+    }
 
+    @RequestMapping(value = "/resetTeacherPassword",method = RequestMethod.POST)
+    public @ResponseBody Map  resetTeacherPassword(User updateUser,  HttpServletRequest request,HttpServletResponse response){
+        User user = (User) request.getSession().getAttribute("user");
+        //加密  sessionUserId+updateUserId+key
+        //违法用户修改
+        if(!updateUser.getToken().equals(MD5Util.md5Hex(user.getUserId()+updateUser.getUserId()+AppConstants.appConfig.getProperty("app.key")))){
+            return null;
+        }else{
+            int count  = webUserService.resetTeacherPassword(updateUser);
+            if(count>0){
+                return CommonUtil.ajaxSuccess(true);
+            }else{
+                return CommonUtil.ajaxFail(null,"密码重置失败，请联系管理员");
+            }
 
+        }
+    }
 
+    /**
+     * 删除 辅导员
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "/deleteTeacher")
+    public @ResponseBody Map  deleteTeacher(HttpServletRequest request,HttpServletResponse response){
+        String token = request.getParameter("token");
+        String teacherId = request.getParameter("teacherId");
+        User sessionUser = (User) request.getSession().getAttribute("user");
+        String confirmToken =MD5Util.md5Hex(sessionUser.getUserId()+teacherId+AppConstants.appConfig.getProperty("app.key"));
+        if(!confirmToken.equals(token)){
+            return CommonUtil.ajaxFail(null,"不合法");
+        }
+        int count  = webUserService.deleteTeacher(teacherId);
+        if(count>0){
+            return CommonUtil.ajaxSuccess(null);
+        }else{
+            return CommonUtil.ajaxFail(null,"删除失败");
+        }
+    }
+
+    /**
+     * 编辑老师信息
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "/editTeacher")
+    public @ResponseBody Map  editTeacher(Teacher teacher,HttpServletRequest request,HttpServletResponse response){
+        String token = request.getParameter("token");
+        String teacherId = request.getParameter("teacherId");
+        User sessionUser = (User) request.getSession().getAttribute("user");
+        String confirmToken =MD5Util.md5Hex(sessionUser.getUserId()+teacherId+AppConstants.appConfig.getProperty("app.key"));
+        if(!confirmToken.equals(token)){
+            return CommonUtil.ajaxFail(null,"不合法");
+        }
+        try{
+            int count  = webUserService.editTeacher(teacher);
+            if(count>0){
+                return CommonUtil.ajaxSuccess(null);
+            }else{
+                return CommonUtil.ajaxFail(null,"老师信息编辑失败,请联系管理员");
+            }
+        }catch(DuplicateKeyException dke){//插入重复数据学号
+            return CommonUtil.ajaxFail(null,"该工号已存在");
+        }
+    }
+
+    /**
+     * 新增一个学生
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "/addTeacher")
+    public @ResponseBody Map  addTeacher(Teacher teacher,HttpServletRequest request,HttpServletResponse response){
+        teacher.setPassword("123456");
+        try{
+            int count  = webUserService.addTeacher(teacher);
+            if(count>0){
+                return CommonUtil.ajaxSuccess(teacher);
+            }else{
+                return CommonUtil.ajaxFail(null,"学生信息添加失败，请联系管理员");
+            }
+        }catch(DuplicateKeyException dke){//插入重复数据学号
+            return CommonUtil.ajaxFail(null,"该学号已存在，不能重复添加");
+        }
+    }
 
 }

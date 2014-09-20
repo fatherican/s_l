@@ -18,6 +18,12 @@ public class UserQueryForm  extends DataTableForm implements Serializable{
     private List<Map> managedClassList ;//负责的班级列表
     private String colleageId;//负责的学院Id
 
+    private String role;//角色
+    private String name; //姓名
+    private String colleageName;//学院的名字
+
+    private List<String> roles;//
+
     public UserQueryForm() {
     }
 
@@ -59,5 +65,37 @@ public class UserQueryForm  extends DataTableForm implements Serializable{
 
     public void setColleageId(String colleageId) {
         this.colleageId = colleageId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getColleageName() {
+        return colleageName;
+    }
+
+    public void setColleageName(String colleageName) {
+        this.colleageName = colleageName;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
     }
 }

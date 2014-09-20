@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib  uri="http://java.sun.com/jstl/core_rt" prefix="c" %>
 <html lang="en">
 
 <head>
@@ -78,9 +79,8 @@
                             <table class="table table-striped table-bordered table-hover" id="leavelist-table">
                                 <thead>
                                 <tr>
-                                    <th>学号</th>
+                                    <th>工号</th>
                                     <th>姓名</th>
-                                    <th>班级</th>
                                     <th>学院</th>
                                     <th>操作</th>
                                 </tr>
@@ -111,24 +111,22 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title" id="addModalLabel">学生信息添加(初始密码为  123456)</h4>
+                <h4 class="modal-title" id="addModalLabel">教师信息添加(初始密码为  123456)</h4>
             </div>
-            <form class="form-horizontal" id="addStudentForm" name="addStudentForm" role="form" >
-                <fieldset id="addStudentFormFieldset">
-                    <input type="hidden" name="colleageName" id="addStudentColleageName">
-                    <input type="hidden" name="className" id="addStudentClassName">
+            <form class="form-horizontal" id="addTeacherForm" name="addTeacherForm" role="form" >
+                <fieldset id="addTeacherFormFieldset">
                     <div class="modal-body">
                         <form class="form-horizontal" role="form">
                             <div class="form-group">
-                                <label for="addStudentStudentNum" class="col-sm-2 control-label">学号</label>
+                                <label for="addTeacherTeacherNum" class="col-sm-2 control-label">学号</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" name="studentNum" id="addStudentStudentNum" placeholder="学号">
+                                    <input type="text" class="form-control" name="teacherWorkNum" id="addTeacherTeacherNum" placeholder="工号">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="addStudentStudentName" class="col-sm-2 control-label">姓名</label>
+                                <label for="addTeacherTeacherName" class="col-sm-2 control-label">姓名</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" name="studentName"  id="addStudentStudentName" placeholder="姓名">
+                                    <input type="text" class="form-control" name="teacherName"  id="addTeacherTeacherName" placeholder="姓名">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -138,10 +136,12 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label for="addStudentClassId" class="col-sm-2 control-label">班级</label>
+                            <div class="form-group <c:if test="${user.role not eq '3'}"> sr-only </c:if>" >
+                                <label for="addTeacherRoleId" class="col-sm-2 control-label">角色</label>
                                 <div class="col-sm-10">
-                                    <select class="form-control"  id="addStudentClassId"  name="classId">
+                                    <select class="form-control"  id="addTeacherRoleId"  name="role" <c:if test="${user.role not eq '3'}"> disabled </c:if>>
+                                            <option value="1">辅导员</option>
+                                            <option value="2">学管处</option>
                                     </select>
                                 </div>
                             </div>
@@ -149,7 +149,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                        <button type="button" id="addStudentFormBt" class="btn btn btn-success">确定</button>
+                        <button type="button" id="addTeacherFormBt" class="btn btn btn-success">确定</button>
                     </div>
                 </fieldset>
             </form>
@@ -157,48 +157,40 @@
     </div>
 </div>
 
-<!-- 编辑学生信息 Modal -->
-<div class="modal fade" id="editStudentModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<!-- 编辑 教师信息 Modal -->
+<div class="modal fade" id="editTeacherModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title" id="myModalLabel">学生信息修改</h4>
+                <h4 class="modal-title" id="myModalLabel">教师信息修改</h4>
             </div>
-            <form class="form-horizontal" id="editStudentForm" name="editStudentForm" role="form" >
-                <fieldset id="editStudentFormFieldset">
-                    <input type="hidden" name="token" id="editStudentToken">
-                    <input type="hidden" name="studentId" id="editStudentStudentId">
-                    <input type="hidden" name="colleageName" id="editStudentColleageName">
-                    <input type="hidden" name="className" id="editStudentClassName">
+            <form class="form-horizontal" id="editTeacherForm" name="editTeacherForm" role="form" >
+                <fieldset id="editTeacherFormFieldset">
+                    <input type="hidden" name="token" id="editTeacherToken">
+                    <input type="hidden" name="teacherId" id="editTeacherTeacherId">
+                    <div class="modal-body">
                     <div class="modal-body">
                         <form class="form-horizontal" role="form">
                             <div class="form-group">
-                                <label for="editStudentStudentNum" class="col-sm-2 control-label">学号</label>
+                                <label for="editTeacherTeacherNum" class="col-sm-2 control-label">工号</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" name="studentNum" id="editStudentStudentNum" placeholder="学号">
+                                    <input type="text" class="form-control" name="teacherWorkNum" id="editTeacherTeacherNum" placeholder="工号">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="editStudentStudentName" class="col-sm-2 control-label">姓名</label>
+                                <label for="editTeacherTeacherName" class="col-sm-2 control-label">姓名</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" name="studentName"  id="editStudentStudentName" placeholder="姓名">
+                                    <input type="text" class="form-control" name="teacherName"  id="editTeacherTeacherName" placeholder="姓名">
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label for="editStudentColleageId" class="col-sm-2 control-label">学院</label>
-                                <div class="col-sm-10">
-                                    <select class="form-control" id="editStudentColleageId" name="colleageId">
+                            <div class="form-group" >
+                                <label for="editTeacherColleageId" class="col-sm-2 control-label">学院</label>
+                                <div class="col-sm-10 "  >
+                                    <select class="form-control disabled" id="editTeacherColleageId" name="colleageId" <c:if test="${user.role eq '2'}">disabled</c:if>>
                                     </select>
                                 </div>
 
-                            </div>
-                            <div class="form-group">
-                                <label for="editStudentClassId" class="col-sm-2 control-label">班级</label>
-                                <div class="col-sm-10">
-                                    <select class="form-control"  id="editStudentClassId"  name="classId">
-                                    </select>
-                                </div>
                             </div>
                         </form>
                     </div>
@@ -252,7 +244,7 @@
             </div>
             <fieldset id="deleteUserFormFieldset">
                 <form class="form-horizontal" id="deleteUserForm" name="deleteUserForm" role="form" >
-                        <input type="hidden" name="studentId" id="deleteUserId">
+                        <input type="hidden" name="teacherId" id="deleteUserId">
                         <input type="hidden" name="token"  id="deleteUserToken">
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
@@ -345,8 +337,8 @@
             addStudentModal();
         });
         //新增学生确定 按钮
-        $("#addStudentFormBt").click(function(){
-            submitAddStudentForm();
+        $("#addTeacherFormBt").click(function(){
+            submitaddTeacherForm();
         });
 
 
@@ -390,7 +382,6 @@
                 "columns": [
                     { "data": "userNo"},
                     { "data": "name","orderable": false},
-                    { "data": "className"},
                     { "data": "colleageName","orderable": false},
                     { "data": "cz","width": "20%" ,"orderable": false,"render": function ( data, type, full, meta ) {
                             var userId = full['userId'];
@@ -401,7 +392,7 @@
                             var colleageName = full['colleageName'];
                             var classId = full['classId'];
                             var className = full['className'];
-                            return '<a href="javascript:showResetPasswordModal(\''+userId+'\',\''+token+'\');">重置密码</a>&nbsp;<a href="javascript:editStudentModal(\''+userId+'\',\''+token+'\',\''+userNo+'\',\''+name
+                            return '<a href="javascript:showResetPasswordModal(\''+userId+'\',\''+token+'\');">重置密码</a>&nbsp;<a href="javascript:editTeacherModal(\''+userId+'\',\''+token+'\',\''+userNo+'\',\''+name
                                     +'\',\''+colleageId+'\',\''+colleageName+'\',\''+classId+'\',\''+className+'\');">编辑</a>&nbsp;<a href="javascript:showDeleteUserModal(\''+userId+'\',\''+token+'\')">删除</a>'
                         }
                     }
@@ -410,7 +401,7 @@
                 processing:true,
                 "info": true,
                 ajax: {
-                    url: '/webUser/studentList.do',
+                    url: '/webUser/teacherList.do',
                     type: 'POST',
                     dataType: "json",
                     data: function ( d ) {
@@ -486,7 +477,7 @@
         $.ajax({
             type: "POST",
             dataType: "json",
-            url: "/webUser/resetStudentPassword.do",
+            url: "/webUser/resetTeacherPassword.do",
             data: $('#resetPasswordForm').serialize(),
             beforeSend:function(){
                 //使form表单不可用
@@ -653,32 +644,28 @@
     }
 
     /**
-     * 修改学生信息  modal
+     * 修改教师信息  modal
      */
-    function editStudentModal(userId,token,userNo,name,colleageId,colleageName,classId,className){
-        $("#editStudentStudentId").val(userId);
-        $("#editStudentToken").val(token);
-        $("#editStudentStudentNum").val(userNo);
-        $("#editStudentStudentName").val(name);
-        $("#editStudentColleageName").val(colleageName);
-        $("#editStudentClassName").val(className);
-
+    function editTeacherModal(userId,token,userNo,name,colleageId,colleageName,classId,className){
+        $("#editTeacherTeacherId").val(userId);
+        $("#editTeacherToken").val(token);
+        $("#editTeacherTeacherNum").val(userNo);
+        $("#editTeacherTeacherName").val(name);
 
         //重置学院信息
-        $("#editStudentColleageId").html("");
-        $("#editStudentClassId").html("");
+        $("#editTeacherColleageId").html("");
         //获取学院信息
-        getColleage('editStudentColleageId','editStudentClassId',colleageId,classId);
-        $("#editStudentModal").modal();
+        getColleage('editTeacherColleageId',colleageId);
+        $("#editTeacherModal").modal();
     }
 
     //新增学生form表单提交
-    function submitAddStudentForm(){
-        $("#addStudentFormFieldset").attr("disabled",false);
-        var studentNumVal = $("#addStudentStudentNum").val();
-        var studentNameVal = $("#addStudentStudentName").val();
+    function submitaddTeacherForm(){
+        $("#addTeacherFormFieldset").attr("disabled",false);
+        var studentNumVal = $("#addTeacherTeacherNum").val();
+        var studentNameVal = $("#addTeacherTeacherName").val();
         var colleageIdVal = $("#addStudentColleageId").val();
-        var editStudentClassIdVal = $("#addStudentClassId").val();
+        var editStudentClassIdVal = $("#addTeacherRoleId").val();
         if(studentNumVal==''){
             alert("学号不允许为空");
             return;
@@ -698,11 +685,11 @@
         $.ajax({
             type: "POST",
             dataType: "json",
-            url: "/webUser/addStudent.do",
-            data: $('#addStudentForm').serialize(),
+            url: "/webUser/addTeacher.do",
+            data: $('#addTeacherForm').serialize(),
             beforeSend:function(){
                 //使form表单不可用
-                $('#addStudentFormFieldset').attr("disabled",true);
+                $('#addTeacherFormFieldset').attr("disabled",true);
             },
             success: function (data) {
                 if(data['code']=='200'){
@@ -712,12 +699,12 @@
                     alert(data['msg']);
                 }
                 //使form表单不可用
-                $('#addStudentFormFieldset').attr("disabled",false);
+                $('#addTeacherFormFieldset').attr("disabled",false);
                 $("#addStudentModal").modal('hide');
                 flushPage();
             },
             error: function(data) {
-                $('#addStudentFormFieldset').attr("disabled",false);
+                $('#addTeacherFormFieldset').attr("disabled",false);
                 $("#addStudentModal").modal('hide');
                 alert("系统异常，请联系管理员");
             }
@@ -731,9 +718,9 @@
 
         //重置学院信息
         $("#addStudentColleageId").html("");
-        $("#addStudentClassId").html("");
+        $("#addTeacherRoleId").html("");
         //获取学院信息
-        getColleage('addStudentColleageId','addStudentClassId','','');
+        getColleage('addStudentColleageId','','');
         $("#addStudentModal").modal();
     }
 
@@ -742,19 +729,18 @@
 
 
     /**
-    *提交修改学生信息的表单
+    *提交修改老师信息的表单
      */
     function submitEditStudentForm() {
-        $("#editStudentFormFieldset").attr("disabled",false);
-        var studentNumVal = $("#editStudentStudentNum").val();
-        var studentNameVal = $("#editStudentStudentName").val();
-        var colleageIdVal = $("#editStudentColleageId").val();
-        var editStudentClassIdVal = $("#editStudentClassId").val();
-        if(studentNumVal==''){
+        $("#editTeacherFormFieldset").attr("disabled",false);
+        var teacherNumVal = $("#editTeacherTeacherNum").val();
+        var teacherNameVal = $("#editTeacherTeacherName").val();
+        var colleageIdVal = $("#editTeacherColleageId").val();
+        if(teacherNumVal==''){
             alert("学号不允许为空");
             return;
         }
-        if(studentNameVal==''){
+        if(teacherNameVal==''){
             alert("姓名不允许为空");
             return;
         }
@@ -762,34 +748,29 @@
             alert("学院不允许为空");
             return;
         }
-        if(editStudentClassIdVal=='' || editStudentClassIdVal==null){
-            alert("班级不允许为空");
-            return;
-        }
         $.ajax({
             type: "POST",
             dataType: "json",
-            url: "/webUser/editStudent.do",
-            data: $('#editStudentForm').serialize(),
+            url: "/webUser/editTeacher.do",
+            data: $('#editTeacherForm').serialize(),
             beforeSend:function(){
                 //使form表单不可用
-                $('#editStudentFormFieldset').attr("disabled",true);
+                $('#editTeacherFormFieldset').attr("disabled",true);
             },
             success: function (data) {
                 if(data['code']=='200'){
-                    $("#resetPasswordModal").modal('hide');
                     alert("用户信息修改成功");
                 }else{
                     alert(data['msg']);
                 }
-                //使form表单不可用
-                $('#editStudentFormFieldset').attr("disabled",false);
-                $("#editStudentModal").modal('hide');
+                //使form表单变成可用
+                $('#editTeacherFormFieldset').attr("disabled",false);
+                $("#editTeacherModal").modal('hide');
                 flushPage();
             },
             error: function(data) {
-                $('#editStudentFormFieldset').attr("disabled",false);
-                $("#editStudentModal").modal('hide');
+                $('#editTeacherFormFieldset').attr("disabled",false);
+                $("#editTeacherModal").modal('hide');
                 alert("系统异常，请联系管理员");
             }
 
@@ -800,7 +781,7 @@
         $.ajax({
             type: "POST",
             dataType: "json",
-            url: "/webUser/deleteStudent.do",
+            url: "/webUser/deleteTeacher.do",
             data: $('#deleteUserForm').serialize(),
             beforeSend:function(){
                 //删除用户按钮不可用
@@ -808,7 +789,7 @@
             },
             success: function (data) {
                 if(data['code']=='200'){
-                    alert("学生信息删除成功");
+                    alert("老师信息删除成功");
                     flushPage();
                 }else{
                     alert("系统异常，请联系管理员");
@@ -826,7 +807,7 @@
     }
 
 
-    function getColleage(colleageIdSelect,classIdSelect,colleageId,classId){
+    function getColleage(colleageIdSelect,colleageId,classId){
         $.ajax({
             type: "POST",
             dataType: "json",
@@ -844,17 +825,9 @@
                         }
                     }
                     $("#"+colleageIdSelect).html(optionsStr);
-                    if(colleageIdSelect=='editStudentColleageId'){
-                        $("#editStudentColleageName").val($("#"+colleageIdSelect+"  option:selected").text());
-                    }else if(colleageIdSelect=='addStudentColleageId'){
-                        $("#addStudentColleageName").val($("#"+colleageIdSelect+"  option:selected").text());
-                    }
-                    getClasses(classIdSelect,colleageId,classId);
                 }else{
                     alert("系统异常，请联系管理员");
                 }
-                //使form表单不可用
-                $('#resetPasswordFormFieldset').attr("disabled",false);
             },
             error: function(data) {
                 $("#checkModal").modal('hide');
@@ -864,44 +837,6 @@
         })
     }
 
-    function getClasses(classIdSelect,colleageId,classId){
-        $.ajax({
-            type: "POST",
-            dataType: "json",
-            url: "/webUser/getClasses.do",
-            data: {"colleageId":colleageId},
-            success: function (data) {
-                if(data['code']=='200'){
-                    var classes = data['data'];
-                    var optionsStr = '';
-                    for(var i =0;i<classes.length;i++){
-                        var classItem = classes[i];
-                        if(classId==classItem['classId']){
-                            optionsStr+='<option selected value="'+classItem['classId']+'">'+classItem['className']+'</option>';
-                        }else{
-                            optionsStr+='<option value="'+classItem['classId']+'">'+classItem['className']+'</option>';
-                        }
-                    }
-                    if(classIdSelect=='editStudentClassId'){
-                        $("#editStudentClassId").html(optionsStr);
-                        $("#editStudentClassName").val($("#editStudentClassId  option:selected").text());
-                    }else if(classIdSelect=='addStudentClassId'){
-                        $("#addStudentClassId").html(optionsStr);
-                        $("#addStudentClassName").val($("#addStudentClassId  option:selected").text());
-                    }
-                }else{
-                    alert("系统异常，请联系管理员");
-                }
-                //使form表单不可用
-                $('#resetPasswordFormFieldset').attr("disabled",false);
-            },
-            error: function(data) {
-                $("#checkModal").modal('hide');
-                alert("系统异常，请联系管理员");
-            }
-
-        })
-    }
 
 </script>
 </body>

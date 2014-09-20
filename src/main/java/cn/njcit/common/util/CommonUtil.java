@@ -61,7 +61,12 @@ public class CommonUtil {
         Map map = new HashMap();
         map.put("recordsTotal",total);
         map.put("recordsFiltered",total);
-        map.put("data",data);
+        if(data!=null){
+            map.put("data",data);
+        }else{
+            map.put("data","");
+        }
+
         if(error!=null){
             map.put("error",error);
         }

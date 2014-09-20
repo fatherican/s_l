@@ -168,7 +168,29 @@
             <artifactId>httpclient-cache</artifactId>
             <version>4.1.2</version>
         </dependency>
+        <!--jstl-->
+        <dependency>
+            <groupId>javax.servlet.jsp.jstl</groupId>
+            <artifactId>jstl-api</artifactId>
+            <version>1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>taglibs</groupId>
+            <artifactId>standard</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.web</groupId>
+            <artifactId>jstl-impl</artifactId>
+            <version>1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>jsppager</groupId>
+            <artifactId>pager-taglib</artifactId>
+            <version>1.0</version>
+        </dependency>
+
     </dependencies>
+
 
 
     <build>

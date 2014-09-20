@@ -2,7 +2,7 @@ package cn.njcit.web.service.user;
 
 import cn.njcit.domain.user.User;
 import cn.njcit.web.controller.leave.LeaveItem;
-import cn.njcit.web.controller.user.UserQueryForm;
+import cn.njcit.web.controller.user.*;
 
 import java.util.List;
 import java.util.Map;
@@ -34,4 +34,42 @@ public interface WebUserService {
     int queryStudentCount(UserQueryForm userQueryForm, User user);
 
     int resetStudentPassword(User updateUser);
+
+    /**
+     * 获取所有的学院
+     * @return
+     */
+    List<Colleage> getColleages();
+
+    List<TClass> getClasses(Colleage colleage);
+
+    int addStudent(Student student);
+
+    int deleteStudent(String studentId);
+
+    int editStudent(Student student);
+
+    /**
+     * 查询教师列表
+     * @param userQueryForm
+     * @param user
+     * @return
+     */
+    List<User> queryTeacherList(UserQueryForm userQueryForm, User user);
+
+
+    int queryTeacherCount(UserQueryForm userQueryForm, User user);
+
+    /**
+     * 更新辅导员的密码
+     * @param updateUser
+     * @return
+     */
+    int resetTeacherPassword(User updateUser);
+
+    int deleteTeacher(String teacherId);
+
+    int editTeacher(Teacher teacher);
+
+    int addTeacher(Teacher teacher);
 }

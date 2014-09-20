@@ -1,7 +1,7 @@
 package cn.njcit.web.dao.user;
 
 import cn.njcit.domain.user.User;
-import cn.njcit.web.controller.user.UserQueryForm;
+import cn.njcit.web.controller.user.*;
 
 import java.util.List;
 
@@ -18,4 +18,26 @@ public interface WebUserDao {
     int queryStudentCount(UserQueryForm userQueryForm);
 
     int resetStudentPassword(User updateUser);
+
+    List<Colleage> getColleages();
+
+    List<TClass> getClasses(Colleage colleage);
+
+    int addStudent(Student student);
+
+    int deleteStudent(String studentId);
+
+    int editStudent(Student student);
+
+    List<User> queryTeacherList(UserQueryForm userQueryForm);
+
+    int queryTeacherCount(UserQueryForm userQueryForm);
+
+    int resetTeacherPassword(User updateUser);
+
+    int deleteTeacher(String teacherId);
+
+    int editTeacher(Teacher teacher);
+
+    int addTeacher(Teacher teacher);
 }

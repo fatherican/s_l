@@ -51,6 +51,7 @@ public class User implements Serializable{
         this.password = password;
     }
 
+
     public Integer getRole() {
         return role;
     }

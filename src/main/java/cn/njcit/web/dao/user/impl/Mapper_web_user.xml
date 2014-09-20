@@ -3,6 +3,7 @@
 <mapper namespace="cn.njcit.web.dao.user.WebUserDao">
 
 
+
     <!--&lt;!&ndash;获得基本用户的信息&ndash;&gt;-->
     <!--<select id="getUser" parameterType="cn.njcit.domain.user.User" resultType="cn.njcit.domain.user.User" >-->
 
@@ -93,6 +94,7 @@
     </select>
 
 
+
     <sql id="queryStudentWhereStateMent">
         <if test="managedClassList!=null">
             and class_id in
@@ -116,4 +118,169 @@
         set password=#{password}
         where student_id=#{userId}
     </update>
+
+
+    <select id="getColleages" resultType="cn.njcit.web.controller.user.Colleage">
+        select colleage_id colleageId,colleage_name colleageName
+        from tb_colleage
+        order by colleage_id
+    </select>
+    <select id="getClasses" resultType="cn.njcit.web.controller.user.TClass" parameterType="cn.njcit.web.controller.user.Colleage">
+        select class_id classId, class_name className, professional_id  professionalId ,
+                colleage_id colleageId, create_time createTime
+        from tb_class
+        <where>
+            <if test="colleageId!=null and colleageId!=''">
+                and colleage_id =#{colleageId}
+            </if>
+        </where>
+        order by class_name
+    </select>
+    <select id="queryTeacherList" resultType="cn.njcit.domain.user.User" parameterType="cn.njcit.web.controller.user.UserQueryForm">
+        select
+                tt.teacher_id userId, tt.teacher_work_num  userNo, tt.teacher_name   name,
+                tt.create_time  , tt.colleage_id colleageId, tt.role role,
+                tc.colleage_name colleageName
+        from tb_teacher tt left join tb_colleage tc on tt.colleage_id = tc.colleage_id
+        where 1=1
+        <include refid="queryTeacherWhereStatement"/>
+    </select>
+
+    <select id="queryTeacherCount" resultType="java.lang.Integer"  parameterType="cn.njcit.web.controller.user.UserQueryForm">
+        select count(1)
+        from tb_teacher tt left join tb_colleage tc on tt.colleage_id = tc.colleage_id
+        where 1=1
+        <include refid="queryTeacherWhereStatement"/>
+    </select>
+
+
+    <sql id="queryTeacherWhereStatement">
+        <if test="userId!=null and userId!=''">
+            and tt.teacher_id=#{userId}
+        </if>
+        <if test="userNo!=null and userNo!=''">
+            and tt.teacher_work_num=#{userNo}
+        </if>
+        <if test="name!=null and name!=''">
+            and tt.teacher_name=#{name}
+        </if>
+        <if test="colleageId!=null and colleageId!=''">
+            and tt.colleage_id=#{colleageId}
+        </if>
+        <if test="colleageName!=null and colleageName!=''">
+            and  tc.colleage_name=#{colleageName}
+        </if>
+        <if test="role!=null and role!=''">
+            and  tt.role=#{role}
+        </if>
+        <if test="roles!=null">
+            and tt.role in
+            <foreach item="item" collection="roles" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+        </if>
+    </sql>
+
+    <insert id="addStudent" parameterType="cn.njcit.web.controller.user.Student">
+        insert into tb_student
+        (
+            student_num, student_name,
+            password, create_time, colleage_id,
+            colleage_name, professional_id, professional_name,
+            class_id, class_name
+        )
+        values(
+            #{studentNum},#{studentName},
+            #{password},#{createTime},#{colleageId},
+            #{colleageName},#{professionalId},#{professionalName},
+            #{classId},#{className}
+        )
+        <selectKey resultType="java.lang.String" order="AFTER" keyProperty="studentId">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+
+    <delete id="deleteStudent" parameterType="string">
+        delete from tb_student
+        where student_id=#{studentId}
+    </delete>
+
+    <update id="editStudent" parameterType="cn.njcit.web.controller.user.Student">
+        update tb_student
+        <set>
+            <if test="studentNum!=null and studentNum!=''">
+                student_num=#{studentNum},
+            </if>
+            <if test="studentName!=null and studentName!=''">
+                student_name=#{studentName},
+            </if>
+            <if test="colleageId!=null and colleageId!=''">
+                colleage_id=#{colleageId},
+            </if>
+            <if test="colleageName!=null and colleageName!=''">
+                colleage_name=#{colleageName},
+            </if>
+            <if test="professionalId!=null and professionalId!=''">
+                professional_id=#{professionalId},
+            </if>
+            <if test="professionalName!=null and professionalName!=''">
+                professional_name=#{professionalName},
+            </if>
+            <if test="classId!=null and classId!=''">
+                class_id=#{classId},
+            </if>
+            <if test="className!=null and className!=''">
+                class_name=#{className},
+            </if>
+        </set>
+        where student_id=#{studentId}
+
+    </update>
+
+    <update id="resetTeacherPassword">
+        update tb_teacher
+        set password=#{password}
+        where teacher_id=#{userId}
+    </update>
+
+
+
+    <delete id="deleteTeacher" parameterType="string" >
+        delete from tb_teacher
+        where teacher_id=#{teacherId}
+    </delete>
+
+    <update id="editTeacher" parameterType="cn.njcit.web.controller.user.Teacher">
+        update tb_teacher
+        <set>
+            <if test="teacherWorkNum!=null and teacherWorkNum!=''">
+                teacher_work_num=#{teacherWorkNum},
+            </if>
+            <if test="teacherName!=null and teacherName!=''">
+                teacher_name=#{teacherName},
+            </if>
+            <if test="colleageId!=null and colleageId!=''">
+                colleage_id=#{colleageId},
+            </if>
+        </set>
+        where teacher_id=#{teacherId}
+    </update>
+
+    <insert id="addTeacher" parameterType="cn.njcit.web.controller.user.Teacher">
+        insert into tb_student
+        (
+            teacher_work_num, teacher_name, password,
+            create_time, colleage_id,
+            role
+        )
+        values(
+            #{teacherWorkNum},#{teacherName}, #{password},
+            #{createTime},#{colleageId}, #{className}
+        )
+        <selectKey resultType="java.lang.String" order="AFTER" keyProperty="teacherId">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
 </mapper>
