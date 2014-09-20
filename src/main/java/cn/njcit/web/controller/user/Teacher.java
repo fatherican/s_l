@@ -12,6 +12,7 @@ public class Teacher {
     private String colleageId;
     private String password;
     private String createTime;
+    private String role;
 
     public Teacher() {
     }
@@ -63,5 +64,13 @@ public class Teacher {
 
     public void setCreateTime(String createTime) {
         this.createTime = createTime;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

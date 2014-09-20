@@ -1,6 +1,8 @@
 package cn.njcit.web.service.user.impl;
 
 import cn.njcit.common.constants.AppConstants;
+import cn.njcit.common.util.CommonUtil;
+import cn.njcit.common.util.UID;
 import cn.njcit.common.util.encrypt.MD5Util;
 import cn.njcit.dao.user.UserDao;
 import cn.njcit.domain.user.User;
@@ -90,6 +92,7 @@ public class WebUserServiceImpl implements WebUserService{
     public int addStudent(Student student) {
         student.setCreateTime(DateFormatUtils.format(new Date(),"yyyy-MM-dd HH:mm:ss"));
         student.setPassword(MD5Util.md5Hex(student.getPassword()));
+        student.setStudentId(String.valueOf(UID.getUID()));
         int count = webUserDao.addStudent(student);
         return count;
     }
@@ -168,9 +171,13 @@ public class WebUserServiceImpl implements WebUserService{
     }
 
     @Override
-    public int addTeacher(Teacher teacher) {
+    public int addTeacher(Teacher teacher,User sessionUser) {
         teacher.setCreateTime(DateFormatUtils.format(new Date(),"yyyy-MM-dd HH:mm:ss"));
         teacher.setPassword(MD5Util.md5Hex(teacher.getPassword()));
+        if(sessionUser.getRole().intValue() == AppConstants.STUDENT_PIPE_ROLE.intValue()){//学管处只能添加辅导员角色的老师
+            teacher.setRole(AppConstants.INSTRUCTOR__ROLE.toString());
+        }
+        teacher.setTeacherId(String.valueOf(UID.getUID()));
         int count = webUserDao.addTeacher(teacher);
         return count;
     }

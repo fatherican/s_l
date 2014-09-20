@@ -71,5 +71,5 @@ public interface WebUserService {
 
     int editTeacher(Teacher teacher);
 
-    int addTeacher(Teacher teacher);
+    int addTeacher(Teacher teacher, User sessionUser);
 }

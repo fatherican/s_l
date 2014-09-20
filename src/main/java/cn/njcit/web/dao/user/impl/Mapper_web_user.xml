@@ -144,6 +144,10 @@
         from tb_teacher tt left join tb_colleage tc on tt.colleage_id = tc.colleage_id
         where 1=1
         <include refid="queryTeacherWhereStatement"/>
+        <if test="orderByName!=null and orderByName!=''">
+            order by ${orderByName} ${orderByOrder}
+        </if>
+        limit #{start},#{length}
     </select>
 
     <select id="queryTeacherCount" resultType="java.lang.Integer"  parameterType="cn.njcit.web.controller.user.UserQueryForm">
@@ -184,20 +188,17 @@
     <insert id="addStudent" parameterType="cn.njcit.web.controller.user.Student">
         insert into tb_student
         (
-            student_num, student_name,
+            student_id,student_num, student_name,
             password, create_time, colleage_id,
             colleage_name, professional_id, professional_name,
             class_id, class_name
         )
         values(
-            #{studentNum},#{studentName},
+            #{studentId},#{studentNum},#{studentName},
             #{password},#{createTime},#{colleageId},
             #{colleageName},#{professionalId},#{professionalName},
             #{classId},#{className}
         )
-        <selectKey resultType="java.lang.String" order="AFTER" keyProperty="studentId">
-            SELECT LAST_INSERT_ID()
-        </selectKey>
     </insert>
 
 
@@ -268,19 +269,15 @@
     </update>
 
     <insert id="addTeacher" parameterType="cn.njcit.web.controller.user.Teacher">
-        insert into tb_student
+        insert into tb_teacher
         (
-            teacher_work_num, teacher_name, password,
-            create_time, colleage_id,
-            role
+            teacher_id,teacher_work_num, teacher_name, password,
+            create_time, colleage_id, role
         )
         values(
-            #{teacherWorkNum},#{teacherName}, #{password},
-            #{createTime},#{colleageId}, #{className}
+            #{teacherId},#{teacherWorkNum},#{teacherName}, #{password},
+            #{createTime},#{colleageId}, #{role}
         )
-        <selectKey resultType="java.lang.String" order="AFTER" keyProperty="teacherId">
-            SELECT LAST_INSERT_ID()
-        </selectKey>
     </insert>
 
 </mapper>

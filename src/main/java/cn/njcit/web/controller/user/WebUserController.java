@@ -407,23 +407,24 @@ public class WebUserController {
     }
 
     /**
-     * 新增一个学生
+     * 新增一个老师
      * @param request
      * @param response
      * @return
      */
     @RequestMapping(value = "/addTeacher")
     public @ResponseBody Map  addTeacher(Teacher teacher,HttpServletRequest request,HttpServletResponse response){
+        User sessionUser = (User) request.getSession().getAttribute("user");
         teacher.setPassword("123456");
         try{
-            int count  = webUserService.addTeacher(teacher);
+            int count  = webUserService.addTeacher(teacher,sessionUser);
             if(count>0){
                 return CommonUtil.ajaxSuccess(teacher);
             }else{
-                return CommonUtil.ajaxFail(null,"学生信息添加失败，请联系管理员");
+                return CommonUtil.ajaxFail(null,"老师信息添加失败，请联系管理员");
             }
         }catch(DuplicateKeyException dke){//插入重复数据学号
-            return CommonUtil.ajaxFail(null,"该学号已存在，不能重复添加");
+            return CommonUtil.ajaxFail(null,"该工号已存在，不能重复添加");
         }
     }
 
