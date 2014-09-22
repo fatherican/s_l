@@ -62,15 +62,39 @@ public class UserServiceImpl implements UserService{
         String userId = (String) reqMap.get("userId");
         User user  = redisInstance.getUserInfo(userId);
         int role = user.getRole();
-        if(AppConstants.INSTRUCTOR__ROLE==role){//辅导员角色
+        if(AppConstants.INSTRUCTOR__ROLE.intValue()==role){//辅导员角色
             //辅导员，根据教师编号来获取其负责的班级
             reqMap.put("teacherId",userId);
             classes = userDao.getClassesByTeacherId(reqMap);
-        }else if(AppConstants.STUDENT_PIPE_ROLE==role){//学管处角色
+        }else if(AppConstants.STUDENT_PIPE_ROLE.intValue()==role){//学管处角色
             Integer colleageId = user.getColleageId();
             reqMap.put("colleageId",colleageId);
             classes = userDao.getClassesByColleageId(reqMap);
         }
         return classes;
+    }
+
+    @Override
+    public int updatePassword(User reqUser) {
+        int role = reqUser.getRole();
+        int  count =0 ;
+        if(role==AppConstants.STUDENT_ROLE.intValue()){//学生
+            count = userDao.updateStudentPassword(reqUser);
+        }else{//其他角色  包括辅导员 ，学管处
+            count = userDao.updateTeacherPassword(reqUser);
+        }
+
+        return count;
+    }
+
+    public User getUniqueUser(User queryUser){
+        int role = queryUser.getRole();
+        User user = null;
+        if(role==AppConstants.STUDENT_ROLE.intValue()){
+            user  = userDao.getStudentWithPassword(queryUser);
+        }else{
+            user  = userDao.getTeacherWithPassword(queryUser);
+        }
+        return user;
     }
 }

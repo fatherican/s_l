@@ -366,12 +366,16 @@ public class WebUserController {
     public @ResponseBody Map  deleteTeacher(HttpServletRequest request,HttpServletResponse response){
         String token = request.getParameter("token");
         String teacherId = request.getParameter("teacherId");
+        String role = request.getParameter("role");//当前删除老师的角色，要通过该角色来删除老师负责的班级
         User sessionUser = (User) request.getSession().getAttribute("user");
         String confirmToken =MD5Util.md5Hex(sessionUser.getUserId()+teacherId+AppConstants.appConfig.getProperty("app.key"));
         if(!confirmToken.equals(token)){
             return CommonUtil.ajaxFail(null,"不合法");
         }
-        int count  = webUserService.deleteTeacher(teacherId);
+        if(StringUtils.isEmpty(role)){
+            return CommonUtil.ajaxFail(null,"不合法");
+        }
+        int count  = webUserService.deleteTeacher(teacherId,Integer.parseInt(role));
         if(count>0){
             return CommonUtil.ajaxSuccess(null);
         }else{
@@ -427,5 +431,27 @@ public class WebUserController {
             return CommonUtil.ajaxFail(null,"该工号已存在，不能重复添加");
         }
     }
+
+    /**
+     *显示调整 老师 负责的 班级
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "/getTeacherClassList")
+    public @ResponseBody Map getTeacherClassList(TClassQueryForm tClassQueryForm,HttpServletRequest request,HttpServletResponse response){
+        tClassQueryForm.initDataTable(request);
+        String userId = request.getParameter("userId");
+        String token = request.getParameter("token");
+        User sessionUser = (User) request.getSession().getAttribute("user");
+        String confirmToken =MD5Util.md5Hex(sessionUser.getUserId()+userId+AppConstants.appConfig.getProperty("app.key"));
+        if(!confirmToken.equals(token)){
+            return null;
+        }
+        List<TClass> classList = webUserService.getTeacherClassList(tClassQueryForm,sessionUser);
+        int  total  = webUserService.getTeacherClassCount(tClassQueryForm,sessionUser);
+        return CommonUtil.reurnDataTable(total,classList,null);
+    }
+
 
 }

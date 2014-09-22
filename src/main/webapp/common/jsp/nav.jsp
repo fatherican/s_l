@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <head>
     <!-- jQuery Version 1.11.0 -->
-    <script src="/resources/bootstrap-sb-admin/js/jquery-1.11.0.js"></script>
+    <script src="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/js/jquery-1.11.0.js"></script>
     <script type="text/javascript">
         String.prototype.endWith=function(str){
             var reg=new RegExp(str+"$");
@@ -49,7 +49,7 @@
                 $.ajax({
                     type: "POST",
                     dataType: "json",
-                    url: "/webUser/updatePassword.do",
+                    url: "<%=request.getContextPath()%>/webUser/updatePassword.do",
                     data: $('#passwordForm').serialize(),
                     beforeSend:function(){
                         //使form表单不可用
@@ -91,7 +91,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="/webLeave/index.do">学生请假管理系统</a>
+        <a class="navbar-brand" href="<%=request.getContextPath()%>/webLeave/index.do">学生请假管理系统</a>
     </div>
     <!-- /.navbar-header -->
 
@@ -105,7 +105,7 @@
                 <li><a href="javascript:showUpdatePasswordModal();"><i class="fa fa-gear fa-fw"></i> 修改密码</a>
                 </li>
                 <li class="divider"></li>
-                <li><a href="/webUser/logout.do"><i class="fa fa-sign-out fa-fw"></i> 登出</a>
+                <li><a href="<%=request.getContextPath()%>/webUser/logout.do"><i class="fa fa-sign-out fa-fw"></i> 登出</a>
                 </li>
             </ul>
             <!-- /.dropdown-user -->
@@ -121,10 +121,10 @@
                     <a href="#"><i class="fa fa-edit fa-fw"></i> 假条审核<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level">
                         <li>
-                            <a  id="webLeaveUncheckA" href="/webLeave/index.do"> 未审批</a>
+                            <a  id="webLeaveUncheckA" href="<%=request.getContextPath()%>/webLeave/index.do"> 未审批</a>
                         </li>
                         <li>
-                            <a id="webLeaveCheckA"  href="/webLeave/checkedIndex.do"> 已审批</a>
+                            <a id="webLeaveCheckA"  href="<%=request.getContextPath()%>/webLeave/checkedIndex.do"> 已审批</a>
                         </li>
                     </ul>
                 </li>
@@ -132,10 +132,10 @@
                     <a href="#"><i class="fa fa-dashboard fa-fw"></i> 人员管理<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level">
                         <li>
-                            <a  id="webUserStudentA" href="/webUser/studentManagerIndex.do">学生管理</a>
+                            <a  id="webUserStudentA" href="<%=request.getContextPath()%>/webUser/studentManagerIndex.do">学生管理</a>
                         </li>
                         <li>
-                            <a id="webUserTeacherA"  href="/webUser/teacherManagerIndex.do">教师管理</a>
+                            <a id="webUserTeacherA"  href="<%=request.getContextPath()%>/webUser/teacherManagerIndex.do">教师管理</a>
                         </li>
                     </ul>
                 </li>

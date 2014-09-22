@@ -42,7 +42,7 @@
 	
 	function changeIframe(iframeSrc){
 		var iframe = document.getElementById("ifm");
-		iframe.src="../iframes/"+iframeSrc+".jsp";
+		iframe.src="<%=request.getContextPath()%>/iframes/"+iframeSrc+".jsp";
 	}
   </script>
   
@@ -95,8 +95,10 @@
 			<span onclick="changeIframe('studentSickLeave');"><a href="#" class="btn">销假</a></span>
 			<span onclick="changeIframe('getTeacherManagedClass');"><a href="#" class="btn">老师(辅导员和学管处)负责的班级</a></span>
 			<span onclick="changeIframe('teacherGetLeaveList');"><a href="#" class="btn">老师查看审批列表</a></span>
-			<span  onclick="changeIframe('teacherGetStudentSickedLeaveList');"><a href="#" class="btn">老师获得销假列表</a></span>
-			<span><a href="#" class="btn">测试</a></span>
+			<span onclick="changeIframe('teacherGetStudentSickedLeaveList');"><a href="#" class="btn">老师获得销假列表</a></span>
+			<span onclick="changeIframe('studentLeaveStatistics');"><a href="#" class="btn">学生 请假统计</a></span>
+			<span onclick="changeIframe('teacherLeaveStatistics');"><a href="#" class="btn">老师 请假统计</a></span>
+			<span onclick="changeIframe('updatePassword');"><a href="#" class="btn">修改密码</a></span>
 			<span><a href="#" class="btn">测试</a></span>
 			<span><a href="#" class="btn">测试</a></span>
 			<span><a href="#" class="btn">测试</a></span>
@@ -145,7 +147,7 @@
 		<strong>API URL   </strong>token=md5(<span id="token"></span>)   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;测试key统一为：123456    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(MD5  可以直接在百度上搜索一个MD5在线加密 【32位小写】)
 	  </div>
 	  <div  style="margin-bottom:18px;">
-			<span id="host">http://localhost:8080</span>/<span id="address"></span>.do
+			<span id="host">http://localhost:8080/studentLeave</span>/<span id="address"></span>.do
 	  </div>
  </div>
 

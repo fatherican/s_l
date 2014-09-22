@@ -67,9 +67,19 @@ public interface WebUserService {
      */
     int resetTeacherPassword(User updateUser);
 
-    int deleteTeacher(String teacherId);
+    int deleteTeacher(String teacherId,int role);
 
     int editTeacher(Teacher teacher);
 
     int addTeacher(Teacher teacher, User sessionUser);
+
+    /**
+     * 获得老师和班级 之间的关系数据
+     * @param tClassQueryForm
+     * @return
+     */
+    List<TClass> getTeacherClassList(TClassQueryForm tClassQueryForm,User sessionUser);
+
+    int getTeacherClassCount(TClassQueryForm tClassQueryForm,User sessionUser);
+
 }

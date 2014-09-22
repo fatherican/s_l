@@ -2,6 +2,8 @@ package cn.njcit.dao.leave;
 
 import java.util.List;
 import java.util.Map;
+
+import cn.njcit.controller.leave.LeaveStatisticsQueryForm;
 import cn.njcit.domain.leave.*;
 /**
  * Created by YK on 2014-06-30.
@@ -62,4 +64,11 @@ public interface LeaveDao {
      * @return
      */
     List<Leave> getSickLeaveList(Map reqMap);
+
+    int statisticsLeaveDays(Map queryMap);
+
+    int statisticsLeaveCourseTimes(Map queryMap);
+
+    List<Map> teacherGetLeaveStatistics(LeaveStatisticsQueryForm leaveQueryForm);
+
 }

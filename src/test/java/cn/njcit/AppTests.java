@@ -22,7 +22,7 @@
 //
 //@RunWith(SpringJUnit4ClassRunner.class)
 //@WebAppConfiguration
-//@ContextConfiguration("file:src/main/resources/META-INF/context/appContext-core.xml")
+//@ContextConfiguration("file:src/main<%=request.getContextPath()%>/resources/META-INF/context/appContext-core.xml")
 //public class AppTests {
 //   /* private MockMvc mockMvc;
 //

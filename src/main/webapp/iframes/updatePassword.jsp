@@ -12,17 +12,14 @@
   <style>
 	<![CDATA[
 		.title { font-size:14px; font-weight:bold; background:#EDF3F9; padding:0px 15px;}
-        td .redBGColor{color:red}
-        td .greenBGColor{background-color:green}
-        .yellowBGColor{background-color:yellow}
 	 ]]>
   </style>
   <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js" type="text/javascript"></script>
 
   <script type="text/javascript">
 		$(document).ready(function(){
-            window.parent.changeToken("userId + key");
-            window.parent.changeAddress("leave/studentSickLeave")
+            window.parent.changeToken("userId+key");
+            window.parent.changeAddress("user/updatePassword")
             $("#submitBT").bind("click",function(){
                 $("#prevId").html("");
                 var host = $(window.parent.document.getElementById("host")).html();
@@ -30,7 +27,7 @@
                 $.ajax({
                     type: "POST",
                     dataType: "html",
-                    url:host+"/leave/studentSickLeave.do",
+                    url:host+"/user/updatePassword.do",
                     data: $('#subForm').serialize(),
                     success: function (result) {
                         var strresult=result;
@@ -51,12 +48,6 @@
 </head>
 <body>
 <div style="margin:0px 18px;">
-    <div class="alert alert-info">
-        <strong>说明</strong>
-    </div>
-    <div class="alert alert-info">
-        学生 销假
-    </div>
 	<div class="alert alert-info">
 		<strong>请求参数</strong>
 	</div>
@@ -64,22 +55,40 @@
 		<table class="table table-striped table-bordered">
 			<thead>
 				<tr>
-                    <th style="width:10%;">参数名称</th>
+                    <th style="width:10%">参数名称</th>
                     <th style="width:10%">参数命名</th>
                     <th style="width:10%">示例值</th>
                     <th>备注</th>
                 </tr>
                 <tr>
-                    <td style="width:10%" >用户ID</td>
+                    <td style="width:10%">userId</td>
                     <td style="width:10%">userId</td>
                     <td style="width:10%">1</td>
-                    <td style="width:10%"> </td>
+                    <td style="width:10%"></td>
                 </tr>
                 <tr>
-                    <td style="width:10%">假条ＩＤ</td>
-                    <td style="width:10%">leaveId</td>
-                    <td style="width:10%">6</td>
-                    <td style="width:10%">可以从请假列表这个接口来获得已审批尚未销假的请假</td>
+                    <td style="width:10%">原密码</td>
+                    <td style="width:10%">oldPassword</td>
+                    <td style="width:10%">123456</td>
+                    <td style="width:10%"></td>
+                </tr>
+                <tr>
+                    <td style="width:10%">新密码</td>
+                    <td style="width:10%">password</td>
+                    <td style="width:10%">12345</td>
+                    <td style="width:10%"></td>
+                </tr>
+                <tr>
+                    <td style="width:10%">确认密码</td>
+                    <td style="width:10%">confirmPassword</td>
+                    <td style="width:10%">12345</td>
+                    <td style="width:10%"></td>
+                </tr>
+                <tr>
+                    <td style="width:10%">角色</td>
+                    <td style="width:10%">role</td>
+                    <td style="width:10%">0</td>
+                    <td style="width:10%">0:学生角色(用户名 90916p39，密码 123456) </br>1:辅导员角色(用户名 1，密码 1) </br> 2:学管处角色(用户名 2，密码  2)  </td>
                 </tr>
                 <tr>
                     <td style="width:10%">秘钥</td>
@@ -97,17 +106,24 @@
 
 
 	<div>
-		<form class="form-inline" name="subForm" method="post" id="subForm">
+		<form class="form-inline" name="subForm" id="subForm">
 			<div class="input-prepend">
 			<p>
-				<span class="add-on">userId</span>
+				<span class="add-on">userNo</span>
 					<input class="span2" type="text" name="userId" value='1'/>
+				<span class="add-on">oldPassword</span>
+					<input class="span2" type="text" name="oldPassword" value='123456' />
+                <span class="add-on">password</span>
+					<input class="span2" type="text" name="password" value='12345' />
+		        <span class="add-on">confirmPassword</span>
+					<input class="span2" type="text" name="confirmPassword" value='12345' />
+				<span class="add-on">role</span>
+					<input class="span2" type="text" name="role" value='0' />
                 <span class="add-on">token</span>
                     <input class="span2" type="text" name="token" value='eeafb716f93fa090d7716749a6eefa72' />
-                <span class="add-on">leaveId</span>
-                    <input class="span2" type="text" name="leaveId" value='6' />
-            </p>
-                <p><input type="button" value="提交"  id="submitBT" class="btn" /></p>
+			</p>
+
+			<p><input type="button" value="提交"  id="submitBT" class="btn" /></p>
 			</div>
 		</form>
 	</div>

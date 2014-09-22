@@ -40,4 +40,10 @@ public interface WebUserDao {
     int editTeacher(Teacher teacher);
 
     int addTeacher(Teacher teacher);
+
+    List<TClass> getTeacherClassList(TClassQueryForm tClassQueryForm);
+
+    int getTeacherClassCount(TClassQueryForm tClassQueryForm);
+
+    int deleteManagedClass(String teacherId);
 }

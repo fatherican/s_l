@@ -13,24 +13,24 @@
     <title>SB Admin 2 - Bootstrap Admin Theme</title>
 
     <!-- Bootstrap Core CSS -->
-    <link href="/resources/bootstrap-sb-admin/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- MetisMenu CSS -->
-    <link href="/resources/bootstrap-sb-admin/css/plugins/metisMenu/metisMenu.min.css" rel="stylesheet">
+    <link href="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/css/plugins/metisMenu/metisMenu.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link href="/resources/bootstrap-sb-admin/css/sb-admin-2.css" rel="stylesheet">
+    <link href="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/css/sb-admin-2.css" rel="stylesheet">
 
     <!-- Morris Charts CSS -->
-    <link href="/resources/bootstrap-sb-admin/css/plugins/morris.css" rel="stylesheet">
+    <link href="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/css/plugins/morris.css" rel="stylesheet">
 
     <!-- Custom Fonts -->
-    <link href="/resources/bootstrap-sb-admin/font-awesome-4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/font-awesome-4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
     <!-- DataTables CSS -->
-    <link href="/resources/bootstrap-sb-admin/css/plugins/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/css/plugins/dataTables.bootstrap.css" rel="stylesheet">
 
     <!-- self custom CSS -->
-    <link href="/resources/css/mycss.css" rel="stylesheet">
+    <link href="<%=request.getContextPath()%>/resources/css/mycss.css" rel="stylesheet">
 
 
 
@@ -266,21 +266,21 @@
 </div>
 
 <!-- jQuery Version 1.11.0 -->
-<script src="/resources/bootstrap-sb-admin/js/jquery-1.11.0.js"></script>
+<script src="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/js/jquery-1.11.0.js"></script>
 
 <!-- Bootstrap Core JavaScript -->
-<script src="/resources/bootstrap-sb-admin/js/bootstrap.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/js/bootstrap.min.js"></script>
 
 <!-- Metis Menu Plugin JavaScript -->
-<script src="/resources/bootstrap-sb-admin/js/plugins/metisMenu/metisMenu.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/js/plugins/metisMenu/metisMenu.min.js"></script>
 
 
 <!-- Custom Theme JavaScript -->
-<script src="/resources/bootstrap-sb-admin/js/sb-admin-2.js"></script>
+<script src="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/js/sb-admin-2.js"></script>
 
 
-<script type="text/javascript" src="/resources/datables/js/jquery.dataTables.js"></script>
-<script src="/resources/bootstrap-sb-admin/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/resources/datables/js/jquery.dataTables.js"></script>
+<script src="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/js/plugins/dataTables/dataTables.bootstrap.js"></script>
 <script type="text/javascript">
     (function($){
         $.fn.serializeJson=function(){
@@ -410,7 +410,7 @@
                 processing:true,
                 "info": true,
                 ajax: {
-                    url: '/webUser/studentList.do',
+                    url: '<%=request.getContextPath()%>/webUser/studentList.do',
                     type: 'POST',
                     dataType: "json",
                     data: function ( d ) {
@@ -486,7 +486,7 @@
         $.ajax({
             type: "POST",
             dataType: "json",
-            url: "/webUser/resetStudentPassword.do",
+            url: "<%=request.getContextPath()%>/webUser/resetStudentPassword.do",
             data: $('#resetPasswordForm').serialize(),
             beforeSend:function(){
                 //使form表单不可用
@@ -698,7 +698,7 @@
         $.ajax({
             type: "POST",
             dataType: "json",
-            url: "/webUser/addStudent.do",
+            url: "<%=request.getContextPath()%>/webUser/addStudent.do",
             data: $('#addStudentForm').serialize(),
             beforeSend:function(){
                 //使form表单不可用
@@ -769,7 +769,7 @@
         $.ajax({
             type: "POST",
             dataType: "json",
-            url: "/webUser/editStudent.do",
+            url: "<%=request.getContextPath()%>/webUser/editStudent.do",
             data: $('#editStudentForm').serialize(),
             beforeSend:function(){
                 //使form表单不可用
@@ -800,7 +800,7 @@
         $.ajax({
             type: "POST",
             dataType: "json",
-            url: "/webUser/deleteStudent.do",
+            url: "<%=request.getContextPath()%>/webUser/deleteStudent.do",
             data: $('#deleteUserForm').serialize(),
             beforeSend:function(){
                 //删除用户按钮不可用
@@ -830,7 +830,7 @@
         $.ajax({
             type: "POST",
             dataType: "json",
-            url: "/webUser/getColleages.do",
+            url: "<%=request.getContextPath()%>/webUser/getColleages.do",
             success: function (data) {
                 if(data['code']=='200'){
                     var colleages = data['data'];
@@ -868,7 +868,7 @@
         $.ajax({
             type: "POST",
             dataType: "json",
-            url: "/webUser/getClasses.do",
+            url: "<%=request.getContextPath()%>/webUser/getClasses.do",
             data: {"colleageId":colleageId},
             success: function (data) {
                 if(data['code']=='200'){

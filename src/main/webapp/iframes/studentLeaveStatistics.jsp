@@ -22,7 +22,7 @@
   <script type="text/javascript">
 		$(document).ready(function(){
             window.parent.changeToken("userId + key");
-            window.parent.changeAddress("leave/studentSickLeave")
+            window.parent.changeAddress("leave/studentLeaveStatistics")
             $("#submitBT").bind("click",function(){
                 $("#prevId").html("");
                 var host = $(window.parent.document.getElementById("host")).html();
@@ -30,7 +30,7 @@
                 $.ajax({
                     type: "POST",
                     dataType: "html",
-                    url:host+"/leave/studentSickLeave.do",
+                    url:host+"/leave/studentLeaveStatistics.do",
                     data: $('#subForm').serialize(),
                     success: function (result) {
                         var strresult=result;
@@ -76,16 +76,28 @@
                     <td style="width:10%"> </td>
                 </tr>
                 <tr>
-                    <td style="width:10%">假条ＩＤ</td>
-                    <td style="width:10%">leaveId</td>
-                    <td style="width:10%">6</td>
-                    <td style="width:10%">可以从请假列表这个接口来获得已审批尚未销假的请假</td>
+                    <td style="width:10%">统计类型</td>
+                    <td style="width:10%">statisticsType</td>
+                    <td style="width:10%"> </td>
+                    <td style="width:10%">空  统计全部  1  第一节课 2第二节课  4第三节课 8 第四节课 0天（请假类型为天的）</td>
                 </tr>
                 <tr>
                     <td style="width:10%">秘钥</td>
                     <td style="width:10%">token</td>
                     <td style="width:10%"> </td>
                     <td style="width:10%">秘钥的生成方式见 API URL token=</td>
+                </tr>
+                <tr>
+                    <td style="width:10%">查询开始时间</td>
+                    <td style="width:10%">startTime</td>
+                    <td style="width:10%">2014-03-03 00:00:00</td>
+                    <td style="width:10%">格式yyyy-MM-dd hh:mm:ss</td>
+                </tr>
+                <tr>
+                    <td style="width:10%">结束时间</td>
+                    <td style="width:10%">endTime</td>
+                    <td style="width:10%">2014-09-03  00:00:00</td>
+                    <td style="width:10%">格式yyyy-MM-dd hh:mm:ss</td>
                 </tr>
 			</thead>
 		</table>
@@ -104,8 +116,19 @@
 					<input class="span2" type="text" name="userId" value='1'/>
                 <span class="add-on">token</span>
                     <input class="span2" type="text" name="token" value='eeafb716f93fa090d7716749a6eefa72' />
-                <span class="add-on">leaveId</span>
-                    <input class="span2" type="text" name="leaveId" value='6' />
+                <span class="add-on">statisticsType</span>
+                    <select  id="statisticsType" name="statisticsType">
+                        <option value="">统计全部(值是 空)</option>
+                        <option value="1">1  第一节课 </option>
+                        <option value="2">2  第二节课</option>
+                        <option value="4">4  第三节课</option>
+                        <option value="8">8  第四节课</option>
+                        <option value="0">0  请假的天数</option>
+                    </select>
+                <span class="add-on">startTime</span>
+                    <input class="span2" type="text" name="startTime" value='2014-09-03  00:00:00' />
+                <span class="add-on">endTime</span>
+                    <input class="span2" type="text" name="endTime" value='2014-09-03  00:00:00' />
             </p>
                 <p><input type="button" value="提交"  id="submitBT" class="btn" /></p>
 			</div>

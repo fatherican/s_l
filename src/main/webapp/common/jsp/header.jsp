@@ -4,7 +4,7 @@
     <script type="text/javascript">
         function trunToLoginPage(){
             if(!location.href.endWith("webUser/loginPage.do")){
-                location.href="/webUser/loginPage.do"
+                location.href="<%=request.getContextPath()%>/webUser/loginPage.do"
             }
         }
         String.prototype.endWith=function(str){
@@ -14,7 +14,7 @@
 
         function trunToIndexPage(){
             if(location.href.endWith("webUser/loginPage.do")){//当用户已经登录并且链接地址跳转到登录时，那么自动跳转到首页
-                location.href="/webLeave/index.do"
+                location.href="<%=request.getContextPath()%>/webLeave/index.do"
             }
         }
     </script>

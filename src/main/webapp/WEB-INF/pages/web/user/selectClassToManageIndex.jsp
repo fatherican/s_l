@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib  uri="http://java.sun.com/jstl/core_rt" prefix="c" %>
 <html lang="en">
 
 <head>
@@ -79,10 +78,10 @@
                             <table class="table table-striped table-bordered table-hover" id="leavelist-table">
                                 <thead>
                                 <tr>
-                                    <th>工号</th>
+                                    <th>学号</th>
                                     <th>姓名</th>
+                                    <th>班级</th>
                                     <th>学院</th>
-                                    <th>角色</th>
                                     <th>操作</th>
                                 </tr>
                                 </thead>
@@ -107,27 +106,29 @@
 <!-- /#wrapper -->
 
 <!-- 添加student Modal -->
-<div class="modal fade" id="addTeacherModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="addStudentModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title" id="addModalLabel">教师信息添加(初始密码为  123456)</h4>
+                <h4 class="modal-title" id="addModalLabel">学生信息添加(初始密码为  123456)</h4>
             </div>
-            <form class="form-horizontal" id="addTeacherForm" name="addTeacherForm" role="form" >
-                <fieldset id="addTeacherFormFieldset">
+            <form class="form-horizontal" id="addStudentForm" name="addStudentForm" role="form" >
+                <fieldset id="addStudentFormFieldset">
+                    <input type="hidden" name="colleageName" id="addStudentColleageName">
+                    <input type="hidden" name="className" id="addStudentClassName">
                     <div class="modal-body">
                         <form class="form-horizontal" role="form">
                             <div class="form-group">
-                                <label for="addTeacherTeacherNum" class="col-sm-2 control-label">工号</label>
+                                <label for="addStudentStudentNum" class="col-sm-2 control-label">学号</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" name="teacherWorkNum" id="addTeacherTeacherNum" placeholder="工号">
+                                    <input type="text" class="form-control" name="studentNum" id="addStudentStudentNum" placeholder="学号">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="addTeacherTeacherName" class="col-sm-2 control-label">姓名</label>
+                                <label for="addStudentStudentName" class="col-sm-2 control-label">姓名</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" name="teacherName"  id="addTeacherTeacherName" placeholder="姓名">
+                                    <input type="text" class="form-control" name="studentName"  id="addStudentStudentName" placeholder="姓名">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -137,12 +138,10 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="form-group <c:if test="${ user.role ne '3'}"> sr-only </c:if> ">
-                                <label for="addTeacherRoleId"  class="col-sm-2 control-label">角色</label>
+                            <div class="form-group">
+                                <label for="addStudentClassId" class="col-sm-2 control-label">班级</label>
                                 <div class="col-sm-10">
-                                    <select class="form-control"  id="addTeacherRoleId"  name="role" <c:if test="${ user.role ne '3'}"> disabled </c:if>>
-                                            <option value="1">辅导员</option>
-                                            <option value="2">学管处</option>
+                                    <select class="form-control"  id="addStudentClassId"  name="classId">
                                     </select>
                                 </div>
                             </div>
@@ -150,8 +149,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                        <button type="reset" id="addTeacherResetBt" class="btn btn-default sr-only"></button>
-                        <button type="button" id="addTeacherFormBt" class="btn btn btn-success">确定</button>
+                        <button type="button" id="addStudentFormBt" class="btn btn btn-success">确定</button>
                     </div>
                 </fieldset>
             </form>
@@ -159,46 +157,46 @@
     </div>
 </div>
 
-<!-- 编辑 教师信息 Modal -->
-<div class="modal fade" id="editTeacherModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<!-- 编辑学生信息 Modal -->
+<div class="modal fade" id="editStudentModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title" id="myModalLabel">教师信息修改</h4>
+                <h4 class="modal-title" id="myModalLabel">学生信息修改</h4>
             </div>
-            <form class="form-horizontal" id="editTeacherForm" name="editTeacherForm" role="form" >
-                <fieldset id="editTeacherFormFieldset">
-                    <input type="hidden" name="token" id="editTeacherToken">
-                    <input type="hidden" name="teacherId" id="editTeacherTeacherId">
-                    <div class="modal-body">
+            <form class="form-horizontal" id="editStudentForm" name="editStudentForm" role="form" >
+                <fieldset id="editStudentFormFieldset">
+                    <input type="hidden" name="token" id="editStudentToken">
+                    <input type="hidden" name="studentId" id="editStudentStudentId">
+                    <input type="hidden" name="colleageName" id="editStudentColleageName">
+                    <input type="hidden" name="className" id="editStudentClassName">
                     <div class="modal-body">
                         <form class="form-horizontal" role="form">
                             <div class="form-group">
-                                <label for="editTeacherTeacherNum" class="col-sm-2 control-label">工号</label>
+                                <label for="editStudentStudentNum" class="col-sm-2 control-label">学号</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" name="teacherWorkNum" id="editTeacherTeacherNum" placeholder="工号">
+                                    <input type="text" class="form-control" name="studentNum" id="editStudentStudentNum" placeholder="学号">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="editTeacherTeacherName" class="col-sm-2 control-label">姓名</label>
+                                <label for="editStudentStudentName" class="col-sm-2 control-label">姓名</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" name="teacherName"  id="editTeacherTeacherName" placeholder="姓名">
+                                    <input type="text" class="form-control" name="studentName"  id="editStudentStudentName" placeholder="姓名">
                                 </div>
                             </div>
-                            <div class="form-group" >
-                                <label for="editTeacherColleageId" class="col-sm-2 control-label">学院</label>
-                                <div class="col-sm-10 "  >
-                                    <select class="form-control disabled" id="editTeacherColleageId" name="colleageId" <c:if test="${user.role eq '2'}">disabled</c:if>>
+                            <div class="form-group">
+                                <label for="editStudentColleageId" class="col-sm-2 control-label">学院</label>
+                                <div class="col-sm-10">
+                                    <select class="form-control" id="editStudentColleageId" name="colleageId">
                                     </select>
                                 </div>
+
                             </div>
-                            <div class="form-group <c:if test="${ user.role ne '3'}"> sr-only </c:if> ">
-                                <label for="editTeacherRoleId"  class="col-sm-2 control-label">角色</label>
+                            <div class="form-group">
+                                <label for="editStudentClassId" class="col-sm-2 control-label">班级</label>
                                 <div class="col-sm-10">
-                                    <select class="form-control"  id="editTeacherRoleId"  name="role" <c:if test="${ user.role ne '3'}"> disabled </c:if>>
-                                        <option value="1">辅导员</option>
-                                        <option value="2">学管处</option>
+                                    <select class="form-control"  id="editStudentClassId"  name="classId">
                                     </select>
                                 </div>
                             </div>
@@ -214,7 +212,7 @@
     </div>
 </div>
 
-<!-- 重置密码  Modal -->
+<!-- new passwordModal -->
 <div class="modal fade" id="resetPasswordModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -244,7 +242,7 @@
     </div>
 </div>
 
-<!--  删除老师 Modal -->
+<!--  delete user Modal -->
 <div class="modal fade" id="deleteUserModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
@@ -254,9 +252,8 @@
             </div>
             <fieldset id="deleteUserFormFieldset">
                 <form class="form-horizontal" id="deleteUserForm" name="deleteUserForm" role="form" >
-                        <input type="hidden" name="teacherId" id="deleteUserId">
+                        <input type="hidden" name="studentId" id="deleteUserId">
                         <input type="hidden" name="token"  id="deleteUserToken">
-                        <input type="hidden" name="role"  id="deleteUserRole">
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
                             <button type="button" id="deleteUserBT" class="btn btn-primary">确定</button>
@@ -267,78 +264,6 @@
         </div>
     </div>
 </div>
-
-<!-- 查看老师负责的班级 Modal -->
-<div class="modal fade" id="teacherManagedClassModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title" id="">编辑老师负责的班级</h4>
-            </div>
-            <div class="modal-body">
-                <form class="form-inline" id="teacherManagedClassForm" name="teacherManagedClassForm" role="form" >
-                    <fieldset id="teacherMangagedClassFormFieldset">
-                        <input type="hidden" name="userId" id="teacherManagedUserId">
-                        <input type="hidden" name="token"  id="teacherManagedToken">
-                        <c:if test="${user.role eq '3'}">
-                            <div class="form-group">
-                                <div class="input-group">
-                                    <label class="input-group-addon" for="teacherManagedColleageId">学院</label>
-                                    <select class="form-control" id="teacherManagedColleageId" name="colleageId">
-
-                                    </select>
-                                </div>
-                            </div>
-                        </c:if>
-                        <div class="form-group">
-                            <div class="input-group">
-                                <div class="input-group-addon" for="teacherManagedClassName">班级</div>
-                                <input class="form-control" name="className" type="text" value="898989" id="teacherManagedClassName">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="input-group">
-                                <div class="input-group-addon" for="teacherManagedState">负责状态</div>
-                                <select class="form-control" id="teacherManagedState" name="managed">
-                                     <option value="">请选择</option>
-                                     <option value="0">未负责</option>
-                                     <option value="1">已负责</option>
-                                     <option value="0">其他</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                           <button id="queryBtn" type="button" class="btn btn-primary">查询</button>
-                        </div>
-
-
-                        <div class="table-responsive">
-                            <table class="table table-striped table-bordered table-hover" id="teacherManagedClassTable">
-                                <thead>
-                                    <tr>
-                                        <th>序号</th>
-                                        <th>学院</th>
-                                        <th>班级</th>
-                                        <th>负责人</th>
-                                        <th>操作</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                </tbody>
-                            </table>
-                        </div>
-
-
-
-                    </fieldset>
-                </form>
-            </div>
-
-        </div>
-    </div>
-</div>
-
 
 <!-- jQuery Version 1.11.0 -->
 <script src="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/js/jquery-1.11.0.js"></script>
@@ -417,18 +342,13 @@
         });
         //新增学生按钮
         $("#addStudentBt").click(function(){
-            addTeacherModal();
+            addStudentModal();
         });
         //新增学生确定 按钮
-        $("#addTeacherFormBt").click(function(){
-            submitaddTeacherForm();
+        $("#addStudentFormBt").click(function(){
+            submitAddStudentForm();
         });
 
-
-        $("#queryBtn").click(function(){
-            teacherManagedPostData = $("#teacherManagedClassForm").serializeJson();
-            teacherManagedTable.page('first').draw();
-        });
 
 
 
@@ -470,17 +390,8 @@
                 "columns": [
                     { "data": "userNo"},
                     { "data": "name","orderable": false},
+                    { "data": "className"},
                     { "data": "colleageName","orderable": false},
-                    { "data": "role","orderable": false,"render": function ( data, type, full, meta ) {
-                            var roleStr = '';
-                            if(data=='1'){//辅导员
-                                roleStr = '辅导员';
-                            }else if(data=='2'){//学管处
-                                roleStr='学管处';
-                            }
-                            return roleStr;
-                        }
-                    },
                     { "data": "cz","width": "20%" ,"orderable": false,"render": function ( data, type, full, meta ) {
                             var userId = full['userId'];
                             var token = full['token'];
@@ -490,10 +401,9 @@
                             var colleageName = full['colleageName'];
                             var classId = full['classId'];
                             var className = full['className'];
-                            var role = full['role'];
-                            return '<a href="javascript:showResetPasswordModal(\''+userId+'\',\''+token+'\');">重置密码</a>&nbsp;<a href="javascript:editTeacherModal(\''+userId+'\',\''+token+'\',\''+userNo+'\',\''+name
-                                    +'\',\''+colleageId+'\',\''+colleageName+'\',\''+classId+'\',\''+className+'\',\''+role+'\');">编辑</a>&nbsp;<a href="javascript:showDeleteUserModal(\''+userId+'\',\''+token+'\',\''+role+'\')">删除</a>' +
-                                    '&nbsp;<a href="javascript:showTeacherManagedClassModal(\''+userId+'\',\''+token+'\')">管理班级</a>'
+                            return '<a href="javascript:showResetPasswordModal(\''+userId+'\',\''+token+'\');">重置密码</a>&nbsp;<a href="javascript:editStudentModal(\''+userId+'\',\''+token+'\',\''+userNo+'\',\''+name
+                                    +'\',\''+colleageId+'\',\''+colleageName+'\',\''+classId+'\',\''+className+'\');">编辑</a>&nbsp;<a href="javascript:showDeleteUserModal(\''+userId+'\',\''+token+'\')">删除</a>' +
+                                    '&nbsp;<a href="javascript:showSecurityModal(\''+userId+'\',\''+token+'\')">权限管理</a>';
                         }
                     }
                 ],
@@ -501,7 +411,7 @@
                 processing:true,
                 "info": true,
                 ajax: {
-                    url: '<%=request.getContextPath()%>/webUser/teacherList.do',
+                    url: '<%=request.getContextPath()%>/webUser/studentList.do',
                     type: 'POST',
                     dataType: "json",
                     data: function ( d ) {
@@ -522,6 +432,49 @@
         }
 
 
+    /**
+    *显示详细信息
+     */
+    function showDetail(userNo,studentName,className,
+                        leaveType,leaveDays,courseIndex,
+                        createTime,studentMobile,studentNote,
+                        instructorNote,studentPipeNote,instructorApproved,
+                        studentPipeApproved,leaveStartDate,leaveEndDate,
+                        colleageName,courseName,approved,leaveId,
+                        flag){
+        $("#userNoTdDetail").html(userNo);
+        $("#studentNameTdDetail").html(studentName);
+        $("#classNameTdDetail").html(className);
+        if (leaveType == '0') {//节次
+            $("#leaveTypeTdDetail").html('节次');
+            $("#courseIndexTdDetail").html(courseIndex);
+            $("#leaveDaysTdDetail").html('-');
+        } else if (leaveType == '1') {//天数
+            $("#leaveTypeTdDetail").html('天数');
+            $("#courseIndexTdDetail").html('-');
+            $("#leaveDaysTdDetail").html(leaveDays);
+        }
+        $("#createTimeTdDetail").html(createTime);
+        $("#studentMobileTdDetail").html(studentMobile);
+        $("#studentNoteTdDetail").html(studentNote);
+        $("#instructorNoteDetail").val("");
+        if (instructorNote == 'null'|| instructorNote == '') {
+            instructorNote='无'
+        }
+        if (studentPipeNote == 'null'||studentPipeNote == '') {
+            studentPipeNote='无'
+        }
+        $("#instructorNoteContentDetail").html(instructorNote);
+        $("#studentPipeNoteContentDetail").html(studentPipeNote);
+        $("#leaveStartDateTdDetail").html(formatMillSecondsToDataYYYYMMDD(Number(leaveStartDate)));
+        $("#leaveEndDateTdDetail").html(formatMillSecondsToDataYYYYMMDD(Number(leaveEndDate)));
+        $("#colleageNameTdDetail").html(colleageName);
+        if(courseName=='null'){
+            courseName='';
+        }
+        $("#courseNameTdDetail").html(courseName);
+        $("#detailModal").modal();
+    }
 
 
 
@@ -534,7 +487,7 @@
         $.ajax({
             type: "POST",
             dataType: "json",
-            url: "<%=request.getContextPath()%>/webUser/resetTeacherPassword.do",
+            url: "<%=request.getContextPath()%>/webUser/resetStudentPassword.do",
             data: $('#resetPasswordForm').serialize(),
             beforeSend:function(){
                 //使form表单不可用
@@ -560,20 +513,16 @@
         });
     }
 
-    function flushPage(dt,flushPageFlag){
+    function flushPage(){
 
-        var info = dt.page.info();
+        var info = dataTable.page.info();
         var recordsTotal = Number(info['recordsTotal']);
         var startIndex = Number(info['start']);
         var endIndex = Number(info['end']);
         if(endIndex-startIndex==1){
-            dt.page('previous').draw(false);
+            dataTable.page('previous').draw(false);
         }else{
-            if(flushPageFlag){
-                dt.ajax.reload(null,true);
-            }else{
-                dt.ajax.reload(null,false);
-            }
+            dataTable.ajax.reload(null,false);
         }
     }
 
@@ -584,7 +533,108 @@
         $("#resetPasswordUserId").val('');
         $("#resetPasswordtoken").val('');
     }
+    /**
+    *显示 审批 modal
+     */
+    function showCheckModal(userNo,studentName,className,
+                            leaveType,leaveDays,courseIndex,
+                            createTime,studentMobile,studentNote,
+                            instructorNote,studentPipeNote,instructorApproved,
+                            studentPipeApproved,leaveStartDate,leaveEndDate,
+                            colleageName,courseName,approved,leaveId,
+                            flag) {
+        $("#leaveId").val(leaveId);
+        var role = '${user.role}';//1 辅导员 2 学管处 3 超级用户
+        $("#userNoTd").html(userNo);
+        $("#studentNameTd").html(studentName);
+        $("#classNameTd").html(className);
+        if (leaveType == '0') {//节次
+            $("#leaveTypeTd").html('节次');
+            $("#courseIndexTd").html(courseIndex);
+            $("#leaveDaysTd").html('-');
+        } else if (leaveType == '1') {//天数
+            $("#leaveTypeTd").html('天数');
+            $("#courseIndexTd").html('-');
+            $("#leaveDaysTd").html(leaveDays);
+        }
+        $("#createTimeTd").html(createTime);
+        $("#studentMobileTd").html(studentMobile);
+        $("#studentNoteTd").html(studentNote);
+        $("#instructorNote").val("");
+        if (instructorNote == 'null'|| instructorNote == '') {
+            instructorNote='无'
+        }
+        if (studentPipeNote == 'null'||studentPipeNote == '') {
+            studentPipeNote='无'
+        }
+        if(role=='1' || role=='2'){
+            if(instructorApproved=='-1'){//辅导员未审批，显示辅导员审批textArea
+                $("#instructorNoteTextArea").removeClass("sr-only");
+                $("#instructorNoteContent").addClass("sr-only");
+                //学管处审批一行不显示
+                $("#studentPipeNoteTr").addClass("sr-only");
+            }else{//辅导员已经审批，显示辅导员审批结果，同时处理学管处文本显示
+                $("#instructorNoteTextArea").addClass("sr-only");
+                $("#instructorNoteContent").removeClass("sr-only");
+                //学管处审批一行显示
+                $("#studentPipeNoteTr").removeClass("sr-only");
+                if(studentPipeApproved=='-1'){//学管处未审批,显示学管处textArea
+                    $("#studentPipeNoteTextArea").removeClass("sr-only");
+                    $("#studentPipeNoteContent").addClass("sr-only");
+                }else{//学管处已审批，显示学管处审批内容
+                    $("#studentPipeNoteTextArea").addClass("sr-only");
+                    $("#studentPipeNoteContent").removeClass("sr-only");
+                }
+            }
+        }else if('3'==role){
+            if(studentPipeApproved=='-1') {//学管处未审批,显示学管处textArea
+                $("#studentPipeNoteTextArea").removeClass("sr-only");
+                $("#studentPipeNoteContent").addClass("sr-only");
+            }else{//学管处已审批，显示学管处审批内容
+                $("#studentPipeNoteTextArea").addClass("sr-only");
+                $("#studentPipeNoteContent").removeClass("sr-only");
+            }
+        }
+        $("#instructorNoteContent").html(instructorNote);
+        $("#studentPipeNoteContent").html(studentPipeNote);
+        $("#leaveStartDateTd").html(formatMillSecondsToDataYYYYMMDD(Number(leaveStartDate)));
+        $("#leaveEndDateTd").html(formatMillSecondsToDataYYYYMMDD(Number(leaveEndDate)));
+        $("#colleageNameTd").html(colleageName);
+        if(courseName=='null'){
+            courseName='';
+        }
+        $("#courseNameTd").html(courseName);
 
+        //------------------控制modal的同意和不同意按钮的显示
+        if(flag){//同意
+            $("#agreeBt").removeClass("sr-only");
+            $("#disAgreeBt").addClass("sr-only");
+
+        }else{
+            $("#agreeBt").addClass("sr-only");
+            $("#disAgreeBt").removeClass("sr-only");
+        }
+        $("#checkModal").modal({
+            keyboard:false,
+            backdrop: 'static'
+        });
+    }
+
+    /**
+    *将毫秒转换成 yyyy-MM-dd  的时间格式
+    * @param millSeconds  毫秒值
+    * @returns {string}
+     */
+    function formatMillSecondsToDataYYYYMMDD(millSeconds){
+        var date = new Date(millSeconds);
+        return date.getFullYear()
+                + "-"// "年"
+                + ((date.getMonth() + 1) > 10 ? (date.getMonth() + 1) : "0"
+                        + (date.getMonth() + 1))
+                + "-"// "月"
+                + (date.getDate() < 10 ? "0" + date.getDate() : date
+                        .getDate());
+    }
 
 
     /**
@@ -597,42 +647,39 @@
     }
 
 
-    /**
-     * 显示删除 用户 的modal
-     */
-    function showDeleteUserModal(userId,token,role){
+    function showDeleteUserModal(userId,token){
         $("#deleteUserId").val(userId);
         $("#deleteUserToken").val(token);
-        $("#deleteUserRole").val(role);
         $("#deleteUserModal").modal();
     }
 
     /**
-     * 修改教师信息  modal
+     * 修改学生信息  modal
      */
-    function editTeacherModal(userId,token,userNo,name,colleageId,colleageName,classId,className,role){
-        $("#editTeacherTeacherId").val(userId);
-        $("#editTeacherToken").val(token);
-        $("#editTeacherTeacherNum").val(userNo);
-        $("#editTeacherTeacherName").val(name);
+    function editStudentModal(userId,token,userNo,name,colleageId,colleageName,classId,className){
+        $("#editStudentStudentId").val(userId);
+        $("#editStudentToken").val(token);
+        $("#editStudentStudentNum").val(userNo);
+        $("#editStudentStudentName").val(name);
+        $("#editStudentColleageName").val(colleageName);
+        $("#editStudentClassName").val(className);
+
 
         //重置学院信息
-        $("#editTeacherColleageId").html("");
+        $("#editStudentColleageId").html("");
+        $("#editStudentClassId").html("");
         //获取学院信息
-        getColleage('editTeacherColleageId',colleageId);
-        $("#editTeacherModal").modal();
+        getColleage('editStudentColleageId','editStudentClassId',colleageId,classId);
+        $("#editStudentModal").modal();
     }
 
-    /**
-     * 新增学生form表单提交
-     *
-     */
-    function submitaddTeacherForm(){
-        $("#addTeacherFormFieldset").attr("disabled",false);
-        var studentNumVal = $("#addTeacherTeacherNum").val();
-        var studentNameVal = $("#addTeacherTeacherName").val();
+    //新增学生form表单提交
+    function submitAddStudentForm(){
+        $("#addStudentFormFieldset").attr("disabled",false);
+        var studentNumVal = $("#addStudentStudentNum").val();
+        var studentNameVal = $("#addStudentStudentName").val();
         var colleageIdVal = $("#addStudentColleageId").val();
-        var editStudentClassIdVal = $("#addTeacherRoleId").val();
+        var editStudentClassIdVal = $("#addStudentClassId").val();
         if(studentNumVal==''){
             alert("学号不允许为空");
             return;
@@ -652,27 +699,27 @@
         $.ajax({
             type: "POST",
             dataType: "json",
-            url: "<%=request.getContextPath()%>/webUser/addTeacher.do",
-            data: $('#addTeacherForm').serialize(),
+            url: "<%=request.getContextPath()%>/webUser/addStudent.do",
+            data: $('#addStudentForm').serialize(),
             beforeSend:function(){
                 //使form表单不可用
-                $('#addTeacherFormFieldset').attr("disabled",true);
+                $('#addStudentFormFieldset').attr("disabled",true);
             },
             success: function (data) {
                 if(data['code']=='200'){
-                    $("#addTeacherModal").modal('hide');
-                    alert("老师信息添加成功");
+                    $("#addStudentModal").modal('hide');
+                    alert("学生信息添加成功");
                 }else{
                     alert(data['msg']);
                 }
                 //使form表单不可用
-                $('#addTeacherFormFieldset').attr("disabled",false);
-                $("#addTeacherModal").modal('hide');
-                flushPage(dataTable);
+                $('#addStudentFormFieldset').attr("disabled",false);
+                $("#addStudentModal").modal('hide');
+                flushPage();
             },
             error: function(data) {
-                $('#addTeacherFormFieldset').attr("disabled",false);
-                $("#addTeacherModal").modal('hide');
+                $('#addStudentFormFieldset').attr("disabled",false);
+                $("#addStudentModal").modal('hide');
                 alert("系统异常，请联系管理员");
             }
 
@@ -680,16 +727,15 @@
 
     }
 
-    /**
-     * 显示新增教师的 modal
-     */
-    function addTeacherModal(){
-        $("#addTeacherResetBt").trigger("click");//点击清空按钮
+
+    function addStudentModal(){
+
         //重置学院信息
         $("#addStudentColleageId").html("");
+        $("#addStudentClassId").html("");
         //获取学院信息
-        getColleage('addStudentColleageId','${user.colleageId}','');
-        $("#addTeacherModal").modal();
+        getColleage('addStudentColleageId','addStudentClassId','','');
+        $("#addStudentModal").modal();
     }
 
 
@@ -697,18 +743,19 @@
 
 
     /**
-    *提交修改老师信息的表单
+    *提交修改学生信息的表单
      */
     function submitEditStudentForm() {
-        $("#editTeacherFormFieldset").attr("disabled",false);
-        var teacherNumVal = $("#editTeacherTeacherNum").val();
-        var teacherNameVal = $("#editTeacherTeacherName").val();
-        var colleageIdVal = $("#editTeacherColleageId").val();
-        if(teacherNumVal==''){
+        $("#editStudentFormFieldset").attr("disabled",false);
+        var studentNumVal = $("#editStudentStudentNum").val();
+        var studentNameVal = $("#editStudentStudentName").val();
+        var colleageIdVal = $("#editStudentColleageId").val();
+        var editStudentClassIdVal = $("#editStudentClassId").val();
+        if(studentNumVal==''){
             alert("学号不允许为空");
             return;
         }
-        if(teacherNameVal==''){
+        if(studentNameVal==''){
             alert("姓名不允许为空");
             return;
         }
@@ -716,43 +763,45 @@
             alert("学院不允许为空");
             return;
         }
+        if(editStudentClassIdVal=='' || editStudentClassIdVal==null){
+            alert("班级不允许为空");
+            return;
+        }
         $.ajax({
             type: "POST",
             dataType: "json",
-            url: "<%=request.getContextPath()%>/webUser/editTeacher.do",
-            data: $('#editTeacherForm').serialize(),
+            url: "<%=request.getContextPath()%>/webUser/editStudent.do",
+            data: $('#editStudentForm').serialize(),
             beforeSend:function(){
                 //使form表单不可用
-                $('#editTeacherFormFieldset').attr("disabled",true);
+                $('#editStudentFormFieldset').attr("disabled",true);
             },
             success: function (data) {
                 if(data['code']=='200'){
+                    $("#resetPasswordModal").modal('hide');
                     alert("用户信息修改成功");
                 }else{
                     alert(data['msg']);
                 }
-                //使form表单变成可用
-                $('#editTeacherFormFieldset').attr("disabled",false);
-                $("#editTeacherModal").modal('hide');
-                flushPage(dataTable);
+                //使form表单不可用
+                $('#editStudentFormFieldset').attr("disabled",false);
+                $("#editStudentModal").modal('hide');
+                flushPage();
             },
             error: function(data) {
-                $('#editTeacherFormFieldset').attr("disabled",false);
-                $("#editTeacherModal").modal('hide');
+                $('#editStudentFormFieldset').attr("disabled",false);
+                $("#editStudentModal").modal('hide');
                 alert("系统异常，请联系管理员");
             }
 
         });
     }
 
-    /**
-    *提交删除老师的表单
-     */
     function confirmDeleteUser() {
         $.ajax({
             type: "POST",
             dataType: "json",
-            url: "<%=request.getContextPath()%>/webUser/deleteTeacher.do",
+            url: "<%=request.getContextPath()%>/webUser/deleteStudent.do",
             data: $('#deleteUserForm').serialize(),
             beforeSend:function(){
                 //删除用户按钮不可用
@@ -760,8 +809,8 @@
             },
             success: function (data) {
                 if(data['code']=='200'){
-                    alert("老师信息删除成功");
-                    flushPage(dataTable);
+                    alert("学生信息删除成功");
+                    flushPage();
                 }else{
                     alert("系统异常，请联系管理员");
                 }
@@ -777,15 +826,8 @@
         });
     }
 
-    /**
-    *获得学院列表
-    * @param colleageIdSelect
-    * @param colleageId
-    * @param classId
-     */
-    function getColleage(colleageIdSelect,colleageId,classId,neededEmptyOption){
-        var role = '${user.role}';
-        var selfColleageId = '${user.colleageId}';//当前用户的colleageId
+
+    function getColleage(colleageIdSelect,classIdSelect,colleageId,classId){
         $.ajax({
             type: "POST",
             dataType: "json",
@@ -794,23 +836,65 @@
                 if(data['code']=='200'){
                     var colleages = data['data'];
                     var optionsStr = '';
-                    if(neededEmptyOption){
-                        optionsStr+='<option value="">请选择</option>'
-                    }
                     for(var i =0;i<colleages.length;i++){
                         var colleage = colleages[i];
                         if(colleageId==colleage['colleageId']){
                             optionsStr+='<option selected value="'+colleage['colleageId']+'">'+colleage['colleageName']+'</option>';
                         }else{
-                            if(role=='3'){//当前用户是超级管理员的情况，才允许设置学院
-                                optionsStr+='<option value="'+colleage['colleageId']+'">'+colleage['colleageName']+'</option>';
-                            }
+                            optionsStr+='<option value="'+colleage['colleageId']+'">'+colleage['colleageName']+'</option>';
                         }
                     }
                     $("#"+colleageIdSelect).html(optionsStr);
+                    if(colleageIdSelect=='editStudentColleageId'){
+                        $("#editStudentColleageName").val($("#"+colleageIdSelect+"  option:selected").text());
+                    }else if(colleageIdSelect=='addStudentColleageId'){
+                        $("#addStudentColleageName").val($("#"+colleageIdSelect+"  option:selected").text());
+                    }
+                    getClasses(classIdSelect,colleageId,classId);
                 }else{
                     alert("系统异常，请联系管理员");
                 }
+                //使form表单不可用
+                $('#resetPasswordFormFieldset').attr("disabled",false);
+            },
+            error: function(data) {
+                $("#checkModal").modal('hide');
+                alert("系统异常，请联系管理员");
+            }
+
+        })
+    }
+
+    function getClasses(classIdSelect,colleageId,classId){
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "<%=request.getContextPath()%>/webUser/getClasses.do",
+            data: {"colleageId":colleageId},
+            success: function (data) {
+                if(data['code']=='200'){
+                    var classes = data['data'];
+                    var optionsStr = '';
+                    for(var i =0;i<classes.length;i++){
+                        var classItem = classes[i];
+                        if(classId==classItem['classId']){
+                            optionsStr+='<option selected value="'+classItem['classId']+'">'+classItem['className']+'</option>';
+                        }else{
+                            optionsStr+='<option value="'+classItem['classId']+'">'+classItem['className']+'</option>';
+                        }
+                    }
+                    if(classIdSelect=='editStudentClassId'){
+                        $("#editStudentClassId").html(optionsStr);
+                        $("#editStudentClassName").val($("#editStudentClassId  option:selected").text());
+                    }else if(classIdSelect=='addStudentClassId'){
+                        $("#addStudentClassId").html(optionsStr);
+                        $("#addStudentClassName").val($("#addStudentClassId  option:selected").text());
+                    }
+                }else{
+                    alert("系统异常，请联系管理员");
+                }
+                //使form表单不可用
+                $('#resetPasswordFormFieldset').attr("disabled",false);
             },
             error: function(data) {
                 $("#checkModal").modal('hide');
@@ -821,110 +905,13 @@
     }
 
     /**
-    *显示老师 负责的  班级列表
+    *显示权限面板，即调整 老师 所负责的班级
+    * @param userId
+    * @param token
      */
-    function showTeacherManagedClassModal(userId,token){
-        initTeacherManagedClassForm(userId,token);
-        initTeacherManagedClassTable(userId,token);
-        $("#teacherManagedClassModal").modal();
+    function showSecurityModal(userId,token){
+        window.open("<%=request.getContextPath()%>/webUser/showSecurity.do?userId="+userId+"&token="+token,"老师班级管理面板","alwaysRaised=yes,z-look=yes,height=100,width=400,top=0,left=0,toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no");
     }
-
-    function initTeacherManagedClassForm(userId,token){
-        $("#teacherManagedUserId").val(userId);
-        $("#teacherManagedToken").val(token);
-
-        if('${user.role}'=='3'){//超级管理员，才具有筛选学院的功能
-            getColleage('teacherManagedColleageId','','',true)
-        }
-    }
-
-    var teacherManagedTable;
-    /**
-    *初始化 班级列表
-     */
-    var teacherManagedPostData;
-    function initTeacherManagedClassTable(){
-        teacherManagedPostData = $("#teacherManagedClassForm").serializeJson();
-        if(teacherManagedTable==null){
-            teacherManagedTable=$("#teacherManagedClassTable").DataTable( {
-                'dom': 'rt<"row"<"col-sm-3"i><"col-sm-6 float_left"p><"col-sm-3"l>>', // 元素布局
-                'language': {
-                    'emptyTable': '没有数据',
-                    'loadingRecords': '加载中...',
-                    'processing': '查询中...',
-                    'search': '检索:',
-                    'lengthMenu': '每页 _MENU_ 条',
-                    'zeroRecords': '没有数据',
-                    'paginate': {
-                        'first':      '第一页',
-                        'last':       '最后一页',
-                        'previous':   '上一页',
-                        'next':       '下一页'
-                    },
-                    'info': '共计 _TOTAL_  条',
-                    'infoEmpty': '没有数据',
-                    'infoFiltered': '(过滤总件数 _MAX_ 条)'
-                },
-                renderer: "bootstrap",
-                "searching": false,//不显示搜索框
-                "initComplete":function( settings, json ){
-                    json=null;
-                },
-                "drawCallback": function( settings ) {
-                    return null;
-                },
-                "columns": [
-                    {data:'dd',"orderable": false,render:function(){
-                        return '<input type="checkbox"></input>';
-                        }
-                    },
-                    { "data": "colleageName","orderable": false},
-                    { "data": "className","orderable": false},
-                    { "data": "userName","orderable": false},
-                    { "data": "cz","width": "20%" ,"orderable": false,"render": function ( data, type, full, meta ) {
-                        var managed = full['managed'];
-                        var czStr = '';
-                        //
-                        if(managed=='0'){
-                            czStr+='<button type="button" class="btn btn-primary">添加</button>';
-                        }
-                        if(managed=='1'){
-                            czStr+='<button type="button" class="btn btn-primary">删除</button>';
-                        }
-                        return czStr;
-                        }
-                    }
-                ],
-                "order": [],
-                serverSide: true,
-                processing:true,
-                "info": true,
-                ajax: {
-                    url: '<%=request.getContextPath()%>/webUser/getTeacherClassList.do',
-                    type: 'POST',
-                    dataType: "json",
-                    data: function ( d ) {
-                        return $.extend( {}, d,teacherManagedPostData );
-                    }
-                    //                   "dataSrc":function(json){
-                    //                       alert("dddd");
-                    //                       return null;
-                    //                   }
-                    //                   success:function(){
-                    //                       alert("ddd");
-                    //                   },
-                    //                   error:function(){
-                    //                       alert("error");
-                    //                   }
-                }
-            });
-        }else{
-            flushPage(teacherManagedTable);
-        }
-
-    }
-
-
 </script>
 </body>
 

@@ -6,7 +6,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="keywords" content="" />
   <meta name="description" content="" />
-  <link rel="stylesheet" type="text/css" href="../resources/css/css.css" />
+  <link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/resources/css/css.css" />
 
   <title></title>
   <style>

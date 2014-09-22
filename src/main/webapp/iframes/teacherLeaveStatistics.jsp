@@ -22,7 +22,7 @@
   <script type="text/javascript">
 		$(document).ready(function(){
             window.parent.changeToken("userId + key");
-            window.parent.changeAddress("leave/studentGetLeaveList")
+            window.parent.changeAddress("leave/teacherLeaveStatistics")
             $("#submitBT").bind("click",function(){
                 $("#prevId").html("");
                 var host = $(window.parent.document.getElementById("host")).html();
@@ -30,7 +30,7 @@
                 $.ajax({
                     type: "POST",
                     dataType: "html",
-                    url:host+"/leave/studentGetLeaveList.do",
+                    url:host+"/leave/teacherLeaveStatistics.do",
                     data: $('#subForm').serialize(),
                     success: function (result) {
                         var strresult=result;
@@ -55,12 +55,7 @@
         <strong>说明</strong>
     </div>
     <div class="alert alert-info">
-        学生获得请假列表。
-        包括：</br>
-         1：待审批</br>
-         2：最新审批（最近一周的审批结果，包括已审批和未审批）</br>
-         3：审批列表时间段查询</br>
-         4:获得已审批未销假列表
+        学生 销假
     </div>
 	<div class="alert alert-info">
 		<strong>请求参数</strong>
@@ -75,16 +70,16 @@
                     <th>备注</th>
                 </tr>
                 <tr>
-                    <td style="width:10%" >请求的列表数据类型</td>
-                    <td style="width:10%">studentQueryLeaveListType</td>
-                    <td style="width:10%">1</td>
-                    <td style="width:10%"> 1:待审批   2:最新审批 3:审批列表时间段查询</td>
-                </tr>
-                <tr>
-                    <td style="width:10%">用户ID</td>
+                    <td style="width:10%" >当前用户ID</td>
                     <td style="width:10%">userId</td>
                     <td style="width:10%">1</td>
-                    <td style="width:10%">     </td>
+                    <td style="width:10%"> </td>
+                </tr>
+                <tr>
+                    <td style="width:10%">统计课程</td>
+                    <td style="width:10%">courseIndex</td>
+                    <td style="width:10%"> </td>
+                    <td style="width:10%">空  统计全部  1  第一节课 2第二节课  4第三节课 8 第四节课</td>
                 </tr>
                 <tr>
                     <td style="width:10%">秘钥</td>
@@ -92,24 +87,23 @@
                     <td style="width:10%"> </td>
                     <td style="width:10%">秘钥的生成方式见 API URL token=</td>
                 </tr>
-
-                <tr>
-                    <td style="width:10%">页码</td>
-                    <td style="width:10%">pageNum</td>
-                    <td style="width:10%">1</td>
-                    <td style="width:10%" style="background:red;">页码从1开始，不是0</td>
+               <tr>
+                    <td style="width:10%">学生姓名</td>
+                    <td style="width:10%">studentName</td>
+                    <td style="width:10%">杨凯</td>
+                    <td style="width:10%"></td>
                 </tr>
-                <tr>
-                    <td style="width:10%">每页显示的条数</td>
-                    <td style="width:10%">pageSize</td>
-                    <td style="width:10%">20</td>
+               <tr>
+                    <td style="width:10%">学号</td>
+                    <td style="width:10%">studentNum</td>
+                    <td style="width:10%">90916p39</td>
                     <td style="width:10%"></td>
                 </tr>
                 <tr>
-                    <td colspan="4" style="background:red;">上面的字段对 所有的请求列表数据类型  都适用 </td>
-                </tr>
-                <tr>
-                    <td colspan="4"  style="background:green;text-align: center;">，下面的字段只针对 3（审批列表时间段查询）有效</td>
+                    <td style="width:10%">班级</td>
+                    <td style="width:10%">classId</td>
+                    <td style="width:10%"></td>
+                    <td style="width:10%">班级Id，请调用 老师获取负责班级接口  获得</td>
                 </tr>
                 <tr>
                     <td style="width:10%">查询开始时间</td>
@@ -123,7 +117,6 @@
                     <td style="width:10%">2014-09-03  00:00:00</td>
                     <td style="width:10%">格式yyyy-MM-dd hh:mm:ss</td>
                 </tr>
-
 			</thead>
 		</table>
 	</div>
@@ -136,39 +129,33 @@
 	<div>
 		<form class="form-inline" name="subForm" method="post" id="subForm">
 			<div class="input-prepend">
-            <p>
-                <span class="add-on">leaveType</span>
-                <select onchange="changeLeaveType();" id="studentQueryLeaveListType" name="studentQueryLeaveListType">
-                    <option value="1">待审批 [1]</option>
-                    <option value="2">最新审批[2]</option>
-                    <option value="3">审批列表时间段查询[3]</option>
-                    <option value="4">获得已审批未销假列表[4]</option>
-                </select>
-                <script type="text/javascript">
-                    $('#studentQueryLeaveListType').change(function() {
-                        var checkIndex=$(this).get(0).selectedIndex;
-                        if(checkIndex==2){//显示时间段参数
-                            $("#oeruidP").show();
-                        }else{//隐藏时间段参数
-                            $("#oeruidP").hide();
-                        }
-                    });
-
-                </script>
-            </p>
 			<p>
 				<span class="add-on">userId</span>
-					<input class="span2" type="text" name="userId" value='1'/>
+					<input class="span2" type="text" name="userId" value='201407261644000001'/>
                 <span class="add-on">token</span>
-                    <input class="span2" type="text" name="token" value='eeafb716f93fa090d7716749a6eefa72' />
-                <span class="add-on">pageNum</span>
-                    <input class="span2" type="text" name="pageNum" value='1' />
-                <span class="add-on">pageSize</span>
-                 <input class="span2" type="text" name="pageSize" value='10' />
-            </p>
-            <p id="oeruidP" style="display: none;">
+                    <input class="span2" type="text" name="token" value='0b7403611d4ad964cc4c2b6cffbc87f1' />
+                <span class="add-on">courseIndex</span>
+                    <select  id="courseIndex" name="courseIndex">
+                        <option value="">统计全部(值是 空)</option>
+                        <option value="1">1  第一节课 </option>
+                        <option value="2">2  第二节课</option>
+                        <option value="4">4  第三节课</option>
+                        <option value="8">8  第四节课</option>
+                    </select>
+                <span class="add-on">studentName</span>
+                     <input class="span2" type="text" name="studentName" value='杨凯' />
+                </br>
+                <span class="add-on">studentNum</span>
+                     <input class="span2" type="text" name="studentNum" value='90916p39' />
+                <span class="add-on">classId</span>
+                    <select  id="classId" name="classId">
+                        <option value="">统计全部(值是 空)</option>
+                        <option value="1">90916p  (1) </option>
+                        <option value="2">90917p  （2）</option>
+                        <option value="3">...等等..</option>
+                    </select>
                 <span class="add-on">startTime</span>
-                    <input class="span2" type="text" name="startTime" value='2014-03-03 00:00:00'/>
+                    <input class="span2" type="text" name="startTime" value='2014-09-03  00:00:00' />
                 <span class="add-on">endTime</span>
                     <input class="span2" type="text" name="endTime" value='2014-09-03  00:00:00' />
             </p>

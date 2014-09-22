@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.njcit.dao.user.UserDao">
+    <update id="updateStudentPassword" parameterType="cn.njcit.domain.user.User">
+        update tb_student
+        set password=#{password}
+        where student_id=#{userId}
+    </update>
+    <update id="updateTeacherPassword"  parameterType="cn.njcit.domain.user.User">
+        update tb_teacher
+        set password=#{password}
+        where teacher_id=#{userId}
+    </update>
 
     <!--获得基本用户的信息-->
     <select id="getUser" parameterType="cn.njcit.domain.user.User" resultType="cn.njcit.domain.user.User" >
@@ -61,5 +71,47 @@
         where colleage_id=#{colleageId}
     </select>
 
+
+
+
+    <!--获得学生的信息带密码-->
+    <select id="getStudentWithPassword"  parameterType="cn.njcit.domain.user.User"   resultType="cn.njcit.domain.user.User">
+        select t.student_id userId,t.student_num userNo,t.student_name name,t.password password,
+        t.colleage_id colleageId,t.professional_id professionalId,t.class_id classId,t.class_name className
+        from  tb_student as t
+        where 1=1
+        <if test="userId!=null and userId!=''">
+            and  t.student_id=#{userId}
+        </if>
+        <if test="userNo!=null and userNo!=''">
+            and  t.student_num=#{userNo}
+        </if>
+        <if test="password!=null and password!=''">
+            and t.password=#{password}
+        </if>
+        <if test="name!=null and name!=''">
+            and  t.student_name=#{name}
+        </if>
+    </select>
+    <select id="getTeacherWithPassword"  parameterType="cn.njcit.domain.user.User" resultType="cn.njcit.domain.user.User">
+          select t.teacher_id userId,t.teacher_name name,t.teacher_work_num userNo,
+               t.colleage_id colleageId,t.role role,t.password password
+        from  tb_teacher as t
+        where 1=1
+        <if test="userId!=null and userId!=''">
+            and  t.teacher_id=#{userId}
+        </if>
+        <if test="name!=null and name!=''">
+            and t.teacher_name=#{name}
+        </if>
+        <if test="userNo!=null and userNo!=''">
+            and t.teacher_work_num=#{userNo}
+        </if>
+        <if test="password!=null and password!=''">
+            and t.password=#{password}
+        </if>
+
+
+    </select>
 
 </mapper>

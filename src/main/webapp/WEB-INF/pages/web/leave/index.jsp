@@ -13,24 +13,24 @@
     <title>SB Admin 2 - Bootstrap Admin Theme</title>
 
     <!-- Bootstrap Core CSS -->
-    <link href="/resources/bootstrap-sb-admin/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- MetisMenu CSS -->
-    <link href="/resources/bootstrap-sb-admin/css/plugins/metisMenu/metisMenu.min.css" rel="stylesheet">
+    <link href="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/css/plugins/metisMenu/metisMenu.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link href="/resources/bootstrap-sb-admin/css/sb-admin-2.css" rel="stylesheet">
+    <link href="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/css/sb-admin-2.css" rel="stylesheet">
 
     <!-- Morris Charts CSS -->
-    <link href="/resources/bootstrap-sb-admin/css/plugins/morris.css" rel="stylesheet">
+    <link href="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/css/plugins/morris.css" rel="stylesheet">
 
     <!-- Custom Fonts -->
-    <link href="/resources/bootstrap-sb-admin/font-awesome-4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/font-awesome-4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
     <!-- DataTables CSS -->
-    <link href="/resources/bootstrap-sb-admin/css/plugins/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/css/plugins/dataTables.bootstrap.css" rel="stylesheet">
 
     <!-- self custom CSS -->
-    <link href="/resources/css/mycss.css" rel="stylesheet">
+    <link href="<%=request.getContextPath()%>/resources/css/mycss.css" rel="stylesheet">
 
 
 
@@ -280,21 +280,21 @@
 
 
 <!-- jQuery Version 1.11.0 -->
-<script src="/resources/bootstrap-sb-admin/js/jquery-1.11.0.js"></script>
+<script src="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/js/jquery-1.11.0.js"></script>
 
 <!-- Bootstrap Core JavaScript -->
-<script src="/resources/bootstrap-sb-admin/js/bootstrap.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/js/bootstrap.min.js"></script>
 
 <!-- Metis Menu Plugin JavaScript -->
-<script src="/resources/bootstrap-sb-admin/js/plugins/metisMenu/metisMenu.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/js/plugins/metisMenu/metisMenu.min.js"></script>
 
 
 <!-- Custom Theme JavaScript -->
-<script src="/resources/bootstrap-sb-admin/js/sb-admin-2.js"></script>
+<script src="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/js/sb-admin-2.js"></script>
 
 
-<script type="text/javascript" src="/resources/datables/js/jquery.dataTables.js"></script>
-<script src="/resources/bootstrap-sb-admin/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/resources/datables/js/jquery.dataTables.js"></script>
+<script src="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/js/plugins/dataTables/dataTables.bootstrap.js"></script>
 <script type="text/javascript">
     (function($){
         $.fn.serializeJson=function(){
@@ -446,7 +446,7 @@
                 processing:true,
                 "info": true,
                 ajax: {
-                    url: '/webLeave/unCheckedLeaveList.do',
+                    url: '<%=request.getContextPath()%>/webLeave/unCheckedLeaveList.do',
                     type: 'POST',
                     dataType: "json",
                     data: function ( d ) {
@@ -540,7 +540,7 @@
         $.ajax({
             type: "POST",
             dataType: "json",
-            url: "/webLeave/checkLeaveItem.do",
+            url: "<%=request.getContextPath()%>/webLeave/checkLeaveItem.do",
             data: $('#objForm').serialize(),
             beforeSend:function(){
                 //使form表单不可用

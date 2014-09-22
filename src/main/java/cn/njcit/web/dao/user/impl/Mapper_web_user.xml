@@ -156,6 +156,58 @@
         where 1=1
         <include refid="queryTeacherWhereStatement"/>
     </select>
+    <select id="getTeacherClassList" parameterType="cn.njcit.web.controller.user.TClassQueryForm" resultType="cn.njcit.web.controller.user.TClass">
+        select *
+        from
+        (
+            select tcl.class_id classId,tcl.class_name className,tcl.colleage_id colleageId,tco.colleage_name colleageName,
+                (case
+                            when ttmc.teacher_id=#{userId}  then 1
+                            when ttmc.teacher_id is null then 0
+                            else 2
+                end
+                ) managed,tt.teacher_name userName,tt.teacher_work_num userNo
+            from tb_class tcl left join tb_teacher_managed_class ttmc on tcl.class_id=ttmc.class_id inner join tb_colleage tco on tcl.colleage_id=tco.colleage_id left join tb_teacher tt on ttmc.teacher_id=tt.teacher_id
+        )t
+        where 1=1
+        <include refid="queryTeacherListWhereStatement"/>
+        <if test="orderByName!=null and orderByName!=''">
+            order by ${orderByName} ${orderByOrder}
+        </if>
+        limit #{start},#{length}
+    </select>
+    <select id="getTeacherClassCount"  parameterType="cn.njcit.web.controller.user.TClassQueryForm"  resultType="java.lang.Integer">
+        select count(1)
+        from
+        (
+            select tcl.class_id classId,tcl.class_name className,tcl.colleage_id colleageId,tco.colleage_name colleageName,
+            (case
+            when ttmc.teacher_id=#{userId}  then 1
+            when ttmc.teacher_id is null then 0
+            else 2
+            end
+            ) managed
+            from tb_class tcl left join tb_teacher_managed_class ttmc on tcl.class_id=ttmc.class_id inner join tb_colleage tco on tcl.colleage_id=tco.colleage_id
+        )t
+        where 1=1
+        <include refid="queryTeacherListWhereStatement"/>
+    </select>
+
+    <sql id="queryTeacherListWhereStatement">
+        <if test="managed!=null and managed!=''">
+            and   t.managed=#{managed}
+        </if>
+        <if test="className!=null and className!=''">
+            and   t.className=#{className}
+        </if>
+        <if test="colleageId!=null and colleageId!=''">
+            and   t.colleageId=#{colleageId}
+        </if>
+        <if test="colleageName!=null and colleageName!=''">
+            and   t.colleageName=#{colleageName}
+        </if>
+    </sql>
+
 
 
     <sql id="queryTeacherWhereStatement">
@@ -251,6 +303,11 @@
         delete from tb_teacher
         where teacher_id=#{teacherId}
     </delete>
+    <delete id="deleteManagedClass" parameterType="string">
+      delete
+      from tb_teacher_managed_class
+      where teacher_id=#{teacherId}
+    </delete>
 
     <update id="editTeacher" parameterType="cn.njcit.web.controller.user.Teacher">
         update tb_teacher
@@ -263,6 +320,9 @@
             </if>
             <if test="colleageId!=null and colleageId!=''">
                 colleage_id=#{colleageId},
+            </if>
+            <if test="role!=null and role!=''">
+                role=#{role},
             </if>
         </set>
         where teacher_id=#{teacherId}

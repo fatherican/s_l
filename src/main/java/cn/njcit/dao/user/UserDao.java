@@ -44,4 +44,12 @@ public interface UserDao {
      * @return
      */
     List<Map> getClassesByColleageId(Map reqMap);
+
+    User getStudentWithPassword(User queryUser);
+
+    int updateStudentPassword(User reqUser);
+
+    User getTeacherWithPassword(User queryUser);
+
+    int updateTeacherPassword(User reqUser);
 }

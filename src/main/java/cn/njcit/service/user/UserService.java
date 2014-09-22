@@ -21,4 +21,9 @@ public interface UserService {
      * @return
      */
     List<Map> getTeacherManagedClass(Map reqMap);
+
+
+    User getUniqueUser(User queryUser);
+
+    int updatePassword(User reqUser);
 }

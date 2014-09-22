@@ -2,12 +2,14 @@ package cn.njcit.service.leave.impl;
 
 import cn.njcit.common.constants.AppConstants;
 import cn.njcit.common.exception.ServiceException;
+import cn.njcit.controller.leave.LeaveStatisticsQueryForm;
 import cn.njcit.core.redis.RedisInstance;
 import cn.njcit.dao.leave.LeaveDao;
 import cn.njcit.dao.user.UserDao;
 import cn.njcit.domain.leave.Leave;
 import cn.njcit.domain.user.User;
 import cn.njcit.service.leave.LeaveService;
+import cn.njcit.service.user.UserService;
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -16,6 +18,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -35,6 +38,8 @@ public class LeaveServiceImpl implements LeaveService {
 
     @Autowired
     private RedisInstance redisInstance;
+    @Autowired
+    private UserService userService;
 
 
     @Override
@@ -216,6 +221,134 @@ public class LeaveServiceImpl implements LeaveService {
         List<Leave> leaveList = leaveDao.getLeaveList(reqMap);
         converLeaveList(leaveList);
         return leaveList;
+    }
+
+    @Override
+    public Map studentLeaveStatistics(Map queryMap) {
+//        queryMap.put("startTime", startTime);
+//        queryMap.put("endTime", endTime);
+//        queryMap.put("statisticsType", statisticsType);
+//        queryMap.put("userId",userId);
+          int leaveDays = 0;
+          int firstClassTimes = 0;
+          int secondClassTimes = 0;
+          int thirdClassTimes = 0;
+          int fourthClassTimes = 0;
+          int courseCount =0;
+          Map resultMap = new HashMap();
+          String statisticsType = (String)queryMap.get("statisticsType");
+          if(StringUtils.isNotEmpty(statisticsType)){
+              if("0".equals(statisticsType)){//只统计天数请假的
+                  leaveDays = leaveDao.statisticsLeaveDays(queryMap);
+
+              }
+              List<String> courseList = new ArrayList<String>();
+              if("1".equals(statisticsType)){//1  1+2 1+4 1+8
+                  courseList.add("1");
+                  courseList.add("3");
+                  courseList.add("5");
+                  courseList.add("9");
+              }
+              if("2".equals(statisticsType)){//2  2+1 2+4 2+8
+                  courseList.add("2");
+                  courseList.add("3");
+                  courseList.add("6");
+                  courseList.add("10");
+              }
+              if("4".equals(statisticsType)){//1+4  2+4 4 4+8
+                  courseList.add("5");
+                  courseList.add("6");
+                  courseList.add("4");
+                  courseList.add("12");
+              }
+              if("8".equals(statisticsType)){//1+8  2+8 4+8 8
+                  courseList.add("9");
+                  courseList.add("10");
+                  courseList.add("12");
+                  courseList.add("8");
+              }
+              queryMap.put("courseList",courseList);
+              courseCount = leaveDao.statisticsLeaveCourseTimes(queryMap);
+              if("1".equals(statisticsType)){//1  1+2 1+4 1+8
+                  firstClassTimes=courseCount;
+              }
+              if("2".equals(statisticsType)){//2  2+1 2+4 2+8
+                  secondClassTimes=courseCount;
+              }
+              if("4".equals(statisticsType)){//1+4  2+4 4 4+8
+                  thirdClassTimes=courseCount;
+              }
+              if("8".equals(statisticsType)){//1+8  2+8 4+8 8
+                  fourthClassTimes=courseCount;
+              }
+          }else{//没有具体的统计类型，则统计所有
+              //统计天数
+              leaveDays = leaveDao.statisticsLeaveDays(queryMap);
+              List<String> courseList = new ArrayList<String>();
+              queryMap.put("courseList",courseList);
+              //统计第一节课
+              courseList.add("1");
+              courseList.add("3");
+              courseList.add("5");
+              courseList.add("9");
+              courseCount = leaveDao.statisticsLeaveCourseTimes(queryMap);
+              firstClassTimes=courseCount;
+              courseList.clear();
+              //统计第二节课
+            courseList.add("2");
+            courseList.add("3");
+            courseList.add("6");
+            courseList.add("10");
+            courseCount = leaveDao.statisticsLeaveCourseTimes(queryMap);
+            secondClassTimes=courseCount;
+            courseList.clear();
+              //统计第三节课
+            courseList.add("5");
+            courseList.add("6");
+            courseList.add("4");
+            courseList.add("12");
+            courseCount = leaveDao.statisticsLeaveCourseTimes(queryMap);
+            thirdClassTimes=courseCount;
+            courseList.clear();
+              //统计第四节课
+            courseList.add("9");
+            courseList.add("10");
+            courseList.add("12");
+            courseList.add("8");
+            courseCount = leaveDao.statisticsLeaveCourseTimes(queryMap);
+            fourthClassTimes=courseCount;
+            courseList.clear();
+          }
+          resultMap.put("leaveDays",leaveDays);
+          resultMap.put("firstClassTimes",firstClassTimes);
+          resultMap.put("secondClassTimes",secondClassTimes);
+          resultMap.put("thirdClassTimes",thirdClassTimes);
+          resultMap.put("fourthClassTimes",fourthClassTimes);
+        return resultMap;
+    }
+
+    @Override
+    public List<Map> teacherGetLeaveStatistics(LeaveStatisticsQueryForm leaveQueryForm, String userId) {
+        List<String> classIdList = new ArrayList<String>();
+        Map reqMap = new HashMap();
+        reqMap.put("userId",userId);
+        User user  = redisInstance.getUserInfo(userId);
+        int role = user.getRole();
+        if(AppConstants.INSTRUCTOR__ROLE.intValue()==role) {//辅导员角色
+            List<Map> managedClassList = userService.getTeacherManagedClass(reqMap);
+            if(managedClassList!=null){
+                for(Map map : managedClassList){
+                    String classId = String.valueOf(map.get("class_id"));
+                    classIdList.add(classId);
+                }
+                leaveQueryForm.setClassIdList(classIdList);
+            }
+        }else if(AppConstants.STUDENT_PIPE_ROLE.intValue()==role){
+            leaveQueryForm.setColleageId(String.valueOf(user.getColleageId()));
+        }
+        List<Map> leaveStatisList = leaveDao.teacherGetLeaveStatistics(leaveQueryForm);
+
+        return leaveStatisList;
     }
 
     @Override

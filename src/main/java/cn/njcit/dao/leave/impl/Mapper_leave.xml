@@ -56,6 +56,9 @@
         <if test="leaveSicked!=null and leaveSicked!=''">
             and leave_sicked = #{leaveSicked}
         </if>
+        <if test="leaveEndDate!=null and leaveEndDate!=''">
+            and #{leaveEndDate}>leave_end_date
+        </if>
         <if test="createTimeStart!=null and createTimeStart!=''">
             and create_time >= #{createTimeStart}
         </if>
@@ -217,4 +220,104 @@
             </otherwise>
         </choose>
     </select>
+    <select id="statisticsLeaveDays" resultType="java.lang.Integer" parameterType="hashmap">
+        SELECT IF(sum(tl.leave_days) is null,0,sum(tl.leave_days))  leaveDays
+        from tb_leave tl
+        where tl.student_id=#{userId} and tl.approved=1 and tl.leave_type=1
+        <include refid="studentStatisticsWhereStatement"/>
+    </select>
+    <select id="statisticsLeaveCourseTimes" resultType="java.lang.Integer">
+        SELECT IF(count(1) is null,0,count(1))  times
+        from tb_leave tl
+        where tl.student_id=#{userId}  and tl.approved=1 and tl.leave_type=0
+        <include refid="studentStatisticsWhereStatement"/>
+        <if test="courseList!=null and courseList!=''">
+            and tl.course_index in
+            <foreach collection="courseList" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+
+    </select>
+    <select id="teacherGetLeaveStatistics" parameterType="cn.njcit.controller.leave.LeaveStatisticsQueryForm" resultType="java.util.Map">
+        SELECT class_id classId,class_name className,
+        sum(
+            (
+                CASE
+                when tl.leave_type='0' and (tl.course_index=1 or tl.course_index=3 or tl.course_index=5 or tl.course_index=9) then 1
+                ELSE 0
+                END
+            )
+        ) firstClassTimes,
+        sum(
+            (
+                CASE
+                when tl.leave_type='0' and (tl.course_index=2 or tl.course_index=3 or tl.course_index=6 or tl.course_index=10) then 1
+                ELSE 0
+                END
+            )
+        ) secondClassTimes,
+        sum(
+            (
+                CASE
+                when tl.leave_type='0' and (tl.course_index=5 or tl.course_index=6 or tl.course_index=4 or tl.course_index=12) then 1
+                ELSE 0
+                END
+            )
+        ) thirdClassTimes,
+        sum(
+            (
+                CASE
+                when tl.leave_type='0' and (tl.course_index=9 or tl.course_index=10 or tl.course_index=12 or tl.course_index=8) then 1
+                ELSE 0
+                END
+            )
+        ) fourthClassTimes,
+        sum(
+            (
+                CASE
+                when tl.leave_type='1' then tl.leave_days
+                ELSE 0
+                END
+            )
+        ) leaveDays
+        from tb_leave tl
+        where 1=1
+        <if test="className!=null and className!=''">
+            and tl.class_name = #{className}
+        </if>
+        <if test="classIdList!=null and classIdList!=''">
+            and tl.class_id in
+            <foreach collection="classIdList" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="classId!=null and classId!=''">
+            and tl.class_id = #{classId}
+        </if>
+        <if test="studentNum!=null and studentNum!=''">
+            and tl.user_no = #{studentNum}
+        </if>
+        <if test="studentName!=null and studentName!=''">
+              and tl.student_name=#{studentName}
+        </if>
+        <if test="courseIndex!=null and courseIndex!=''">
+              and tl.course_index=#{courseIndex}
+        </if>
+        <if test="colleageId!=null and colleageId!=''">
+            and tl.colleage_id=#{colleageId}
+        </if>
+        <include refid="studentStatisticsWhereStatement"/>
+        group by class_id,class_name
+    </select>
+    <sql id="studentStatisticsWhereStatement">
+        <if test="startTime!=null and startTime!=''">
+          and tl.create_time>#{startTime}
+        </if>
+        <if test="endTime!=null and endTime!=''">
+            and #{endTime}>tl.create_time
+        </if>
+    </sql>
+
+
 </mapper>

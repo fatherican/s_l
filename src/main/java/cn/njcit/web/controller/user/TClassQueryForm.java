@@ -1,22 +1,21 @@
 package cn.njcit.web.controller.user;
 
-import java.io.Serializable;
+import cn.njcit.web.domain.DataTableForm;
 
 /**
- * Created by YK on 2014/9/17.
+ * Created by YK on 2014-09-21.
  */
-public class TClass implements Serializable{
+public class TClassQueryForm extends DataTableForm{
+    private String userId;
     private String classId;
     private String className;
     private String  professionalId;
     private String  colleageId;
     private String  createTime;
     private String  colleageName;
-    private int managed;//0 未负责 1 当前用户已负责 2其他用户在负责
-    private String userName;
-    private String userNo;
+    private int managed;//0 未负责 1 已负责
 
-    public TClass() {
+    public TClassQueryForm() {
     }
 
     public String getClassId() {
@@ -75,19 +74,11 @@ public class TClass implements Serializable{
         this.managed = managed;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getUserNo() {
-        return userNo;
-    }
-
-    public void setUserNo(String userNo) {
-        this.userNo = userNo;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

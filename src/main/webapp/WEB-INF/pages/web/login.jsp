@@ -13,16 +13,16 @@
     <title>SB Admin 2 - Bootstrap Admin Theme</title>
 
     <!-- Bootstrap Core CSS -->
-    <link href="/resources/bootstrap-sb-admin/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- MetisMenu CSS -->
-    <link href="/resources/bootstrap-sb-admin/css/plugins/metisMenu/metisMenu.min.css" rel="stylesheet">
+    <link href="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/css/plugins/metisMenu/metisMenu.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link href="/resources/bootstrap-sb-admin/css/sb-admin-2.css" rel="stylesheet">
+    <link href="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/css/sb-admin-2.css" rel="stylesheet">
 
     <!-- Custom Fonts -->
-    <link href="/resources/bootstrap-sb-admin/font-awesome-4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/font-awesome-4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -80,16 +80,16 @@
     </div>
 
     <!-- jQuery Version 1.11.0 -->
-    <script src="/resources/bootstrap-sb-admin/js/jquery-1.11.0.js"></script>
+    <script src="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/js/jquery-1.11.0.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
-    <script src="/resources/bootstrap-sb-admin/js/bootstrap.min.js"></script>
+    <script src="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/js/bootstrap.min.js"></script>
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="/resources/bootstrap-sb-admin/js/plugins/metisMenu/metisMenu.min.js"></script>
+    <script src="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/js/plugins/metisMenu/metisMenu.min.js"></script>
 
     <!-- Custom Theme JavaScript -->
-    <script src="/resources/bootstrap-sb-admin/js/sb-admin-2.js"></script>
+    <script src="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/js/sb-admin-2.js"></script>
     <script type="text/javascript">
         $(document).ready(function () {
             $("#loginBt").click(function(){
@@ -103,7 +103,7 @@
                 $.ajax({
                     type: "POST",
                     dataType: "json",
-                    url: "/webUser/login.do",
+                    url: "<%=request.getContextPath()%>/webUser/login.do",
                     data: $('#objForm').serialize(),
                     beforeSend:function(){
                         $("#loginModalText").html("正在登陆请稍后.....");
@@ -116,7 +116,7 @@
                         var code = data["code"];
                         if(code=='200'){
                             $("#loginModal").modal('hide');
-                            location.href="/webLeave/index.do"
+                            location.href="<%=request.getContextPath()%>/webLeave/index.do"
                         }else{
                             $("#loginModal").modal('hide');
                             alert(data['msg']);

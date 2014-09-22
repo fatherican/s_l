@@ -12,6 +12,7 @@ import cn.njcit.web.service.user.WebUserService;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -159,8 +160,15 @@ public class WebUserServiceImpl implements WebUserService{
     }
 
     @Override
-    public int deleteTeacher(String teacherId) {
+    @Transactional
+    public int deleteTeacher(String teacherId,int role) {
         int count = webUserDao.deleteTeacher(teacherId);
+         //同事删除该老师负责的班级
+        if(role ==  AppConstants.STUDENT_ROLE.intValue()){//学管处
+
+        }else  if(role == AppConstants.INSTRUCTOR__ROLE.intValue()){//辅导员
+            webUserDao.deleteManagedClass(teacherId);
+        }
         return count;
     }
 
@@ -182,5 +190,28 @@ public class WebUserServiceImpl implements WebUserService{
         return count;
     }
 
+    @Override
+    public List<TClass> getTeacherClassList(TClassQueryForm tClassQueryForm,User sessionUser) {
+        initTClassQueryForm(tClassQueryForm,sessionUser);
+        List<TClass> classList = webUserDao.getTeacherClassList(tClassQueryForm);
+        return classList;
+    }
 
+
+    @Override
+    public int getTeacherClassCount(TClassQueryForm tClassQueryForm,User sessionUser) {
+        initTClassQueryForm(tClassQueryForm,sessionUser);
+        int  count  = webUserDao.getTeacherClassCount(tClassQueryForm);
+        return count;
+    }
+
+    private TClassQueryForm initTClassQueryForm(TClassQueryForm tClassQueryForm,User sessionUser){
+        if(sessionUser.getRole().intValue()==AppConstants.STUDENT_PIPE_ROLE){
+            tClassQueryForm.setColleageId(sessionUser.getColleageId().toString());
+        }
+        if("0".equals(tClassQueryForm.getColleageId())){
+            tClassQueryForm.setColleageId("");
+        }
+        return tClassQueryForm;
+    }
 }

@@ -1,6 +1,7 @@
 package cn.njcit.service.leave;
 
 import cn.njcit.common.exception.ServiceException;
+import cn.njcit.controller.leave.LeaveStatisticsQueryForm;
 import cn.njcit.domain.leave.Leave;
 import org.codehaus.jackson.JsonParseException;
 
@@ -84,4 +85,10 @@ public interface LeaveService {
      * @return
      */
     List<Leave> getTeacherMangagedLeaveList(Map reqMap);
+
+    Map studentLeaveStatistics(Map queryMap);
+
+
+    List<Map> teacherGetLeaveStatistics(LeaveStatisticsQueryForm leaveQueryForm, String userId);
+
 }
