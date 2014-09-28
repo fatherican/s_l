@@ -199,7 +199,7 @@ public class LeaveServiceImpl implements LeaveService {
               int i=0;
               String classIds[] = new String[classes.size()];
               for(Map map : classes){
-                  classIds[i]= (String) map.get("class_id");
+                  classIds[i]= String.valueOf(map.get("class_id"));
                   i++;
               }
               if(classIds!=null && classIds.length>0)

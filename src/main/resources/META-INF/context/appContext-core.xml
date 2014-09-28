@@ -35,6 +35,7 @@
                 <value>classpath:cn/njcit/dao/leave/impl/Mapper_leave.xml</value>
                 <value>classpath:cn/njcit/web/dao/user/impl/Mapper_web_user.xml</value>
                 <value>classpath:cn/njcit/web/dao/leave/impl/Mapper_web_leave.xml</value>
+                <value>classpath:cn/njcit/web/dao/manager/impl/Mapper_web_manager.xml</value>
             </list>
         </property>
         <!--<property name="configLocation" value="classpath:/META-INF/mybatis-config/MyBatis-Configuration.xml"></property>-->
@@ -60,6 +61,10 @@
     </bean>
     <bean id="webLeaveDaoImpl" class="org.mybatis.spring.mapper.MapperFactoryBean">
         <property name="mapperInterface" value="cn.njcit.web.dao.leave.WebLeaveDao"></property>
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+    </bean>
+    <bean id="webManagerDaoImpl" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="cn.njcit.web.dao.manager.WebManagerDao"></property>
         <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
     </bean>
 

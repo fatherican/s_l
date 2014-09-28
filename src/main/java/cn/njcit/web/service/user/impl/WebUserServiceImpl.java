@@ -193,6 +193,7 @@ public class WebUserServiceImpl implements WebUserService{
     @Override
     public List<TClass> getTeacherClassList(TClassQueryForm tClassQueryForm,User sessionUser) {
         initTClassQueryForm(tClassQueryForm,sessionUser);
+
         List<TClass> classList = webUserDao.getTeacherClassList(tClassQueryForm);
         return classList;
     }
@@ -205,12 +206,23 @@ public class WebUserServiceImpl implements WebUserService{
         return count;
     }
 
+    @Override
+    public int removeManagedClass(TClassQueryForm queryForm) {
+        int count = webUserDao.removeManagedClass(queryForm);
+        return count;
+    }
+
+    @Override
+    public int addManagedClass(TClassQueryForm queryForm) {
+        int count = webUserDao.addManagedClass(queryForm);
+        return count;
+    }
+
     private TClassQueryForm initTClassQueryForm(TClassQueryForm tClassQueryForm,User sessionUser){
-        if(sessionUser.getRole().intValue()==AppConstants.STUDENT_PIPE_ROLE){
+        if(sessionUser.getRole().intValue()==AppConstants.STUDENT_PIPE_ROLE.intValue()){
             tClassQueryForm.setColleageId(sessionUser.getColleageId().toString());
-        }
-        if("0".equals(tClassQueryForm.getColleageId())){
-            tClassQueryForm.setColleageId("");
+        }else  if(sessionUser.getRole().intValue()==AppConstants.ADMIN_ROLE.intValue()){
+            tClassQueryForm.setColleageId(null);
         }
         return tClassQueryForm;
     }

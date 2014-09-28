@@ -46,4 +46,8 @@ public interface WebUserDao {
     int getTeacherClassCount(TClassQueryForm tClassQueryForm);
 
     int deleteManagedClass(String teacherId);
+
+    int removeManagedClass(TClassQueryForm queryForm);
+
+    int addManagedClass(TClassQueryForm queryForm);
 }

@@ -50,7 +50,7 @@ public class WebLeaveController {
 
 
     /**
-     * 审批请假列表
+     * 审批请假
      * @param request
      * @param response
      * @return

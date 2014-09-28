@@ -294,17 +294,17 @@
                         <div class="form-group">
                             <div class="input-group">
                                 <div class="input-group-addon" for="teacherManagedClassName">班级</div>
-                                <input class="form-control" name="className" type="text" value="898989" id="teacherManagedClassName">
+                                <input class="form-control" name="className" type="text" value="" id="teacherManagedClassName">
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="input-group">
-                                <div class="input-group-addon" for="teacherManagedState">负责状态</div>
+                                <div class="input-group-addon" for="teacherManagedState">管理状态</div>
                                 <select class="form-control" id="teacherManagedState" name="managed">
                                      <option value="">请选择</option>
-                                     <option value="0">未负责</option>
-                                     <option value="1">已负责</option>
-                                     <option value="0">其他</option>
+                                    <option value="1">已负责</option>
+                                    <option value="0">管理中</option>
+                                     <option value="2">未管理</option>
                                 </select>
                             </div>
                         </div>
@@ -844,6 +844,8 @@
      */
     var teacherManagedPostData;
     function initTeacherManagedClassTable(){
+        var userId =  $("#teacherManagedUserId").val();//当前老师的userId
+
         teacherManagedPostData = $("#teacherManagedClassForm").serializeJson();
         if(teacherManagedTable==null){
             teacherManagedTable=$("#teacherManagedClassTable").DataTable( {
@@ -874,22 +876,35 @@
                     return null;
                 },
                 "columns": [
-                    {data:'dd',"orderable": false,render:function(){
-                        return '<input type="checkbox"></input>';
+                    {data:'dd',"orderable": false,render:function(data, type, full, meta ){
+                        var managed=full["managed"];
+                        var checkStr = "";
+                        if(managed=='0' || managed=='1'){//其他老师在负责
+                            checkStr='<input type="checkbox" disabled style="disabled:true"></input>';
                         }
+                        if(managed=='2'){//无人负责
+                            checkStr='<input type="checkbox"></input>';
+                        }
+                            return checkStr;
+                       }
                     },
                     { "data": "colleageName","orderable": false},
                     { "data": "className","orderable": false},
                     { "data": "userName","orderable": false},
                     { "data": "cz","width": "20%" ,"orderable": false,"render": function ( data, type, full, meta ) {
+                        var btnDelId = full["classId"]+"-del-btn";
+                        var btnAddId = full["classId"]+"-add-btn";
                         var managed = full['managed'];
                         var czStr = '';
                         //
-                        if(managed=='0'){
-                            czStr+='<button type="button" class="btn btn-primary">添加</button>';
+                        if(managed=='0'){//其他老师在负责
+                            czStr+='<button type="button" disabled style="disabled:true;" class="btn btn-default">管理中</button>';
                         }
-                        if(managed=='1'){
-                            czStr+='<button type="button" class="btn btn-primary">删除</button>';
+                        if(managed=='1'){//当前自己在负责
+                            czStr+='<button type="button" id="'+btnDelId+'" class="btn btn-danger" onclick="removeManagedClass(\''+userId+'\',\''+full["classId"]+'\',\''+btnDelId+'\')">删除</button>';
+                        }
+                        if(managed=='2'){//无人负责
+                            czStr+='<button type="button" id="'+btnAddId+'" class="btn btn-primary" onclick="addManagedClass(\''+userId+'\',\''+full["classId"]+'\',\''+btnAddId+'\')">添加</button>';
                         }
                         return czStr;
                         }
@@ -923,6 +938,66 @@
         }
 
     }
+
+   //删除该老师负责的班级
+function removeManagedClass(userId,classId,btnId){
+    var dataObj = new Object();
+    dataObj["userId"]=userId;
+    dataObj["classId"]=classId;
+    $.ajax({
+        type: "POST",
+        dataType: "json",
+        url: "<%=request.getContextPath()%>/webUser/removeManagedClass.do",
+        data:dataObj,
+        beforeSend:function(){
+            //使 除除按钮不可用
+            $("#"+btnId).attr("disabled",true);
+        },
+        success: function (data) {
+            if(data['code']=='200'){
+                flushPage(teacherManagedTable,true);
+            }else{
+                alert("系统异常，请联系管理员");
+            }
+        },
+        error: function(data) {
+            alert("系统异常，请联系管理员");
+            flushPage(teacherManagedTable,true);
+        }
+
+    });
+}
+
+
+    //添加该老师负责的班级
+    function addManagedClass(userId,classId,btnId){
+        var dataObj = new Object();
+        dataObj["userId"]=userId;
+        dataObj["classId"]=classId;
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "<%=request.getContextPath()%>/webUser/addManagedClass.do",
+            data:dataObj,
+            beforeSend:function(){
+                //使 除除按钮不可用
+                $("#"+btnId).attr("disabled",true);
+            },
+            success: function (data) {
+                if(data['code']=='200'){
+                    flushPage(teacherManagedTable,true);
+                }else{
+                    alert("系统异常，请联系管理员");
+                }
+            },
+            error: function(data) {
+                alert("系统异常，请联系管理员");
+                flushPage(teacherManagedTable,true);
+            }
+
+        });
+    }
+
 
 
 </script>

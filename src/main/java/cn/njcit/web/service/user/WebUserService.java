@@ -82,4 +82,7 @@ public interface WebUserService {
 
     int getTeacherClassCount(TClassQueryForm tClassQueryForm,User sessionUser);
 
+    int removeManagedClass(TClassQueryForm queryForm);
+
+    int addManagedClass(TClassQueryForm queryForm);
 }

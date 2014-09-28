@@ -12,8 +12,10 @@ public class TClass implements Serializable{
     private String  colleageId;
     private String  createTime;
     private String  colleageName;
-    private int managed;//0 未负责 1 当前用户已负责 2其他用户在负责
+    private int managed;//0  其他老师负责 1 当前老师正在负责 2 未有老师负责
+    //负责该班级老的的名字
     private String userName;
+    //负责该班级老师的 工号
     private String userNo;
 
     public TClass() {

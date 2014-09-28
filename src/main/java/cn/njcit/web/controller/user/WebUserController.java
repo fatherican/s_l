@@ -10,6 +10,7 @@ import cn.njcit.web.controller.leave.LeaveItem;
 import cn.njcit.web.domain.DataTableForm;
 import cn.njcit.web.service.user.WebUserService;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Controller;
@@ -21,10 +22,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by YK on 2014/9/11.
@@ -453,5 +451,46 @@ public class WebUserController {
         return CommonUtil.reurnDataTable(total,classList,null);
     }
 
+    /**
+     * 移除老师负责的某个班级
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "/removeManagedClass")
+    public @ResponseBody Map  removeManagedClass(TClassQueryForm queryForm,HttpServletRequest request,HttpServletResponse response){
+        try{
+            int count  = webUserService.removeManagedClass(queryForm);
+            if(count>0){
+                return CommonUtil.ajaxSuccess(true);
+            }else{
+                return CommonUtil.ajaxFail(null,"老师信息添加失败，请联系管理员");
+            }
+        }catch(DuplicateKeyException dke){//插入重复数据学号
+            return CommonUtil.ajaxFail(null,"该工号已存在，不能重复添加");
+        }
+    }
+
+
+    /**
+     * 移除老师负责的某个班级
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "/addManagedClass")
+    public @ResponseBody Map  addManagedClass(TClassQueryForm queryForm,HttpServletRequest request,HttpServletResponse response){
+        try{
+            queryForm.setCreateTime(DateFormatUtils.format(new Date(),"yyyy-MM-dd HH:mm:ss"));
+            int count  = webUserService.addManagedClass(queryForm);
+            if(count>0){
+                return CommonUtil.ajaxSuccess(true);
+            }else{
+                return CommonUtil.ajaxFail(null,"老师信息添加失败，请联系管理员");
+            }
+        }catch(DuplicateKeyException dke){//插入重复数据学号
+            return CommonUtil.ajaxFail(null,"该工号已存在，不能重复添加");
+        }
+    }
 
 }

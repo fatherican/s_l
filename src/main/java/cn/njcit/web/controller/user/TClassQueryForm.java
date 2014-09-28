@@ -13,7 +13,7 @@ public class TClassQueryForm extends DataTableForm{
     private String  colleageId;
     private String  createTime;
     private String  colleageName;
-    private int managed;//0 未负责 1 已负责
+    private String managed;//0  其他老师负责 1 当前老师正在负责 2 未有老师负责
 
     public TClassQueryForm() {
     }
@@ -66,11 +66,11 @@ public class TClassQueryForm extends DataTableForm{
         this.colleageName = colleageName;
     }
 
-    public int getManaged() {
+    public String getManaged() {
         return managed;
     }
 
-    public void setManaged(int managed) {
+    public void setManaged(String managed) {
         this.managed = managed;
     }
 
