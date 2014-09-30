@@ -61,14 +61,14 @@
             <div class="col-lg-12">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        学生列表
+                        班级列表
                     </div>
                     <!-- /.panel-heading -->
                     <div class="panel-body">
 
                         <div class="row">
                             <div class="col-lg-12 text-right">
-                                <button type="button" id="addStudentBt" class="btn btn-primary">新增</button>
+                                <button type="button" id="addClassBt" class="btn btn-primary">新增</button>
                             </div>
                             <!-- /.col-lg-12 -->
                         </div>
@@ -115,6 +115,7 @@
             <form class="form-horizontal" id="updateClassForm" name="updateClassForm" role="form" >
                 <fieldset id="updateClassFormFieldset">
                     <input type="hidden" name="classId" id="updateClassClassId">
+                    <input type="hidden" name="prefix" id="updateClassPrefix">
                     <div class="modal-body">
                         <form class="form-horizontal" role="form">
                             <div class="form-group">
@@ -136,21 +137,62 @@
 </div>
 
 
-<!--  delete user Modal -->
-<div class="modal fade" id="deleteUserModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+
+<!-- 班级信息修改 Modal -->
+<div class="modal fade" id="addClassModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" >添加班级</h4>
+            </div>
+            <form class="form-horizontal" id="addClassForm" name="updateClassForm" role="form" >
+                <fieldset id="addClassFormFieldset">
+                    <div class="modal-body">
+                        <input type="text" name="prefix" id="addClassPrefix">
+                        <form class="form-horizontal" role="form">
+                            <div class="form-group">
+                                 <label  class="col-sm-2 control-label" for="addClassColleageId">学院</label>
+                                <div class="col-sm-10">
+                                    <select class="form-control" id="addClassColleageId" name="colleageId">
+
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="addClassClassName" class="col-sm-2 control-label">班级</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" name="className" id="addClassClassName" >
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="button" id="addClassFormBt" class="btn btn btn-success">确定</button>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!--  delete class Modal -->
+<div class="modal fade" id="deleteClassModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title" >确定删除用户</h4>
+                <h4 class="modal-title" >确定删除班级</h4>
             </div>
-            <fieldset id="deleteUserFormFieldset">
-                <form class="form-horizontal" id="deleteUserForm" name="deleteUserForm" role="form" >
-                        <input type="hidden" name="studentId" id="deleteUserId">
-                        <input type="hidden" name="token"  id="deleteUserToken">
+            <fieldset id="deleteClassFieldset">
+                <form class="form-horizontal" id="deleteClassForm" name="deleteClassForm" role="form" >
+                        <input type="hidden" name="classId" id="deleteClassClassId">
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                            <button type="button" id="deleteUserBT" class="btn btn-primary">确定</button>
+                            <button type="button" id="deletClassBT" class="btn btn-primary">确定</button>
                         </div>
                     </fieldset>
                 </form>
@@ -202,6 +244,7 @@
     $(document).ready(function () {
             bindEvent();
             initDataTable();
+            initColleage();
 //        $('#leavelist-table').dataTable();
 //        initColumn();
 
@@ -210,12 +253,78 @@
     function bindEvent(){
         //更新班级确定按钮
         $("#updateClassBt").click(function(){
-            updateClassForm(true);
+            updateClassForm();
+        });
+        //确定删除按钮
+        $("#deletClassBT").click(function(){
+            deleteClassForm();
         });
 
+        //新增按钮
+        $("#addClassBt").click(function(){
+            addClassModal();
+        });
+        //新增确定按钮
+        $("#addClassFormBt").click(function(){
+            addClassForm();
+        });
+
+        //学院选择
+        $("#addClassColleageId").change(function(){
+            colleageChange();
+        });
+
+    }
+    function initColleage(){
+        var role = '${user.role}';
+        var prefix = '${user.prefix}';
+        if(role=='2'){
+            $("#addClassPrefix").val(prefix);
+        }
+        getColleage();
 
     }
 
+    //学院change事件
+    function colleageChange(){
+        $("#addClassPrefix").val($("#addClassColleageId  option:selected").attr("prefix"));
+    }
+
+
+    function getColleage(){
+        var role = '${user.role}';
+        var selfColleageId = '${user.colleageId}';//当前用户的colleageId
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "<%=request.getContextPath()%>/webUser/getColleages.do",
+            success: function (data) {
+                if(data['code']=='200'){
+                    var colleages = data['data'];
+                    var optionsStr = '';
+                    for(var i =0;i<colleages.length;i++){
+                        var colleage = colleages[i];
+                        var colleageId = colleage["colleageId"];
+                        var prefix = colleage["prefix"];
+                        if(role=='3'){
+                            optionsStr+='<option prefix="'+prefix+'"  value="'+colleage['colleageId']+'">'+colleage['colleageName']+'</option>';
+                        }else if(role=='2'){
+                            if(selfColleageId==colleageId){
+                                optionsStr+='<option prefix="'+prefix+'"  selected value="'+colleage['colleageId']+'">'+colleage['colleageName']+'</option>';
+                            }
+                        }
+                    }
+                    $("#addClassColleageId").html(optionsStr);
+                    $("#addClassPrefix").val($("#addClassColleageId  option:selected").attr("prefix"));
+                }else{
+                    alert("系统异常，请联系管理员");
+                }
+            },
+            error: function(data) {
+                alert("系统异常，请联系管理员");
+            }
+        })
+    }
 
 
 
@@ -257,7 +366,8 @@
                     { "data": "cz","width": "20%" ,"orderable": false,"render": function ( data, type, full, meta ) {
                             var classId = full['classId'];
                             var className = full['className'];
-                            return '<a href="javascript:updateClass(\''+classId+'\',\''+className+'\');">编辑</a>&nbsp;<a href="javascript:deleteClass(\''+classId+'\')">删除</a>';
+                            var prefix = full['prefix'];
+                            return '<a href="javascript:updateClass(\''+classId+'\',\''+className+'\',\''+prefix+'\');">编辑</a>&nbsp;<a href="javascript:deleteClass(\''+classId+'\')">删除</a>';
                         }
                     }
                 ],
@@ -289,9 +399,10 @@
     /**
      *显示  班级  modal
      */
-    function updateClass(classId,className){
+    function updateClass(classId,className,prefix){
         $("#updateClassClassName").val(className);
         $("#updateClassClassId").val(classId);
+        $("#updateClassPrefix").val(prefix);
         $("#updateClassModal").modal();
     }
 
@@ -303,7 +414,12 @@
             alert("班级名称不允许为空");
             return false;
         }
-        //TODO 此处 少一个 班级名字 的判断，班级的名字 必须合法
+        var className =  $("#updateClassClassName").val();
+        var prefix =  $("#updateClassPrefix").val();
+        if(!className.startWith(prefix)){
+            alert("班级必须以"+prefix+"开头");
+           return false;
+        }
         $.ajax({
             type: "POST",
             dataType: "json",
@@ -314,14 +430,15 @@
                 $('#updateClassFormFieldset').attr("disabled",true);
             },
             success: function (data) {
+                $("#updateClassModal").modal('hide');
                 if(data['code']=='200'){
-                    $("#updateClassModal").modal('hide');
-                    alert("重置密码成功");
+                    alert("班级修改成功");
                 }else{
-                    alert("系统异常，请联系管理员");
+                    alert(data['msg']);
                 }
                 //使form表单不可用
                 $('#updateClassFormFieldset').attr("disabled",false);
+                flushPage();
             },
             error: function(data) {
                 $("#updateClassModal").modal('hide');
@@ -331,88 +448,81 @@
         });
     }
 
-
-    /**
-    *显示详细信息
-     */
-    function showDetail(userNo,studentName,className,
-                        leaveType,leaveDays,courseIndex,
-                        createTime,studentMobile,studentNote,
-                        instructorNote,studentPipeNote,instructorApproved,
-                        studentPipeApproved,leaveStartDate,leaveEndDate,
-                        colleageName,courseName,approved,leaveId,
-                        flag){
-        $("#userNoTdDetail").html(userNo);
-        $("#studentNameTdDetail").html(studentName);
-        $("#classNameTdDetail").html(className);
-        if (leaveType == '0') {//节次
-            $("#leaveTypeTdDetail").html('节次');
-            $("#courseIndexTdDetail").html(courseIndex);
-            $("#leaveDaysTdDetail").html('-');
-        } else if (leaveType == '1') {//天数
-            $("#leaveTypeTdDetail").html('天数');
-            $("#courseIndexTdDetail").html('-');
-            $("#leaveDaysTdDetail").html(leaveDays);
-        }
-        $("#createTimeTdDetail").html(createTime);
-        $("#studentMobileTdDetail").html(studentMobile);
-        $("#studentNoteTdDetail").html(studentNote);
-        $("#instructorNoteDetail").val("");
-        if (instructorNote == 'null'|| instructorNote == '') {
-            instructorNote='无'
-        }
-        if (studentPipeNote == 'null'||studentPipeNote == '') {
-            studentPipeNote='无'
-        }
-        $("#instructorNoteContentDetail").html(instructorNote);
-        $("#studentPipeNoteContentDetail").html(studentPipeNote);
-        $("#leaveStartDateTdDetail").html(formatMillSecondsToDataYYYYMMDD(Number(leaveStartDate)));
-        $("#leaveEndDateTdDetail").html(formatMillSecondsToDataYYYYMMDD(Number(leaveEndDate)));
-        $("#colleageNameTdDetail").html(colleageName);
-        if(courseName=='null'){
-            courseName='';
-        }
-        $("#courseNameTdDetail").html(courseName);
-        $("#detailModal").modal();
+    function deleteClass(classId){
+        $("#deleteClassClassId").val(classId);
+        $("#deleteClassModal").modal();
     }
 
-
-
-
-
-    /**
-     * 重置密码
-     */
-    function resetPassword(){
+    function deleteClassForm(){
         $.ajax({
             type: "POST",
             dataType: "json",
-            url: "<%=request.getContextPath()%>/webUser/resetStudentPassword.do",
-            data: $('#resetPasswordForm').serialize(),
+            url: "<%=request.getContextPath()%>/webManager/deleteClass.do",
+            data: $('#deleteClassForm').serialize(),
             beforeSend:function(){
                 //使form表单不可用
-                $('#resetPasswordFormFieldset').attr("disabled",true);
+                $('#deleteClassFieldset').attr("disabled",true);
             },
             success: function (data) {
+                $("#deleteClassModal").modal('hide');
                 if(data['code']=='200'){
-                    $("#resetPasswordModal").modal('hide');
-                    clearResetPasswordForm();
-                    alert("重置密码成功");
+                    alert("班级删除成功");
                 }else{
-                    alert("系统异常，请联系管理员");
+                    alert(data['msg']);
                 }
                 //使form表单不可用
-                $('#resetPasswordFormFieldset').attr("disabled",false);
+                $('#deleteClassFieldset').attr("disabled",false);
+                flushPage();
             },
             error: function(data) {
-                clearResetPasswordForm();
-                $("#checkModal").modal('hide');
+                $("#deleteClassModal").modal('hide');
+                alert("系统异常，请联系管理员");
+            }
+        });
+    }
+    //添加班级   modal
+    function  addClassModal(){
+        $("#addClassModal").modal();
+    }
+
+    function addClassForm(){
+        if($.trim($("#addClassClassName").val())==''){
+            alert("班级名称不允许为空");
+            return false;
+        }
+        var className =  $("#addClassClassName").val();
+        var prefix =  $("#addClassPrefix").val();
+        if(!className.startWith(prefix)){
+            alert("班级必须以"+prefix+"开头");
+            return false;
+        }
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "<%=request.getContextPath()%>/webManager/addClass.do",
+            data: $('#addClassForm').serialize(),
+            beforeSend:function(){
+                //使form表单不可用
+                $('#addClassFormFieldset').attr("disabled",true);
+            },
+            success: function (data) {
+                $("#addClassModal").modal('hide');
+                if(data['code']=='200'){
+                    alert("班级添加成功");
+                }else{
+                    alert(data['msg']);
+                }
+                //使form表单不可用
+                $('#addClassFormFieldset').attr("disabled",false);
+                flushPage();
+            },
+            error: function(data) {
+                $("#addClassModal").modal('hide');
                 alert("系统异常，请联系管理员");
             }
 
         });
     }
-
     function flushPage(){
 
         var info = dataTable.page.info();
@@ -424,100 +534,6 @@
         }else{
             dataTable.ajax.reload(null,false);
         }
-    }
-
-    /**
-     *清楚  重置密码 form
-     */
-    function clearResetPasswordForm(){
-        $("#resetPasswordUserId").val('');
-        $("#resetPasswordtoken").val('');
-    }
-    /**
-    *显示 审批 modal
-     */
-    function showCheckModal(userNo,studentName,className,
-                            leaveType,leaveDays,courseIndex,
-                            createTime,studentMobile,studentNote,
-                            instructorNote,studentPipeNote,instructorApproved,
-                            studentPipeApproved,leaveStartDate,leaveEndDate,
-                            colleageName,courseName,approved,leaveId,
-                            flag) {
-        $("#leaveId").val(leaveId);
-        var role = '${user.role}';//1 辅导员 2 学管处 3 超级用户
-        $("#userNoTd").html(userNo);
-        $("#studentNameTd").html(studentName);
-        $("#classNameTd").html(className);
-        if (leaveType == '0') {//节次
-            $("#leaveTypeTd").html('节次');
-            $("#courseIndexTd").html(courseIndex);
-            $("#leaveDaysTd").html('-');
-        } else if (leaveType == '1') {//天数
-            $("#leaveTypeTd").html('天数');
-            $("#courseIndexTd").html('-');
-            $("#leaveDaysTd").html(leaveDays);
-        }
-        $("#createTimeTd").html(createTime);
-        $("#studentMobileTd").html(studentMobile);
-        $("#studentNoteTd").html(studentNote);
-        $("#instructorNote").val("");
-        if (instructorNote == 'null'|| instructorNote == '') {
-            instructorNote='无'
-        }
-        if (studentPipeNote == 'null'||studentPipeNote == '') {
-            studentPipeNote='无'
-        }
-        if(role=='1' || role=='2'){
-            if(instructorApproved=='-1'){//辅导员未审批，显示辅导员审批textArea
-                $("#instructorNoteTextArea").removeClass("sr-only");
-                $("#instructorNoteContent").addClass("sr-only");
-                //学管处审批一行不显示
-                $("#studentPipeNoteTr").addClass("sr-only");
-            }else{//辅导员已经审批，显示辅导员审批结果，同时处理学管处文本显示
-                $("#instructorNoteTextArea").addClass("sr-only");
-                $("#instructorNoteContent").removeClass("sr-only");
-                //学管处审批一行显示
-                $("#studentPipeNoteTr").removeClass("sr-only");
-                if(studentPipeApproved=='-1'){//学管处未审批,显示学管处textArea
-                    $("#studentPipeNoteTextArea").removeClass("sr-only");
-                    $("#studentPipeNoteContent").addClass("sr-only");
-                }else{//学管处已审批，显示学管处审批内容
-                    $("#studentPipeNoteTextArea").addClass("sr-only");
-                    $("#studentPipeNoteContent").removeClass("sr-only");
-                }
-            }
-        }else if('3'==role){
-            if(studentPipeApproved=='-1') {//学管处未审批,显示学管处textArea
-                $("#studentPipeNoteTextArea").removeClass("sr-only");
-                $("#studentPipeNoteContent").addClass("sr-only");
-            }else{//学管处已审批，显示学管处审批内容
-                $("#studentPipeNoteTextArea").addClass("sr-only");
-                $("#studentPipeNoteContent").removeClass("sr-only");
-            }
-        }
-        $("#instructorNoteContent").html(instructorNote);
-        $("#studentPipeNoteContent").html(studentPipeNote);
-        $("#leaveStartDateTd").html(formatMillSecondsToDataYYYYMMDD(Number(leaveStartDate)));
-        $("#leaveEndDateTd").html(formatMillSecondsToDataYYYYMMDD(Number(leaveEndDate)));
-        $("#colleageNameTd").html(colleageName);
-        if(courseName=='null'){
-            courseName='';
-        }
-        $("#courseNameTd").html(courseName);
-
-        //------------------控制modal的同意和不同意按钮的显示
-        if(flag){//同意
-            $("#agreeBt").removeClass("sr-only");
-            $("#disAgreeBt").addClass("sr-only");
-
-        }else{
-            $("#agreeBt").addClass("sr-only");
-            $("#disAgreeBt").removeClass("sr-only");
-        }
-        $("#checkModal").modal({
-            keyboard:false,
-            backdrop: 'static'
-        });
     }
 
     /**
@@ -536,282 +552,16 @@
                         .getDate());
     }
 
-
-    /**
-    * 显示修改密码 modal
-     */
-    function showResetPasswordModal(userId,token){
-        $("#resetPasswordUserId").val(userId);
-        $("#resetPasswordtoken").val(token);
-        $("#resetPasswordModal").modal();
+    String.prototype.startWith=function(s){
+        if(s==null||s==""||this.length==0||s.length>this.length)
+            return false;
+        if(this.substr(0,s.length)==s)
+            return true;
+        else
+            return false;
+        return true;
     }
 
-
-    function showDeleteUserModal(userId,token){
-        $("#deleteUserId").val(userId);
-        $("#deleteUserToken").val(token);
-        $("#deleteUserModal").modal();
-    }
-
-    /**
-     * 修改学生信息  modal
-     */
-    function editStudentModal(userId,token,userNo,name,colleageId,colleageName,classId,className){
-        $("#editStudentStudentId").val(userId);
-        $("#editStudentToken").val(token);
-        $("#editStudentStudentNum").val(userNo);
-        $("#editStudentStudentName").val(name);
-        $("#editStudentColleageName").val(colleageName);
-        $("#editStudentClassName").val(className);
-
-
-        //重置学院信息
-        $("#editStudentColleageId").html("");
-        $("#editStudentClassId").html("");
-        //获取学院信息
-        getColleage('editStudentColleageId','editStudentClassId',colleageId,classId);
-        $("#editStudentModal").modal();
-    }
-
-    //新增学生form表单提交
-    function submitAddStudentForm(){
-        $("#addStudentFormFieldset").attr("disabled",false);
-        var studentNumVal = $("#addStudentStudentNum").val();
-        var studentNameVal = $("#addStudentStudentName").val();
-        var colleageIdVal = $("#addStudentColleageId").val();
-        var editStudentClassIdVal = $("#addStudentClassId").val();
-        if(studentNumVal==''){
-            alert("学号不允许为空");
-            return;
-        }
-        if(studentNameVal==''){
-            alert("姓名不允许为空");
-            return;
-        }
-        if(colleageIdVal==''  || colleageIdVal==null){
-            alert("学院不允许为空");
-            return;
-        }
-        if(editStudentClassIdVal=='' || editStudentClassIdVal==null){
-            alert("班级不允许为空");
-            return;
-        }
-        $.ajax({
-            type: "POST",
-            dataType: "json",
-            url: "<%=request.getContextPath()%>/webUser/addStudent.do",
-            data: $('#addStudentForm').serialize(),
-            beforeSend:function(){
-                //使form表单不可用
-                $('#addStudentFormFieldset').attr("disabled",true);
-            },
-            success: function (data) {
-                if(data['code']=='200'){
-                    $("#addStudentModal").modal('hide');
-                    alert("学生信息添加成功");
-                }else{
-                    alert(data['msg']);
-                }
-                //使form表单不可用
-                $('#addStudentFormFieldset').attr("disabled",false);
-                $("#addStudentModal").modal('hide');
-                flushPage();
-            },
-            error: function(data) {
-                $('#addStudentFormFieldset').attr("disabled",false);
-                $("#addStudentModal").modal('hide');
-                alert("系统异常，请联系管理员");
-            }
-
-        });
-
-    }
-
-
-    function addStudentModal(){
-
-        //重置学院信息
-        $("#addStudentColleageId").html("");
-        $("#addStudentClassId").html("");
-        //获取学院信息
-        getColleage('addStudentColleageId','addStudentClassId','','');
-        $("#addStudentModal").modal();
-    }
-
-
-
-
-
-    /**
-    *提交修改学生信息的表单
-     */
-    function submitEditStudentForm() {
-        $("#editStudentFormFieldset").attr("disabled",false);
-        var studentNumVal = $("#editStudentStudentNum").val();
-        var studentNameVal = $("#editStudentStudentName").val();
-        var colleageIdVal = $("#editStudentColleageId").val();
-        var editStudentClassIdVal = $("#editStudentClassId").val();
-        if(studentNumVal==''){
-            alert("学号不允许为空");
-            return;
-        }
-        if(studentNameVal==''){
-            alert("姓名不允许为空");
-            return;
-        }
-        if(colleageIdVal==''  || colleageIdVal==null){
-            alert("学院不允许为空");
-            return;
-        }
-        if(editStudentClassIdVal=='' || editStudentClassIdVal==null){
-            alert("班级不允许为空");
-            return;
-        }
-        $.ajax({
-            type: "POST",
-            dataType: "json",
-            url: "<%=request.getContextPath()%>/webUser/editStudent.do",
-            data: $('#editStudentForm').serialize(),
-            beforeSend:function(){
-                //使form表单不可用
-                $('#editStudentFormFieldset').attr("disabled",true);
-            },
-            success: function (data) {
-                if(data['code']=='200'){
-                    $("#resetPasswordModal").modal('hide');
-                    alert("用户信息修改成功");
-                }else{
-                    alert(data['msg']);
-                }
-                //使form表单不可用
-                $('#editStudentFormFieldset').attr("disabled",false);
-                $("#editStudentModal").modal('hide');
-                flushPage();
-            },
-            error: function(data) {
-                $('#editStudentFormFieldset').attr("disabled",false);
-                $("#editStudentModal").modal('hide');
-                alert("系统异常，请联系管理员");
-            }
-
-        });
-    }
-
-    function confirmDeleteUser() {
-        $.ajax({
-            type: "POST",
-            dataType: "json",
-            url: "<%=request.getContextPath()%>/webUser/deleteStudent.do",
-            data: $('#deleteUserForm').serialize(),
-            beforeSend:function(){
-                //删除用户按钮不可用
-                $('#deleteUserFormFieldset').attr("disabled",true);
-            },
-            success: function (data) {
-                if(data['code']=='200'){
-                    alert("学生信息删除成功");
-                    flushPage();
-                }else{
-                    alert("系统异常，请联系管理员");
-                }
-                //使form表单不可用
-                $('#deleteUserFormFieldset').attr("disabled",false);
-                $("#deleteUserModal").modal('hide');
-            },
-            error: function(data) {
-                $("#deleteUserModal").modal('hide');
-                alert("系统异常，请联系管理员");
-            }
-
-        });
-    }
-
-
-    function getColleage(colleageIdSelect,classIdSelect,colleageId,classId){
-        $.ajax({
-            type: "POST",
-            dataType: "json",
-            url: "<%=request.getContextPath()%>/webUser/getColleages.do",
-            success: function (data) {
-                if(data['code']=='200'){
-                    var colleages = data['data'];
-                    var optionsStr = '';
-                    for(var i =0;i<colleages.length;i++){
-                        var colleage = colleages[i];
-                        if(colleageId==colleage['colleageId']){
-                            optionsStr+='<option selected value="'+colleage['colleageId']+'">'+colleage['colleageName']+'</option>';
-                        }else{
-                            optionsStr+='<option value="'+colleage['colleageId']+'">'+colleage['colleageName']+'</option>';
-                        }
-                    }
-                    $("#"+colleageIdSelect).html(optionsStr);
-                    if(colleageIdSelect=='editStudentColleageId'){
-                        $("#editStudentColleageName").val($("#"+colleageIdSelect+"  option:selected").text());
-                    }else if(colleageIdSelect=='addStudentColleageId'){
-                        $("#addStudentColleageName").val($("#"+colleageIdSelect+"  option:selected").text());
-                    }
-                    getClasses(classIdSelect,colleageId,classId);
-                }else{
-                    alert("系统异常，请联系管理员");
-                }
-                //使form表单不可用
-                $('#resetPasswordFormFieldset').attr("disabled",false);
-            },
-            error: function(data) {
-                $("#checkModal").modal('hide');
-                alert("系统异常，请联系管理员");
-            }
-
-        })
-    }
-
-    function getClasses(classIdSelect,colleageId,classId){
-        $.ajax({
-            type: "POST",
-            dataType: "json",
-            url: "<%=request.getContextPath()%>/webUser/getClasses.do",
-            data: {"colleageId":colleageId},
-            success: function (data) {
-                if(data['code']=='200'){
-                    var classes = data['data'];
-                    var optionsStr = '';
-                    for(var i =0;i<classes.length;i++){
-                        var classItem = classes[i];
-                        if(classId==classItem['classId']){
-                            optionsStr+='<option selected value="'+classItem['classId']+'">'+classItem['className']+'</option>';
-                        }else{
-                            optionsStr+='<option value="'+classItem['classId']+'">'+classItem['className']+'</option>';
-                        }
-                    }
-                    if(classIdSelect=='editStudentClassId'){
-                        $("#editStudentClassId").html(optionsStr);
-                        $("#editStudentClassName").val($("#editStudentClassId  option:selected").text());
-                    }else if(classIdSelect=='addStudentClassId'){
-                        $("#addStudentClassId").html(optionsStr);
-                        $("#addStudentClassName").val($("#addStudentClassId  option:selected").text());
-                    }
-                }else{
-                    alert("系统异常，请联系管理员");
-                }
-                //使form表单不可用
-                $('#resetPasswordFormFieldset').attr("disabled",false);
-            },
-            error: function(data) {
-                $("#checkModal").modal('hide');
-                alert("系统异常，请联系管理员");
-            }
-
-        })
-    }
-
-    /**
-    *显示权限面板，即调整 老师 所负责的班级
-    * @param userId
-    * @param token
-     */
-    function showSecurityModal(userId,token){
-        window.open("<%=request.getContextPath()%>/webUser/showSecurity.do?userId="+userId+"&token="+token,"老师班级管理面板","alwaysRaised=yes,z-look=yes,height=100,width=400,top=0,left=0,toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no");
-    }
 </script>
 </body>
 

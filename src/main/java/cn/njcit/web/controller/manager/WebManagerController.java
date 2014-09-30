@@ -60,10 +60,18 @@ public class WebManagerController {
      *新增班级
      * @return
      */
-    @RequestMapping("addClass")
-    public @ResponseBody Map addClass(HttpServletRequest request,HttpServletResponse response){
-
-        return null;
+    @RequestMapping(value = "addClass",method = RequestMethod.POST)
+    public @ResponseBody Map addClass(TClass tClass,HttpServletRequest request,HttpServletResponse response){
+        try{
+            int count = webManagerService.addClass(tClass);
+            if(count>0){
+                return CommonUtil.ajaxSuccess(true);
+            }else{
+                return CommonUtil.ajaxFail(null,"班级添加失败，请联系管理员");
+            }
+        } catch(DuplicateKeyException dke){//插入重复数据学号
+            return CommonUtil.ajaxFail(null,"该班级已存在，不能重复添加");
+        }
     }
 
 
@@ -72,9 +80,17 @@ public class WebManagerController {
      * @return
      */
     @RequestMapping("editClass")
-    public @ResponseBody Map editClass(HttpServletRequest request,HttpServletResponse response){
-
-        return null;
+    public @ResponseBody Map editClass(TClass tClass,HttpServletRequest request,HttpServletResponse response){
+        try{
+            int count = webManagerService.editClass(tClass);
+            if(count>0){
+                return CommonUtil.ajaxSuccess(true);
+            }else{
+                return CommonUtil.ajaxFail(null,"班级编辑失败，请联系管理员");
+            }
+        } catch(DuplicateKeyException dke){//插入重复数据学号
+            return CommonUtil.ajaxFail(null,"该班级已存在，不能重复添加");
+        }
     }
 
 
@@ -86,9 +102,13 @@ public class WebManagerController {
      * @return
      */
     @RequestMapping("deleteClass")
-    public @ResponseBody Map deleteClass(HttpServletRequest request,HttpServletResponse response){
-
-        return null;
+    public @ResponseBody Map deleteClass(TClass tClass,HttpServletRequest request,HttpServletResponse response){
+        int count = webManagerService.deleteClass(tClass);
+        if(count>0){
+            return CommonUtil.ajaxSuccess(true);
+        }else{
+            return CommonUtil.ajaxFail(null,"班级编辑失败，请联系管理员");
+        }
     }
 
 

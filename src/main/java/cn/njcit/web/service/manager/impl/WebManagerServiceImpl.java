@@ -9,9 +9,11 @@ import cn.njcit.web.controller.user.TClassQueryForm;
 import cn.njcit.web.dao.manager.WebManagerDao;
 import cn.njcit.web.service.manager.WebManagerService;
 import cn.njcit.web.service.user.WebUserService;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -82,6 +84,25 @@ public class WebManagerServiceImpl implements WebManagerService {
     @Override
     public int addColleage(Colleage colleage) {
         int count = webManagerDao.addColleage(colleage);
+        return count;
+    }
+
+    @Override
+    public int editClass(TClass tClass) {
+        int count = webManagerDao.editClass(tClass);
+        return count;
+    }
+
+    @Override
+    public int deleteClass(TClass tClass) {
+        int count = webManagerDao.deleteClass(tClass);
+        return count;
+    }
+
+    @Override
+    public int addClass(TClass tClass) {
+        tClass.setCreateTime(DateFormatUtils.format(new Date(),"yyyy-MM-dd HH:mm:ss"));
+        int count = webManagerDao.addClass(tClass);
         return count;
     }
 }

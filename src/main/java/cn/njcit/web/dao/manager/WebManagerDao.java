@@ -28,4 +28,10 @@ public interface WebManagerDao {
     int deleteColleage(Colleage colleage);
 
     int addColleage(Colleage colleage);
+
+    int editClass(TClass tClass);
+
+    int deleteClass(TClass tClass);
+
+    int addClass(TClass tClass);
 }

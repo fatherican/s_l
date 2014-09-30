@@ -66,8 +66,9 @@
 
     <select id="login" resultType="cn.njcit.domain.user.User" parameterType="cn.njcit.web.controller.user.UserQueryForm">
         select tb.teacher_id userId,tb.teacher_work_num userNo,tb.teacher_name name,
-               tb.role role ,tb.colleage_id colleageId,tb.password password
-        from tb_teacher tb
+               tb.role role ,tb.colleage_id colleageId,tb.password password,
+               tco.prefix prefix
+        from tb_teacher tb left join tb_colleage tco on tb.colleage_id=tco.colleage_id
         where tb.teacher_work_num=#{userNo} and tb.password=#{password}
     </select>
     <select id="queryStudentList" parameterType="cn.njcit.web.controller.user.UserQueryForm" resultType="cn.njcit.domain.user.User">
@@ -121,7 +122,7 @@
 
 
     <select id="getColleages" resultType="cn.njcit.web.controller.user.Colleage">
-        select colleage_id colleageId,colleage_name colleageName
+        select colleage_id colleageId,colleage_name colleageName,prefix
         from tb_colleage
         order by colleage_id
     </select>

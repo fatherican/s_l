@@ -8,8 +8,9 @@
         where colleage_id=#{colleageId}
     </delete>
 
+
     <select id="getClassManageList" parameterType="cn.njcit.web.controller.user.TClassQueryForm" resultType="cn.njcit.web.controller.user.TClass">
-        select tco.colleage_id colleageId,tco.colleage_name colleageName, tcl.class_id classId,tcl.class_name className
+        select tco.colleage_id colleageId,tco.colleage_name colleageName, tcl.class_id classId,tcl.class_name className,tco.prefix prefix
         from tb_class tcl left join tb_colleage tco on tco.colleage_id=tcl.colleage_id
         where 1=1
         <include refid="queryClassWhereStateMent"/>
@@ -78,10 +79,28 @@
         where colleage_id=#{colleageId}
     </update>
 
+
     <insert id="addColleage" parameterType="cn.njcit.web.controller.user.Colleage">
         insert into tb_colleage(colleage_name,prefix)
         value(#{colleageName},#{prefix})
     </insert>
+    <insert id="addClass"  parameterType="cn.njcit.web.controller.user.TClass">
+        insert into tb_class(
+            class_name, colleage_id, create_time
+        )
+        value(
+            #{className},#{colleageId},#{createTime}
+        )
+    </insert>
 
+    <update id="editClass" parameterType="cn.njcit.web.controller.user.TClass">
+        update tb_class
+        set class_name=#{className}
+        where class_id=#{classId}
+    </update>
+    <delete id="deleteClass"  parameterType="cn.njcit.web.controller.user.TClass">
+        delete from tb_class
+        where class_id=#{classId}
+    </delete>
 
 </mapper>

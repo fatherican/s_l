@@ -783,42 +783,7 @@
     * @param colleageId
     * @param classId
      */
-    function getColleage(colleageIdSelect,colleageId,classId,neededEmptyOption){
-        var role = '${user.role}';
-        var selfColleageId = '${user.colleageId}';//当前用户的colleageId
-        $.ajax({
-            type: "POST",
-            dataType: "json",
-            url: "<%=request.getContextPath()%>/webUser/getColleages.do",
-            success: function (data) {
-                if(data['code']=='200'){
-                    var colleages = data['data'];
-                    var optionsStr = '';
-                    if(neededEmptyOption){
-                        optionsStr+='<option value="">请选择</option>'
-                    }
-                    for(var i =0;i<colleages.length;i++){
-                        var colleage = colleages[i];
-                        if(colleageId==colleage['colleageId']){
-                            optionsStr+='<option selected value="'+colleage['colleageId']+'">'+colleage['colleageName']+'</option>';
-                        }else{
-                            if(role=='3'){//当前用户是超级管理员的情况，才允许设置学院
-                                optionsStr+='<option value="'+colleage['colleageId']+'">'+colleage['colleageName']+'</option>';
-                            }
-                        }
-                    }
-                    $("#"+colleageIdSelect).html(optionsStr);
-                }else{
-                    alert("系统异常，请联系管理员");
-                }
-            },
-            error: function(data) {
-                $("#checkModal").modal('hide');
-                alert("系统异常，请联系管理员");
-            }
-
-        })
-    }
+   66
 
     /**
     *显示老师 负责的  班级列表

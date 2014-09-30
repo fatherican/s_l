@@ -17,6 +17,7 @@ public class User implements Serializable{
     private Integer role;//角色
     private Integer colleageId;//学院ID
     private String colleageName;
+    private String prefix;
     //学生应该有的字段
     private Integer classId;//班级ID
     private String className;//班级名称
@@ -126,5 +127,13 @@ public class User implements Serializable{
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
     }
 }
