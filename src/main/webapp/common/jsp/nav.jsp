@@ -26,7 +26,14 @@
             }else if(hrefVal.endWith("webUser/teacherManagerIndex.do")){//学生管理界面
                 $("#webUserLi").addClass("active");
                 $("#webUserTeacherA").addClass("active");
+            }else if(hrefVal.endWith("webManager/classManageListIndex.do")){//班级管理界面
+                $("#webUserLi").addClass("active");
+                $("#webClassManagerA").addClass("active");
+            }else if(hrefVal.endWith("webManager/colleageManageListIndex.do")){//学院管理界面
+                $("#webUserLi").addClass("active");
+                $("#webColleageManagerA").addClass("active");
             }
+
 
 
 
@@ -129,13 +136,19 @@
                     </ul>
                 </li>
                 <li id="webUserLi">
-                    <a href="#"><i class="fa fa-dashboard fa-fw"></i> 人员管理<span class="fa arrow"></span></a>
+                    <a href="#"><i class="fa fa-dashboard fa-fw"></i>管理<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level">
                         <li>
                             <a  id="webUserStudentA" href="<%=request.getContextPath()%>/webUser/studentManagerIndex.do">学生管理</a>
                         </li>
                         <li>
                             <a id="webUserTeacherA"  href="<%=request.getContextPath()%>/webUser/teacherManagerIndex.do">教师管理</a>
+                        </li>
+                        <li>
+                            <a id="webClassManagerA"  href="<%=request.getContextPath()%>/webManager/classManageListIndex.do">班级管理</a>
+                        </li>
+                        <li>
+                            <a id="webColleageManagerA"  href="<%=request.getContextPath()%>/webManager/colleageManageListIndex.do">学院管理</a>
                         </li>
                     </ul>
                 </li>

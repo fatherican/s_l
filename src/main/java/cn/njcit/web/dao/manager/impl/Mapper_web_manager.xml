@@ -3,357 +3,85 @@
 <mapper namespace="cn.njcit.web.dao.manager.WebManagerDao">
 
 
+    <delete id="deleteColleage" parameterType="cn.njcit.web.controller.user.Colleage">
+        delete from tb_colleage
+        where colleage_id=#{colleageId}
+    </delete>
 
-    <!--&lt;!&ndash;获得基本用户的信息&ndash;&gt;-->
-    <!--<select id="getUser" parameterType="cn.njcit.domain.user.User" resultType="cn.njcit.domain.user.User" >-->
-
-
-
-    <!--</select>-->
-
-    <!--&lt;!&ndash;获得教师的信息&ndash;&gt;-->
-    <!--<select id="getTeacher" parameterType="cn.njcit.domain.user.User"  resultType="cn.njcit.domain.user.User">-->
-        <!--select t.teacher_id userId,t.teacher_name name,t.teacher_work_num userNo,-->
-               <!--t.colleage_id colleageId,t.role role-->
-        <!--from  tb_teacher as t-->
-        <!--where 1=1-->
-        <!--<if test="userId!=null and userId!=''">-->
-          <!--and  t.teacher_id=#{userId}-->
-        <!--</if>-->
-        <!--<if test="name!=null and name!=''">-->
-            <!--and t.teacher_name=#{name}-->
-        <!--</if>-->
-        <!--<if test="userNo!=null and userNo!=''">-->
-            <!--and t.teacher_work_num=#{userNo}-->
-        <!--</if>-->
-        <!--<if test="password!=null and password!=''">-->
-            <!--and t.password=#{password}-->
-        <!--</if>-->
-
-
-    <!--</select>-->
-
-    <!--&lt;!&ndash;获得学生的信息&ndash;&gt;-->
-    <!--<select id="getStudent"  parameterType="cn.njcit.domain.user.User"   resultType="cn.njcit.domain.user.User">-->
-        <!--select t.student_id userId,t.student_num userNo,t.student_name name,-->
-               <!--t.colleage_id colleageId,t.professional_id professionalId,t.class_id classId-->
-        <!--from  tb_student as t-->
-        <!--where 1=1-->
-        <!--<if test="userId!=null and userId!=''">-->
-            <!--and  t.student_id=#{userId}-->
-        <!--</if>-->
-        <!--<if test="userNo!=null and userNo!=''">-->
-            <!--and  t.student_num=#{userNo}-->
-        <!--</if>-->
-        <!--<if test="password!=null and password!=''">-->
-            <!--and t.password=#{password}-->
-        <!--</if>-->
-        <!--<if test="name!=null and name!=''">-->
-            <!--and  t.student_name=#{name}-->
-        <!--</if>-->
-    <!--</select>-->
-    <!--<select id="getClassesByTeacherId" parameterType="map" resultType="java.util.Map">-->
-        <!--select tc.class_id,tc.class_name-->
-        <!--from tb_teacher tt left join tb_teacher_managed_class tmc on tt.teacher_id=tmc.teacher_id left join tb_class tc on tmc.class_id=tc.class_id-->
-        <!--where tt.teacher_id=#{teacherId}-->
-    <!--</select>-->
-    <!--<select id="getClassesByColleageId" parameterType="map" resultType="java.util.Map">-->
-        <!--select class_id,class_name-->
-        <!--from tb_class-->
-        <!--where colleage_id=#{colleageId}-->
-    <!--</select>-->
-
-
-    <select id="login" resultType="cn.njcit.domain.user.User" parameterType="cn.njcit.web.controller.user.UserQueryForm">
-        select tb.teacher_id userId,tb.teacher_work_num userNo,tb.teacher_name name,
-               tb.role role ,tb.colleage_id colleageId,tb.password password
-        from tb_teacher tb
-        where tb.teacher_work_num=#{userNo} and tb.password=#{password}
-    </select>
-    <select id="queryStudentList" parameterType="cn.njcit.web.controller.user.UserQueryForm" resultType="cn.njcit.domain.user.User">
-        select  student_id userId,
-                student_num userNo,
-                student_name   name ,
-                colleage_id   colleageId,
-                colleage_name    colleageName,
-                class_id    classId,
-                class_name   className
-         from tb_student
+    <select id="getClassManageList" parameterType="cn.njcit.web.controller.user.TClassQueryForm" resultType="cn.njcit.web.controller.user.TClass">
+        select tco.colleage_id colleageId,tco.colleage_name colleageName, tcl.class_id classId,tcl.class_name className
+        from tb_class tcl left join tb_colleage tco on tco.colleage_id=tcl.colleage_id
         where 1=1
-        <include refid="queryStudentWhereStateMent"/>
+        <include refid="queryClassWhereStateMent"/>
         <if test="orderByName!=null and orderByName!=''">
             order by ${orderByName} ${orderByOrder}
         </if>
         limit #{start},#{length}
     </select>
-    <select id="queryStudentCount" parameterType="cn.njcit.web.controller.user.UserQueryForm"  resultType="java.lang.Integer">
+
+    <select id="getClassManageCount" resultType="java.lang.Integer">
         select count(1)
-        from tb_student
+        from tb_class tcl left join tb_colleage tco on tco.colleage_id=tcl.colleage_id
         where 1=1
-        <include refid="queryStudentWhereStateMent"/>
+        <include refid="queryClassWhereStateMent"/>
     </select>
 
-
-
-    <sql id="queryStudentWhereStateMent">
-        <if test="managedClassList!=null">
-            and class_id in
-            <foreach item="item" collection="managedClassList" separator="," open="(" close=")" index="">
-                #{item.class_id}
-            </foreach>
-        </if>
+    <sql id="queryClassWhereStateMent">
         <if test="colleageId!=null and colleageId!=''">
-            and colleage_id =#{colleageId}
+            and tco.colleage_id=#{colleageId}
         </if>
-    </sql>
-
-    <!--更新密码-->
-    <update id="updatePassword" parameterType="cn.njcit.web.controller.user.UserQueryForm">
-        update  tb_teacher
-        set password=#{password}
-        where teacher_id=#{userId}
-    </update>
-    <update id="resetStudentPassword" parameterType="cn.njcit.domain.user.User">
-        update tb_student
-        set password=#{password}
-        where student_id=#{userId}
-    </update>
-
-
-    <select id="getColleages" resultType="cn.njcit.web.controller.user.Colleage">
-        select colleage_id colleageId,colleage_name colleageName
-        from tb_colleage
-        order by colleage_id
-    </select>
-    <select id="getClasses" resultType="cn.njcit.web.controller.user.TClass" parameterType="cn.njcit.web.controller.user.Colleage">
-        select class_id classId, class_name className, professional_id  professionalId ,
-                colleage_id colleageId, create_time createTime
-        from tb_class
-        <where>
-            <if test="colleageId!=null and colleageId!=''">
-                and colleage_id =#{colleageId}
-            </if>
-        </where>
-        order by class_name
-    </select>
-    <select id="queryTeacherList" resultType="cn.njcit.domain.user.User" parameterType="cn.njcit.web.controller.user.UserQueryForm">
-        select
-                tt.teacher_id userId, tt.teacher_work_num  userNo, tt.teacher_name   name,
-                tt.create_time  , tt.colleage_id colleageId, tt.role role,
-                tc.colleage_name colleageName
-        from tb_teacher tt left join tb_colleage tc on tt.colleage_id = tc.colleage_id
-        where 1=1
-        <include refid="queryTeacherWhereStatement"/>
-        <if test="orderByName!=null and orderByName!=''">
-            order by ${orderByName} ${orderByOrder}
+       <if test="colleageName!=null and colleageName!=''">
+           and tco.colleage_name=#{colleageName}
         </if>
-        limit #{start},#{length}
-    </select>
-
-    <select id="queryTeacherCount" resultType="java.lang.Integer"  parameterType="cn.njcit.web.controller.user.UserQueryForm">
-        select count(1)
-        from tb_teacher tt left join tb_colleage tc on tt.colleage_id = tc.colleage_id
-        where 1=1
-        <include refid="queryTeacherWhereStatement"/>
-    </select>
-    <select id="getTeacherClassList" parameterType="cn.njcit.web.controller.user.TClassQueryForm" resultType="cn.njcit.web.controller.user.TClass">
-        select *
-        from
-        (
-            select tcl.class_id classId,tcl.class_name className,tcl.colleage_id colleageId,tco.colleage_name colleageName,
-                (case
-                            when ttmc.teacher_id=#{userId}  then 1
-                            WHEN ttmc.teacher_id IS not NULL and ttmc.teacher_id !=#{userId} THEN 0
-                            else 2
-                end
-                ) managed,tt.teacher_name userName,tt.teacher_work_num userNo
-            from tb_class tcl left join tb_teacher_managed_class ttmc on tcl.class_id=ttmc.class_id inner join tb_colleage tco on tcl.colleage_id=tco.colleage_id left join tb_teacher tt on ttmc.teacher_id=tt.teacher_id
-            where 1=1
-            <if test="colleageId!=null and colleageId!=''">
-                and  tcl.colleage_id=#{colleageId}
-            </if>
-        )t
-        where 1=1
-        <include refid="queryTeacherListWhereStatement"/>
-        <if test="orderByName!=null and orderByName!=''">
-            order by ${orderByName} ${orderByOrder}
-        </if>
-        limit #{start},#{length}
-    </select>
-    <select id="getTeacherClassCount"  parameterType="cn.njcit.web.controller.user.TClassQueryForm"  resultType="java.lang.Integer">
-        select count(1)
-        from
-        (
-            select tcl.class_id classId,tcl.class_name className,tcl.colleage_id colleageId,tco.colleage_name colleageName,
-            (case
-            when ttmc.teacher_id=#{userId}  then 1
-            when ttmc.teacher_id is null then 0
-            else 2
-            end
-            ) managed
-            from tb_class tcl left join tb_teacher_managed_class ttmc on tcl.class_id=ttmc.class_id inner join tb_colleage tco on tcl.colleage_id=tco.colleage_id
-        )t
-        where 1=1
-        <include refid="queryTeacherListWhereStatement"/>
-    </select>
-
-    <sql id="queryTeacherListWhereStatement">
-        <if test="managed!=null and managed!=''">
-            and   t.managed=#{managed}
+       <if test="classId!=null and classId!=''">
+           and tcl.class_id=#{classId}
         </if>
         <if test="className!=null and className!=''">
-            and   t.className=#{className}
+           and tcl.class_name=#{className}
+        </if>
+    </sql>
+
+    <select id="getColleageManageList" parameterType="cn.njcit.web.controller.manager.ColleageQueryForm" resultType="cn.njcit.web.controller.user.Colleage">
+        SELECT colleage_id colleageId,colleage_name colleageName ,prefix
+        from tb_colleage
+        where 1=1
+        <include refid="colleageWhereStatment"/>
+        <if test="orderByName!=null and orderByName!=''">
+            order by ${orderByName} ${orderByOrder}
+        </if>
+        limit #{start},#{length}
+    </select>
+
+    <select id="getColleageManageCount" resultType="java.lang.Integer">
+        SELECT count(1)
+        from tb_colleage
+        where 1=1
+        <include refid="colleageWhereStatment"/>
+    </select>
+
+    <sql id="colleageWhereStatment">
+        <if test="colleageName!=null and colleageName!=''">
+            and colleage_name=#{colleageName}
         </if>
         <if test="colleageId!=null and colleageId!=''">
-            and   t.colleageId=#{colleageId}
+            and colleage_id=#{colleageId}
         </if>
-        <if test="colleageName!=null and colleageName!=''">
-            and   t.colleageName=#{colleageName}
+        <if test="prefix!=null and prefix!=''">
+            and prefix=#{prefix}
         </if>
     </sql>
 
 
-
-    <sql id="queryTeacherWhereStatement">
-        <if test="userId!=null and userId!=''">
-            and tt.teacher_id=#{userId}
-        </if>
-        <if test="userNo!=null and userNo!=''">
-            and tt.teacher_work_num=#{userNo}
-        </if>
-        <if test="name!=null and name!=''">
-            and tt.teacher_name=#{name}
-        </if>
-        <if test="colleageId!=null and colleageId!=''">
-            and tt.colleage_id=#{colleageId}
-        </if>
-        <if test="colleageName!=null and colleageName!=''">
-            and  tc.colleage_name=#{colleageName}
-        </if>
-        <if test="role!=null and role!=''">
-            and  tt.role=#{role}
-        </if>
-        <if test="roles!=null">
-            and tt.role in
-            <foreach item="item" collection="roles" separator="," open="(" close=")" index="">
-                #{item}
-            </foreach>
-        </if>
-    </sql>
-
-    <insert id="addStudent" parameterType="cn.njcit.web.controller.user.Student">
-        insert into tb_student
-        (
-            student_id,student_num, student_name,
-            password, create_time, colleage_id,
-            colleage_name, professional_id, professional_name,
-            class_id, class_name
-        )
-        values(
-            #{studentId},#{studentNum},#{studentName},
-            #{password},#{createTime},#{colleageId},
-            #{colleageName},#{professionalId},#{professionalName},
-            #{classId},#{className}
-        )
-    </insert>
-
-
-    <delete id="deleteStudent" parameterType="string">
-        delete from tb_student
-        where student_id=#{studentId}
-    </delete>
-
-    <update id="editStudent" parameterType="cn.njcit.web.controller.user.Student">
-        update tb_student
-        <set>
-            <if test="studentNum!=null and studentNum!=''">
-                student_num=#{studentNum},
-            </if>
-            <if test="studentName!=null and studentName!=''">
-                student_name=#{studentName},
-            </if>
-            <if test="colleageId!=null and colleageId!=''">
-                colleage_id=#{colleageId},
-            </if>
-            <if test="colleageName!=null and colleageName!=''">
-                colleage_name=#{colleageName},
-            </if>
-            <if test="professionalId!=null and professionalId!=''">
-                professional_id=#{professionalId},
-            </if>
-            <if test="professionalName!=null and professionalName!=''">
-                professional_name=#{professionalName},
-            </if>
-            <if test="classId!=null and classId!=''">
-                class_id=#{classId},
-            </if>
-            <if test="className!=null and className!=''">
-                class_name=#{className},
-            </if>
-        </set>
-        where student_id=#{studentId}
-
+    <update id="editColleage" parameterType="cn.njcit.web.controller.user.Colleage">
+        update tb_colleage
+        set colleage_name=#{colleageName} ,prefix=#{prefix}
+        where colleage_id=#{colleageId}
     </update>
 
-    <update id="resetTeacherPassword">
-        update tb_teacher
-        set password=#{password}
-        where teacher_id=#{userId}
-    </update>
-
-
-
-    <delete id="deleteTeacher" parameterType="string" >
-        delete from tb_teacher
-        where teacher_id=#{teacherId}
-    </delete>
-    <delete id="deleteManagedClass" parameterType="string">
-      delete
-      from tb_teacher_managed_class
-      where teacher_id=#{teacherId}
-    </delete>
-    <delete id="removeManagedClass" parameterType="cn.njcit.web.controller.user.TClassQueryForm">
-        delete
-        from tb_teacher_managed_class
-        where teacher_id=#{userId} and class_id=#{classId}
-
-
-    </delete>
-
-    <update id="editTeacher" parameterType="cn.njcit.web.controller.user.Teacher">
-        update tb_teacher
-        <set>
-            <if test="teacherWorkNum!=null and teacherWorkNum!=''">
-                teacher_work_num=#{teacherWorkNum},
-            </if>
-            <if test="teacherName!=null and teacherName!=''">
-                teacher_name=#{teacherName},
-            </if>
-            <if test="colleageId!=null and colleageId!=''">
-                colleage_id=#{colleageId},
-            </if>
-            <if test="role!=null and role!=''">
-                role=#{role},
-            </if>
-        </set>
-        where teacher_id=#{teacherId}
-    </update>
-
-    <insert id="addTeacher" parameterType="cn.njcit.web.controller.user.Teacher">
-        insert into tb_teacher
-        (
-            teacher_id,teacher_work_num, teacher_name, password,
-            create_time, colleage_id, role
-        )
-        values(
-            #{teacherId},#{teacherWorkNum},#{teacherName}, #{password},
-            #{createTime},#{colleageId}, #{role}
-        )
+    <insert id="addColleage" parameterType="cn.njcit.web.controller.user.Colleage">
+        insert into tb_colleage(colleage_name,prefix)
+        value(#{colleageName},#{prefix})
     </insert>
 
-    <insert id="addManagedClass" parameterType="cn.njcit.web.controller.user.TClassQueryForm">
-        insert into tb_teacher_managed_class(teacher_id,class_id,create_time)
-        value(#{userId},#{classId},#{createTime})
-    </insert>
 
 </mapper>

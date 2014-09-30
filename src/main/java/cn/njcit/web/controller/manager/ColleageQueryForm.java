@@ -1,17 +1,19 @@
-package cn.njcit.web.controller.user;
+package cn.njcit.web.controller.manager;
+
+import cn.njcit.web.domain.DataTableForm;
+
+import java.io.Serializable;
 
 /**
- * Created by YK on 2014/9/17.
+ * Created by YK on 2014/9/30.
  */
-public class Colleage {
-    //学院ID
+public class ColleageQueryForm extends DataTableForm implements Serializable{
+
     private String colleageId;
-    //学院名称
     private String colleageName;
-    //学院前缀
     private String prefix;
 
-    public Colleage() {
+    public ColleageQueryForm() {
     }
 
     public String getColleageId() {

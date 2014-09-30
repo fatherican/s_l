@@ -1,13 +1,22 @@
 package cn.njcit.web.controller.manager;
 
+import cn.njcit.common.util.CommonUtil;
+import cn.njcit.domain.user.User;
+import cn.njcit.web.controller.user.Colleage;
+import cn.njcit.web.controller.user.TClass;
+import cn.njcit.web.controller.user.TClassQueryForm;
 import cn.njcit.web.service.manager.WebManagerService;
+import cn.njcit.web.service.user.WebUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,6 +28,8 @@ import java.util.Map;
 public class WebManagerController {
     @Autowired
     private WebManagerService webManagerService;
+    @Autowired
+    private WebUserService webUserService;
 
     /**
      * 班级列表界面
@@ -26,17 +37,22 @@ public class WebManagerController {
      */
     @RequestMapping("classManageListIndex")
     public String classManageListIndex(){
-        return "";
+        return "/web/manager/classIndex";
     }
 
     /**
      * 班级列表数据
+     * 学管处，只能查看自己学院的班级
+     * 超级管理员 ，则包括全部
      * @return
      */
     @RequestMapping("classManageList")
-    public @ResponseBody Map classManageList(HttpServletRequest request,HttpServletResponse response){
-
-        return null;
+    public @ResponseBody Map classManageList(TClassQueryForm classQueryForm,HttpServletRequest request,HttpServletResponse response){
+        User sessionUser = (User) request.getSession().getAttribute("user");
+        classQueryForm.initDataTable(request);
+        List<TClass> classList = webManagerService.getClassManageList(classQueryForm, sessionUser);
+        int  total  = webManagerService.getClassManageCount(classQueryForm, sessionUser);
+        return CommonUtil.reurnDataTable(total, classList, null);
     }
 
 
@@ -99,7 +115,7 @@ public class WebManagerController {
     @RequestMapping("colleageManageListIndex")
     public String colleageManageListIndex(HttpServletRequest request,HttpServletResponse response){
 
-        return null;
+        return "/web/manager/colleageIndex";
     }
 
 
@@ -108,19 +124,31 @@ public class WebManagerController {
      * @return
      */
     @RequestMapping("colleageManageList")
-    public @ResponseBody Map colleageManageList(HttpServletRequest request,HttpServletResponse response){
-
-        return null;
+    public @ResponseBody Map colleageManageList(ColleageQueryForm colleageQueryForm, HttpServletRequest request,HttpServletResponse response){
+        User sessionUser = (User) request.getSession().getAttribute("user");
+        colleageQueryForm.initDataTable(request);
+        List<Colleage> colleageList = webManagerService.getColleageManageList(colleageQueryForm, sessionUser);
+        int  total  = webManagerService.getColleageManageCount(colleageQueryForm, sessionUser);
+        return CommonUtil.reurnDataTable(total, colleageList, null);
     }
 
     /**
      *编辑学院
      * @return
      */
-    @RequestMapping("editColleage")
-    public @ResponseBody Map editColleage(HttpServletRequest request,HttpServletResponse response){
+    @RequestMapping(value = "editColleage",method = RequestMethod.POST)
+    public @ResponseBody Map editColleage(Colleage colleage,HttpServletRequest request,HttpServletResponse response){
+        try{
+            int count = webManagerService.editColleage(colleage);
+            if(count>0){
+                return CommonUtil.ajaxSuccess(true);
+            }else{
+                return CommonUtil.ajaxFail(null,"学院编辑失败，请联系管理员");
+            }
+        } catch(DuplicateKeyException dke){//插入重复数据学号
+            return CommonUtil.ajaxFail(null,"该系号已存在，不能重复添加");
+        }
 
-        return null;
     }
 
 
@@ -131,9 +159,38 @@ public class WebManagerController {
      * @return
      */
     @RequestMapping("deleteColleage")
-    public @ResponseBody Map deleteColleage(HttpServletRequest request,HttpServletResponse response){
+    public @ResponseBody Map deleteColleage(Colleage colleage ,HttpServletRequest request,HttpServletResponse response){
+        List<TClass> classList = webUserService.getClasses(colleage);
 
-        return null;
+        if(classList==null || classList.size()==0){
+            int count = webManagerService.deleteColleage(colleage);
+            if(count>0){
+                return CommonUtil.ajaxSuccess(true);
+            }else{
+                return CommonUtil.ajaxFail(null,"学院删除失败，请联系管理员");
+            }
+        }else {
+            return CommonUtil.ajaxFail(null,"该学院下已经有班级，无法删除");
+        }
+    }
+
+    /**
+     *添加学院
+     *如果该学院下面有班级，则不允许删除
+     * @return
+     */
+    @RequestMapping("addColleage")
+    public @ResponseBody Map addColleage(Colleage colleage ,HttpServletRequest request,HttpServletResponse response){
+        try{
+            int count = webManagerService.addColleage(colleage);
+            if(count>0){
+                return CommonUtil.ajaxSuccess(true);
+            }else{
+                return CommonUtil.ajaxFail(null,"学院添加失败，请联系管理员");
+            }
+        } catch(DuplicateKeyException dke){//插入重复数据学号
+            return CommonUtil.ajaxFail(null,"该系号已存在，不能重复添加");
+        }
     }
 
 
