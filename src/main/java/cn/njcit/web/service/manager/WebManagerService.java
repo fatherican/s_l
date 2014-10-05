@@ -6,6 +6,7 @@ import cn.njcit.web.controller.user.Colleage;
 import cn.njcit.web.controller.user.TClass;
 import cn.njcit.web.controller.user.TClassQueryForm;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -43,4 +44,16 @@ public interface WebManagerService {
     int deleteClass(TClass tClass);
 
     int addClass(TClass tClass);
+
+    /**
+     * 导入班级数据，如果返回null则代表所有的数据时正常的。
+     * 否则 返回 下载  错误数据文件  的 地址
+     * @param filePath
+     * @return
+     */
+    String importClass(String filePath,String webRootPath) throws IOException;
+
+    String importStudent(String filePath, String webRootPath) throws IOException;
+
+    String importTeacher(String filePath, String webRootPath) throws IOException;
 }

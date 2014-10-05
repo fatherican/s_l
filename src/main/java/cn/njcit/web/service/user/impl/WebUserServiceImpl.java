@@ -93,6 +93,7 @@ public class WebUserServiceImpl implements WebUserService{
     public int addStudent(Student student) {
         student.setCreateTime(DateFormatUtils.format(new Date(),"yyyy-MM-dd HH:mm:ss"));
         student.setPassword(MD5Util.md5Hex(student.getPassword()));
+        student.setStudentNum(student.getStudentNum().toUpperCase());
         student.setStudentId(String.valueOf(UID.getUID()));
         int count = webUserDao.addStudent(student);
         return count;

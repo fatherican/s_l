@@ -87,6 +87,7 @@
 
     <!--文件上传-->
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
+
     <!--全局处理异常信息-->
     <bean id="exceptionHandler" class="cn.njcit.common.exception.ExceptionHandler"/>
     <!-- 加载项目的配置文件 -->

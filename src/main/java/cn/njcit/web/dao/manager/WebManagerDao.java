@@ -4,9 +4,7 @@ import cn.njcit.web.controller.leave.LeaveCheckForm;
 import cn.njcit.web.controller.leave.LeaveItem;
 import cn.njcit.web.controller.leave.leaveQueryForm;
 import cn.njcit.web.controller.manager.ColleageQueryForm;
-import cn.njcit.web.controller.user.Colleage;
-import cn.njcit.web.controller.user.TClass;
-import cn.njcit.web.controller.user.TClassQueryForm;
+import cn.njcit.web.controller.user.*;
 
 import java.util.List;
 
@@ -34,4 +32,12 @@ public interface WebManagerDao {
     int deleteClass(TClass tClass);
 
     int addClass(TClass tClass);
+
+    int batchInsertClass(List<TClass> tClassList);
+
+    TClass getTClass(String className);
+
+    int batchInsertStudent(List<Student> studentList);
+
+    int batchInsertTeacher(List<Teacher> teacherList);
 }

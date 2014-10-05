@@ -1,21 +1,29 @@
 package cn.njcit.web.controller.manager;
 
 import cn.njcit.common.util.CommonUtil;
+import cn.njcit.common.util.UID;
 import cn.njcit.domain.user.User;
 import cn.njcit.web.controller.user.Colleage;
 import cn.njcit.web.controller.user.TClass;
 import cn.njcit.web.controller.user.TClassQueryForm;
 import cn.njcit.web.service.manager.WebManagerService;
 import cn.njcit.web.service.user.WebUserService;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -221,50 +229,138 @@ public class WebManagerController {
      */
     @RequestMapping("informationImportIndex")
     public String informationImportIndex(HttpServletRequest request,HttpServletResponse response){
-
-        return null;
+        return "/web/manager/infomationImportIndex";
     }
 
 
     /**
-     *信息导入相关的模板下载和样例数据下载
+     *信息导入相关的模板下载和样例数据下载或者是 错误文件
      * @return
      */
-    @RequestMapping("getTemplate")
-    public void getTemplate(HttpServletRequest request,HttpServletResponse response){
-
-//        return null;
+    @RequestMapping("download")
+    public void getTemplate(HttpServletRequest request,HttpServletResponse response) throws IOException {
+            String type = request.getParameter("type");
+            String fileName = request.getParameter("fileName");
+            OutputStream os = response.getOutputStream();
+            try {
+                response.reset();
+                response.setHeader("Content-Disposition", "attachment; filename=dict.txt");
+                response.setContentType("application/octet-stream; charset=utf-8");
+                os.write(FileUtils.readFileToByteArray(new File("    ")));//TODO 此处填写文件路径
+                os.flush();
+            } finally {
+                if (os != null) {
+                    os.close();
+                }
+            }
     }
+
+
 
 
     /**
      *导入 班级
      * @return
      */
-    @RequestMapping("importClass")
-    public @ResponseBody Map importClass(HttpServletRequest request,HttpServletResponse response){
+    @RequestMapping(value = "importClass",method = RequestMethod.POST)
+    public ModelAndView importClass(HttpServletRequest request,HttpServletResponse response, @RequestParam("file") MultipartFile multipartFile) throws IOException {
+        ModelAndView mav = new ModelAndView("/web/manager/infomationImportIndex");
+        // 获得文件名：
+        String webRootPath = request.getSession().getServletContext().getRealPath("/");
+        String filename = multipartFile.getOriginalFilename();
+        String tomcatBinPath = System.getProperty("user.dir");
+        File tomcatBinFile = new File(tomcatBinPath);
+        File tomcatBinParentFile = tomcatBinFile.getParentFile();
+        File tomcatUploadFile = new File(tomcatBinParentFile.getPath()+File.separator+"uploadDir");
+        String filePath = tomcatUploadFile.getPath()+File.separator+ UID.getUID()+filename;
+        File source = new File(filePath);
+        if(filePath.endsWith("xls")||filename.endsWith("xlsx")){//符合文件名后缀的文件
+//        保存到本地
+            multipartFile.transferTo(source);
+            String errorFileName = webManagerService.importClass(filePath,webRootPath);
+            if(errorFileName!=null){//存在错误数据，导出 用户修改
+                mav.addObject("errorCode","002");//存在错误数据
+                mav.addObject("fileName",errorFileName);
+                mav.addObject("errorMsg","文件中包含错误数据");
+            }
+        }else{
+            mav.addObject("errorCode","001");//文件不符合要求
+            mav.addObject("errorMsg","文件名不合法，只支持Excel");//文件不符合要求
 
-        return null;
+        }
+        mav.addObject("refresh",true);
+        return mav;
     }
+
+
+
 
     /**
      *导入  学生
      * @return
      */
-    @RequestMapping("importStudent")
-    public @ResponseBody Map importStudent(HttpServletRequest request,HttpServletResponse response){
+    @RequestMapping(value = "importStudent",method = RequestMethod.POST)
+    public ModelAndView importStudent(HttpServletRequest request,HttpServletResponse response,@RequestParam("file") MultipartFile multipartFile) throws IOException {
+        ModelAndView mav = new ModelAndView("/web/manager/infomationImportIndex");
+        // 获得文件名：
+        String webRootPath = request.getSession().getServletContext().getRealPath("/");
+        String filename = multipartFile.getOriginalFilename();
+        String tomcatBinPath = System.getProperty("user.dir");
+        File tomcatBinFile = new File(tomcatBinPath);
+        File tomcatBinParentFile = tomcatBinFile.getParentFile();
+        File tomcatUploadFile = new File(tomcatBinParentFile.getPath()+File.separator+"uploadDir");
+        String filePath = tomcatUploadFile.getPath()+File.separator+ UID.getUID()+filename;
+        File source = new File(filePath);
+        if(filePath.endsWith("xls")||filename.endsWith("xlsx")){//符合文件名后缀的文件
+//        保存到本地
+            multipartFile.transferTo(source);
+            String errorFileName = webManagerService.importStudent(filePath,webRootPath);
+            if(errorFileName!=null){//存在错误数据，导出 用户修改
+                mav.addObject("errorCode","002");//存在错误数据
+                mav.addObject("fileName",errorFileName);
+                mav.addObject("errorMsg","文件中包含错误数据");
+            }
+        }else{
+            mav.addObject("errorCode","001");//文件不符合要求
+            mav.addObject("errorMsg","文件名不合法，只支持Excel");//文件不符合要求
 
-        return null;
+        }
+        mav.addObject("refresh",true);
+        return mav;
     }
 
     /**
      *导入  老师
      * @return
      */
-    @RequestMapping("importTeacher")
-    public @ResponseBody Map importTeacher(HttpServletRequest request,HttpServletResponse response){
+    @RequestMapping(value = "importTeacher",method = RequestMethod.POST)
+    public ModelAndView importTeacher(HttpServletRequest request,HttpServletResponse response,@RequestParam("file") MultipartFile multipartFile) throws IOException {
+        ModelAndView mav = new ModelAndView("/web/manager/infomationImportIndex");
+        // 获得文件名：
+        String webRootPath = request.getSession().getServletContext().getRealPath("/");
+        String filename = multipartFile.getOriginalFilename();
+        String tomcatBinPath = System.getProperty("user.dir");
+        File tomcatBinFile = new File(tomcatBinPath);
+        File tomcatBinParentFile = tomcatBinFile.getParentFile();
+        File tomcatUploadFile = new File(tomcatBinParentFile.getPath()+File.separator+"uploadDir");
+        String filePath = tomcatUploadFile.getPath()+File.separator+ UID.getUID()+filename;
+        File source = new File(filePath);
+        if(filePath.endsWith("xls")){//符合文件名后缀的文件
+//        保存到本地
+            multipartFile.transferTo(source);
+            String errorFileName = webManagerService.importTeacher(filePath,webRootPath);
+            if(errorFileName!=null){//存在错误数据，导出 用户修改
+                mav.addObject("errorCode","002");//存在错误数据
+                mav.addObject("fileName",errorFileName);
+                mav.addObject("errorMsg","文件中包含错误数据");
+            }
+        }else{
+            mav.addObject("errorCode","001");//文件不符合要求
+            mav.addObject("errorMsg","文件名不合法，暂时只支持Excel-2003");//文件不符合要求
 
-        return null;
+        }
+        mav.addObject("refresh",true);
+        return mav;
     }
 
 

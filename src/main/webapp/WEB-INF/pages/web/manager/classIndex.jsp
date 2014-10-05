@@ -10,7 +10,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>SB Admin 2 - Bootstrap Admin Theme</title>
+    <title>请假管理-班级管理</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/css/bootstrap.min.css" rel="stylesheet">
@@ -150,7 +150,7 @@
             <form class="form-horizontal" id="addClassForm" name="updateClassForm" role="form" >
                 <fieldset id="addClassFormFieldset">
                     <div class="modal-body">
-                        <input type="text" name="prefix" id="addClassPrefix">
+                        <input type="hidden" name="prefix" id="addClassPrefix">
                         <form class="form-horizontal" role="form">
                             <div class="form-group">
                                  <label  class="col-sm-2 control-label" for="addClassColleageId">学院</label>

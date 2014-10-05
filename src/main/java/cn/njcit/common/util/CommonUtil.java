@@ -1,6 +1,5 @@
 package cn.njcit.common.util;
 
-import cn.njcit.common.constants.AppConstants;
 import com.alibaba.fastjson.JSON;
 
 import java.util.HashMap;

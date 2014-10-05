@@ -10,7 +10,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>SB Admin 2 - Bootstrap Admin Theme</title>
+    <title>请假管理-学院管理</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/css/bootstrap.min.css" rel="stylesheet">
@@ -272,30 +272,6 @@
 
 
 
-        //班级切换事件
-        $("#editStudentClassId").change(function(){
-            $("#editStudentClassName").val($("#editStudentClassId  option:selected").text());
-        });
-
-        //修改用户信息确定按钮
-        $("#editStudentBt").click(function(){
-            submitEditStudentForm();
-        });
-        //删除学生按钮确定按钮
-        $("#deleteUserBT").click(function(){
-            confirmDeleteUser();
-        });
-        //新增学生按钮
-        $("#addStudentBt").click(function(){
-            addStudentModal();
-        });
-        //新增学生确定 按钮
-        $("#addStudentFormBt").click(function(){
-            submitAddStudentForm();
-        });
-
-
-
 
     }
 
@@ -468,7 +444,11 @@
             alert("系号必须是整数");
             return false;
         }
-
+        var colleageName= $.trim($("#addColleageColleageName").val());
+        if(colleageName==''){
+            alert("院系名称不允许为空");
+            return false;
+        }
         $.ajax({
             type: "POST",
             dataType: "json",

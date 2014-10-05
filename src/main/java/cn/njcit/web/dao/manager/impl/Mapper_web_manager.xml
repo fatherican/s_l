@@ -59,6 +59,11 @@
         where 1=1
         <include refid="colleageWhereStatment"/>
     </select>
+    <select id="getTClass" parameterType="string" resultType="cn.njcit.web.controller.user.TClass">
+        select tc.class_id classId,tc.class_name className,tc.colleage_id colleageId,tco.colleage_name colleageName
+        from tb_class tc left join tb_colleage tco on tc.colleage_id=tco.colleage_id
+        where tc.class_name=#{className}
+    </select>
 
     <sql id="colleageWhereStatment">
         <if test="colleageName!=null and colleageName!=''">
@@ -91,6 +96,52 @@
         value(
             #{className},#{colleageId},#{createTime}
         )
+    </insert>
+    <insert id="batchInsertClass" parameterType="java.util.List">
+        insert ignore into tb_class(
+            class_name, colleage_id, create_time
+        )
+        values
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (
+              #{item.className}, #{item.colleageId}, #{item.createTime}
+            )
+        </foreach>
+    </insert>
+    <insert id="batchInsertStudent" parameterType="java.util.List">
+        insert ignore into tb_student(
+            student_id, student_num, student_name,
+            password, create_time, colleage_id,
+            colleage_name, class_id, class_name
+        )
+        values
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (
+              #{item.studentId}, #{item.studentNum}, #{item.studentName},
+              #{item.password}, #{item.createTime}, #{item.colleageId},
+              #{item.colleageName}, #{item.classId}, #{item.className}
+            )
+        </foreach>
+
+    </insert>
+    <insert id="batchInsertTeacher"  parameterType="java.util.List">
+        insert ignore into tb_teacher(
+            teacher_id, teacher_work_num, teacher_name,
+            password, create_time, colleage_id,
+            role
+        )
+        values
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (
+                #{item.teacherId}, #{item.teacherWorkNum}, #{item.teacherName},
+                #{item.password}, #{item.createTime}, #{item.colleageId},
+                #{item.role}
+            )
+        </foreach>
+
     </insert>
 
     <update id="editClass" parameterType="cn.njcit.web.controller.user.TClass">

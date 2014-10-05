@@ -1,4 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib  uri="http://java.sun.com/jstl/core_rt" prefix="c" %>
 <head>
     <!-- jQuery Version 1.11.0 -->
     <script src="<%=request.getContextPath()%>/resources/bootstrap-sb-admin/js/jquery-1.11.0.js"></script>
@@ -32,9 +34,10 @@
             }else if(hrefVal.endWith("webManager/colleageManageListIndex.do")){//学院管理界面
                 $("#webUserLi").addClass("active");
                 $("#webColleageManagerA").addClass("active");
+            }else if(hrefVal.endWith("webManager/informationImportIndex.do")){//信息导入界面
+                $("#webImportLi").addClass("active");
+                $("#webManagerImportA").addClass("active");
             }
-
-
 
 
             $("#updatePasswordBT").click(function(){
@@ -141,19 +144,30 @@
                         <li>
                             <a  id="webUserStudentA" href="<%=request.getContextPath()%>/webUser/studentManagerIndex.do">学生管理</a>
                         </li>
-                        <li>
-                            <a id="webUserTeacherA"  href="<%=request.getContextPath()%>/webUser/teacherManagerIndex.do">教师管理</a>
-                        </li>
-                        <li>
-                            <a id="webClassManagerA"  href="<%=request.getContextPath()%>/webManager/classManageListIndex.do">班级管理</a>
-                        </li>
-                        <li>
-                            <a id="webColleageManagerA"  href="<%=request.getContextPath()%>/webManager/colleageManageListIndex.do">学院管理</a>
-                        </li>
+                        <c:if test="${user.role eq '3' or user.role eq '2'}">
+                            <li>
+                                <a id="webUserTeacherA"  href="<%=request.getContextPath()%>/webUser/teacherManagerIndex.do">教师管理</a>
+                            </li>
+                        </c:if>
+                        <c:if test="${user.role eq '3' or user.role eq '2'}">
+                            <li>
+                                <a id="webClassManagerA"  href="<%=request.getContextPath()%>/webManager/classManageListIndex.do">班级管理</a>
+                            </li>
+                        </c:if>
+                        <c:if test="${user.role eq '3'}">
+                            <li>
+                                <a id="webColleageManagerA"  href="<%=request.getContextPath()%>/webManager/colleageManageListIndex.do">学院管理</a>
+                            </li>
+                        </c:if>
                     </ul>
                 </li>
-                <li>
-                    <a href="tables.html"><i class="fa fa-files-o  fa-fw"></i> 信息导入</a>
+                <li id="webImportLi">
+                    <a href="#"><i class="fa fa-files-o  fa-fw"></i>信息导入<span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level">
+                        <li>
+                            <a  id="webManagerImportA" href="<%=request.getContextPath()%>/webManager/informationImportIndex.do">导入</a>
+                        </li>
+                    </ul>
                 </li>
             </ul>
         </div>
