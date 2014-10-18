@@ -107,6 +107,7 @@ public class WebManagerServiceImpl implements WebManagerService {
     @Override
     public int addClass(TClass tClass) {
         tClass.setCreateTime(DateFormatUtils.format(new Date(),"yyyy-MM-dd HH:mm:ss"));
+        tClass.setClassName(tClass.getClassName().toUpperCase());
         int count = webManagerDao.addClass(tClass);
         return count;
     }

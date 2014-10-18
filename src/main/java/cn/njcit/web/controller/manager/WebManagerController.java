@@ -274,7 +274,7 @@ public class WebManagerController {
         File tomcatUploadFile = new File(tomcatBinParentFile.getPath()+File.separator+"uploadDir");
         String filePath = tomcatUploadFile.getPath()+File.separator+ UID.getUID()+filename;
         File source = new File(filePath);
-        if(filePath.endsWith("xls")||filename.endsWith("xlsx")){//符合文件名后缀的文件
+        if(filePath.endsWith("xls")){//符合文件名后缀的文件
 //        保存到本地
             multipartFile.transferTo(source);
             String errorFileName = webManagerService.importClass(filePath,webRootPath);
@@ -285,7 +285,7 @@ public class WebManagerController {
             }
         }else{
             mav.addObject("errorCode","001");//文件不符合要求
-            mav.addObject("errorMsg","文件名不合法，只支持Excel");//文件不符合要求
+            mav.addObject("errorMsg","文件名不合法，只支持Excel2003");//文件不符合要求
 
         }
         mav.addObject("refresh",true);
@@ -311,7 +311,7 @@ public class WebManagerController {
         File tomcatUploadFile = new File(tomcatBinParentFile.getPath()+File.separator+"uploadDir");
         String filePath = tomcatUploadFile.getPath()+File.separator+ UID.getUID()+filename;
         File source = new File(filePath);
-        if(filePath.endsWith("xls")||filename.endsWith("xlsx")){//符合文件名后缀的文件
+        if(filePath.endsWith("xls")){//符合文件名后缀的文件
 //        保存到本地
             multipartFile.transferTo(source);
             String errorFileName = webManagerService.importStudent(filePath,webRootPath);
@@ -322,7 +322,7 @@ public class WebManagerController {
             }
         }else{
             mav.addObject("errorCode","001");//文件不符合要求
-            mav.addObject("errorMsg","文件名不合法，只支持Excel");//文件不符合要求
+            mav.addObject("errorMsg","文件名不合法，只支持Excel2003");//文件不符合要求
 
         }
         mav.addObject("refresh",true);

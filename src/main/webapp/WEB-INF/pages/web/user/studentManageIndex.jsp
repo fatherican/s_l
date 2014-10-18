@@ -323,7 +323,7 @@
         //学院切换事件
         $("#editStudentColleageId").change(function(){
             var colleageId = $(this).val();
-            getClasses(colleageId)
+            getClasses('editStudentClassId',colleageId)
             $("#editStudentColleageName").val($("#editStudentColleageId  option:selected").text());
         });
 
@@ -331,6 +331,19 @@
         $("#editStudentClassId").change(function(){
             $("#editStudentClassName").val($("#editStudentClassId  option:selected").text());
         });
+
+        //学院切换事件
+        $("#addStudentColleageId").change(function(){
+            var colleageId = $(this).val();
+            getClasses('addStudentClassId',colleageId)
+            $("#addStudentColleageName").val($("#addStudentColleageId  option:selected").text());
+        });
+
+        //班级切换事件
+        $("#addStudentClassId").change(function(){
+            $("#addStudentClassName").val($("#addStudentClassId  option:selected").text());
+        });
+
 
         //修改用户信息确定按钮
         $("#editStudentBt").click(function(){
@@ -848,6 +861,9 @@
                         $("#editStudentColleageName").val($("#"+colleageIdSelect+"  option:selected").text());
                     }else if(colleageIdSelect=='addStudentColleageId'){
                         $("#addStudentColleageName").val($("#"+colleageIdSelect+"  option:selected").text());
+                    }
+                    if(colleageId==''){
+                        colleageId=$("#"+colleageIdSelect).val();
                     }
                     getClasses(classIdSelect,colleageId,classId);
                 }else{

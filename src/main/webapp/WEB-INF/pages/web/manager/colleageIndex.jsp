@@ -184,7 +184,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title" >确定删除用户</h4>
+                <h4 class="modal-title" >确定删除该系</h4>
             </div>
             <fieldset id="deleteColleageFieldset">
                 <form class="form-horizontal" id="deleteColleageForm" name="deleteColleageForm" role="form" >
