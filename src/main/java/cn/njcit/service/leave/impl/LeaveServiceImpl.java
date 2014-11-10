@@ -95,7 +95,7 @@ public class LeaveServiceImpl implements LeaveService {
         if(leaveItem!=null){
             String studentId =leaveItem.getStudentId();
             String approved = leaveItem.getApproved();
-            if(studentId.equals(userId) && "0".equals(approved)){
+            if(studentId.equals(userId) && "-1".equals(approved)){
                 count = leaveDao.delLeaveItem(reqMap);
             }else{
                 throw new ServiceException("请假已被审批或请假不属于该用户");
@@ -211,11 +211,11 @@ public class LeaveServiceImpl implements LeaveService {
             }
 
         }else if("2".equals(viewType)){//按照班级查看
-            if(user.getRole().equals(AppConstants.INSTRUCTOR__ROLE)) {//辅导员角色
+           /* if(user.getRole().equals(AppConstants.INSTRUCTOR__ROLE)) {//辅导员角色
                 reqMap.put("approved","-1");//只查看，未审批的请假列表
             }else if (user.getRole()==AppConstants.STUDENT_PIPE_ROLE){//学管处角色
                 reqMap.put("approved",2);//只查看，需要学管处 审批的列表
-            }
+            }*/
         }
         reqMap.put("orderBy","create_time");
         List<Leave> leaveList = leaveDao.getLeaveList(reqMap);
@@ -328,27 +328,64 @@ public class LeaveServiceImpl implements LeaveService {
     }
 
     @Override
-    public List<Map> teacherGetLeaveStatistics(LeaveStatisticsQueryForm leaveQueryForm, String userId) {
+    public List<Map> teacherGetLeaveStatistics(Map leaveQueryMap, String userId) {
         List<String> classIdList = new ArrayList<String>();
-        Map reqMap = new HashMap();
-        reqMap.put("userId",userId);
+        //分页查询
+        String pageNum = (String) leaveQueryMap.get("pageNum");
+        String pageSize = (String) leaveQueryMap.get("pageSize");
+        Integer start = (Integer.parseInt(pageNum)-1)*(Integer.parseInt(pageSize));
+        Integer end =start + (Integer.parseInt(pageSize));
+        leaveQueryMap.put("start",start);
+        leaveQueryMap.put("end",end);
+
+        Map userQueryMap = new HashMap();
+        userQueryMap.put("userId", userId);
         User user  = redisInstance.getUserInfo(userId);
+        int statisticType = (Integer) leaveQueryMap.get("statisticType");//请假类型  1：班级  2 时间  3学号
         int role = user.getRole();
         if(AppConstants.INSTRUCTOR__ROLE.intValue()==role) {//辅导员角色
-            List<Map> managedClassList = userService.getTeacherManagedClass(reqMap);
-            if(managedClassList!=null){
-                for(Map map : managedClassList){
-                    String classId = String.valueOf(map.get("class_id"));
-                    classIdList.add(classId);
+            if(statisticType!=1){//按照班级统计，则 班级 是 给定的，所以辅导员此处不用再去查询自己负责的班级，以减少服务器压力
+                List<Map> managedClassList = userService.getTeacherManagedClass(userQueryMap);
+                if(managedClassList!=null){
+                    for(Map map : managedClassList){
+                        String classId = String.valueOf(map.get("class_id"));
+                        classIdList.add(classId);
+                    }
+                    leaveQueryMap.put("classIdList",classIdList);
                 }
-                leaveQueryForm.setClassIdList(classIdList);
             }
         }else if(AppConstants.STUDENT_PIPE_ROLE.intValue()==role){
-            leaveQueryForm.setColleageId(String.valueOf(user.getColleageId()));
+            leaveQueryMap.put("colleageId", String.valueOf(user.getColleageId()));
         }
-        List<Map> leaveStatisList = leaveDao.teacherGetLeaveStatistics(leaveQueryForm);
+        List<Map> leaveStatisList = leaveDao.teacherGetLeaveStatistics(leaveQueryMap);
 
         return leaveStatisList;
+    }
+
+    @Override
+    public int editLeave(Map reqMap) {
+        String leaveType = (String) reqMap.get("leaveType");//请假类型
+        reqMap.put("updateTime", DateFormatUtils.format(new Date(),"yyyy-MM-dd HH:mm:ss"));
+        reqMap.put("needSecondApprove",false);//给予是否需要第二次审批一个默认值
+        if(AppConstants.LEAVE_DAY==Integer.parseInt(leaveType)) {//天数请假
+            String leaveDays = (String) reqMap.get("leaveDays");//请假天数
+            if(Integer.parseInt(leaveDays)>Integer.parseInt(AppConstants.appConfig.getProperty("leave.needSecondApprovedDays"))){
+                reqMap.put("needSecondApprove",true);
+            }
+        }
+        String userId = (String) reqMap.get("userId");
+        User user = redisInstance.getUserInfo(userId);
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String userInfo = JSON.toJSONString(user);
+            Map userMap = objectMapper.readValue(userInfo,Map.class);
+            reqMap.putAll(userMap);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("userInfo 反序列化异常");
+        }
+        int count = leaveDao.editLeave(reqMap);
+        return count;
     }
 
     @Override

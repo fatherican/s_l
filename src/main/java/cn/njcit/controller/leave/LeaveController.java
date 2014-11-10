@@ -135,6 +135,116 @@ public class LeaveController {
         return CommonUtil.ajaxReturn(AppConstants.SUCCESS, leaveId + "", "请假success");
     }
 
+    /**
+     * 学生申请请假
+     * 1、按课程请假
+     * 2、按天数请假
+     *
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "editLeave", produces = {"application/json;charset=UTF-8"})
+    public
+    @ResponseBody
+    String editLeave(HttpServletRequest request) throws ServiceException {
+        boolean isError = false;//传递参数是否出错
+        StringBuffer errorMessage = new StringBuffer();
+
+        Map reqMap = new HashMap();
+        String userId = request.getParameter("userId");
+        reqMap.put("userId", userId);
+        String leaveType = request.getParameter("leaveType");//请假类型
+        reqMap.put("leaveType", leaveType);
+        String token = request.getParameter("token");
+        String key = AppConstants.appConfig.getProperty("app.key");
+        String neededToken = MD5Util.md5Hex(userId + key);
+        String leaveId = request.getParameter("leaveId");
+        reqMap.put("leaveId",leaveId);
+        if(StringUtils.isEmpty(leaveId)){
+            isError = true;
+            errorMessage.append("假条ID为空\t");
+            return CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+        }
+        if (StringUtils.isEmpty(leaveType)) {
+            isError = true;
+            errorMessage.append("请假类型为空\t");
+            return CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+        }
+        if (!neededToken.equals(token)) {
+            isError = true;
+            errorMessage.append("不合法用户\t");
+        }
+        String studentNote = request.getParameter("studentNote");//学生的备注信息
+        reqMap.put("studentNote", studentNote);
+        String studentMobile = request.getParameter("studentMobile");
+        reqMap.put("studentMobile", studentMobile);
+        /*==================课程请假  所需要的的参数**/
+        String courseIndex = request.getParameter("courseIndex");//所请假的节次
+        String[] teacherNames = request.getParameterValues("teacherName");
+        String[] courseNames = request.getParameterValues("courseName");//课程名
+        String leaveDate = request.getParameter("leaveDate");//请假日期
+        /*==================天数请假类型 所需要的参数==============**/
+        String leaveStartDate = request.getParameter("leaveStartDate");//所请假的开始日期
+        String leaveEndDate = request.getParameter("leaveEndDate");//所请假的结束日期
+        String leaveDays = request.getParameter("leaveDays");//请假天数
+        if (AppConstants.LEAVE_CLASS == Integer.parseInt(leaveType)) {//课程请假
+            if (StringUtils.isEmpty(courseIndex)) {
+                isError = true;
+                errorMessage.append("请假节次为空\t");
+                return CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+            }
+            if (StringUtils.isEmpty(courseIndex)) {
+                isError = true;
+                errorMessage.append("请假课程为空\t");
+                return CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+            }
+            if (StringUtils.isEmpty(leaveDate)) {
+                isError = true;
+                errorMessage.append("请假日期为空\t");
+                return CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+            }
+            reqMap.put("courseIndex", courseIndex);
+            reqMap.put("teacherName", arrayToString(teacherNames));
+            reqMap.put("courseName", arrayToString(courseNames));
+            reqMap.put("leaveDate", leaveDate);
+            //设置开始和结束日期都为请假日期当天
+            reqMap.put("leaveStartDate", leaveDate);
+            reqMap.put("leaveEndDate", leaveDate);
+        } else if (AppConstants.LEAVE_DAY == Integer.parseInt(leaveType)) {//天数请假
+            if (StringUtils.isEmpty(leaveStartDate)) {
+                isError = true;
+                errorMessage.append("请假开始日期为空\t");
+                return CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+            }
+            if (StringUtils.isEmpty(leaveEndDate)) {
+                isError = true;
+                errorMessage.append("请假结束日期为空\t");
+                return CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+            }
+            if (StringUtils.isEmpty(leaveDays)) {
+                isError = true;
+                errorMessage.append("请假天数为空\t");
+                return CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+            }
+            reqMap.put("leaveStartDate", leaveStartDate);
+            reqMap.put("leaveDate", leaveStartDate);
+            reqMap.put("leaveEndDate", leaveEndDate);
+            reqMap.put("leaveDays", leaveDays);
+        } else {
+            errorMessage.append("请假类型不匹配\t");
+            return CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+        }
+
+        int count = leaveService.editLeave(reqMap);
+        if(count>0){
+            return CommonUtil.ajaxReturn(AppConstants.SUCCESS, leaveId + "", "请假success");
+        }else{
+            return CommonUtil.ajaxReturn(AppConstants.SERVER_ERROR, leaveId + "", "请假success");
+        }
+
+    }
+
+
 
     /**
      * 学生获得请假列表。
@@ -199,17 +309,24 @@ public class LeaveController {
                 queryResultList = leaveService.queryLeaveList(reqMap);
                 break;
             case 3://审批列表时间段查询
+                String approved = request.getParameter("approved");//总审批状态(-1 未审批0 未通过 1通过 2辅导员已审批等待学管处审批)
+                if(StringUtils.isNotEmpty(approved)){
+                    reqMap.put("approved",approved);
+                }
+
                 reqMap.put("studentId", userId);
                 if (StringUtils.isEmpty(startTime)) {
                     errorMessage.append("开始时间不允许为空\t");
                     return CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+                }else{
+                    reqMap.put("createTimeStart", DateFormatUtils.format(DateUtils.addWeeks(DateUtils.parseDate(startTime, new String[]{"yyyy-MM-dd HH:mm:ss"}), -1), "yyyy-MM-dd HH:mm:ss"));
                 }
                 if (StringUtils.isEmpty(endTime)) {
                     errorMessage.append("结束时间不允许为空\t");
                     return CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+                }else{
+                    reqMap.put("createTimeEnd", DateFormatUtils.format(DateUtils.parseDate(endTime, new String[]{"yyyy-MM-dd HH:mm:ss"}), "yyyy-MM-dd HH:mm:ss"));
                 }
-                reqMap.put("createTimeStart", DateFormatUtils.format(DateUtils.addWeeks(DateUtils.parseDate(startTime, new String[]{"yyyy-MM-dd HH:mm:ss"}), -1), "yyyy-MM-dd HH:mm:ss"));
-                reqMap.put("createTimeEnd", DateFormatUtils.format(DateUtils.parseDate(endTime, new String[]{"yyyy-MM-dd HH:mm:ss"}), "yyyy-MM-dd HH:mm:ss"));
                 queryResultList = leaveService.queryLeaveList(reqMap);
                 break;
             case 4://获得已审批未销假列表
@@ -427,6 +544,11 @@ public class LeaveController {
         reqMap.put("pageNum", pageNum);
         String pageSize = request.getParameter("pageSize");//每页显示的条目
         reqMap.put("pageSize", pageSize);
+
+        String approved = request.getParameter("approved");//(-1 未审批0 未通过 1通过 2辅导员已审批等待学管处审批)
+        if(StringUtils.isNotEmpty(approved)){
+            reqMap.put("approved",approved);
+        }
         /*=========根据班级类型来查看请假列表==============*/
         String classId = request.getParameter("classId");
         reqMap.put("classId", classId);
@@ -630,7 +752,11 @@ public class LeaveController {
 
 
     /**
-     * （学生）  请假  统计
+     * （老师）  请假  统计
+     *
+     * 1、按照 班级统计
+     * 2、按照 时间统计
+     * 3、按照 学号统计
      *
      * @param request
      * @return
@@ -638,7 +764,8 @@ public class LeaveController {
     @RequestMapping(value = "teacherLeaveStatistics", produces = {"application/json;charset=UTF-8"})
     public
     @ResponseBody
-    String teacherLeaveStatistics(LeaveStatisticsQueryForm leaveQueryForm , HttpServletRequest request) {
+    String teacherLeaveStatistics(HttpServletRequest request) {
+        Map queryMap = new HashMap();
         String userId = request.getParameter("userId");
         String token = request.getParameter("token");
         String key = AppConstants.appConfig.getProperty("app.key");
@@ -651,15 +778,44 @@ public class LeaveController {
         if(StringUtils.isEmpty(userId)){
             return CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", "userId 为空");
         }
-        String startTime = request.getParameter("startTime");//开始时间
-        String endTime = request.getParameter("endTime");
-        String statisticsType = request.getParameter("statisticsType");//1  第一节课 2第二节课  4第三节课 8 第四节课 0天（请假类型为天的）
-        Map queryMap = new HashMap();
-        queryMap.put("startTime", startTime);
-        queryMap.put("endTime", endTime);
-        queryMap.put("statisticsType", statisticsType);
+        String pageNum = request.getParameter("pageNum");//页码
+        String pageSize = request.getParameter("pageSize");//每页显示的条数
+        if (StringUtils.isEmpty(pageNum)) {
+            return CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", "页码不允许为空");
+        }
+        if (StringUtils.isEmpty(pageSize)) {
+            pageSize = "20";
+        }
+        queryMap.put("pageNum", pageNum);
+        queryMap.put("pageSize", pageSize);
+        String statisticType = request.getParameter("statisticType");//请假类型  1：班级  2 时间  3学号
+        if(StringUtils.isEmpty(statisticType)){
+            return CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", "统计类型 为空");
+        }
+        int statisticTypeInt = Integer.parseInt(statisticType);
+        queryMap.put("statisticType",statisticTypeInt);
+
+        switch (statisticTypeInt){//1：班级  2 时间  3学号
+            case 1:
+                String classId = request.getParameter("classId");
+                if(StringUtils.isEmpty(classId)){
+                    return CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", "班级Id 为空");
+                }
+                queryMap.put("classId",classId);
+                break;
+            case 2:
+                String startTime = request.getParameter("startTime");//开始时间
+                String endTime = request.getParameter("endTime");
+                queryMap.put("startTime", startTime);
+                queryMap.put("endTime", endTime);
+                break;
+            case 3:
+
+                break;
+        }
+
         queryMap.put("userId",userId);
-        List<Map> leavestatisticsMap = leaveService.teacherGetLeaveStatistics(leaveQueryForm,userId);
+        List<Map> leavestatisticsMap = leaveService.teacherGetLeaveStatistics(queryMap,userId);
         return CommonUtil.ajaxReturn(200, leavestatisticsMap, null);
     }
 }

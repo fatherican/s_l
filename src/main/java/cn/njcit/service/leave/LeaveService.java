@@ -89,6 +89,12 @@ public interface LeaveService {
     Map studentLeaveStatistics(Map queryMap);
 
 
-    List<Map> teacherGetLeaveStatistics(LeaveStatisticsQueryForm leaveQueryForm, String userId);
+    List<Map> teacherGetLeaveStatistics(Map leaveQueryForm, String userId);
 
+    /**
+     * 编辑请假条目
+     * @param reqMap
+     * @return
+     */
+    int editLeave(Map reqMap);
 }

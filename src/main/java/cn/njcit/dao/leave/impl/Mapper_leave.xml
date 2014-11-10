@@ -121,6 +121,57 @@
         set leave_sicked=#{leaveSicked} , leave_sick_date=#{leaveSickDate}
          where leave_id=#{leaveId}
     </update>
+    <update id="editLeave" parameterType="map">
+        update tb_leave
+        <set>
+            <if test="needSecondApprove!=null and needSecondApprove!=''">
+                need_second_approve=#{needSecondApprove},
+            </if>
+            <if test="instructorNote!=null and instructorNote!=''">
+                instructor_note=#{instructorNote},
+            </if>
+            <if test="studentPipeNote!=null and studentPipeNote!=''">
+                student_pipe_note=#{studentPipeNote},
+            </if>
+             <if test="leaveType!=null and leaveType!=''">
+                 leave_type=#{leaveType},
+            </if>
+             <if test="courseIndex!=null and courseIndex!=''">
+                 course_index=#{courseIndex},
+            </if>
+             <if test="teacherName!=null and teacherName!=''">
+                 teacher_name=#{teacherName},
+            </if>
+             <if test="studentMobile!=null and studentMobile!=''">
+                 student_mobile=#{studentMobile},
+            </if>
+             <if test="courseName!=null and courseName!=''">
+                 course_name=#{courseName},
+            </if>
+             <if test="leaveDays!=null and leaveDays!=''">
+                 leave_days=#{leaveDays},
+            </if>
+             <if test="studentNote!=null and studentNote!=''">
+                 student_note=#{studentNote},
+            </if>
+             <if test="leaveStartDate!=null and leaveStartDate!=''">
+                 leave_start_date=#{leaveStartDate},
+            </if>
+            <if test="leaveEndDate!=null and leaveEndDate!=''">
+                leave_end_date=#{leaveEndDate},
+            </if>
+            <if test="leaveDate!=null and leaveDate!=''">
+                leave_date=#{leaveDate},
+            </if>
+            <if test="className!=null and className!=''">
+                class_name=#{},
+            </if>
+            <if test="updateTime!=null and updateTime!=''">
+                update_time=#{updateTime},
+            </if>
+        </set>
+        where leave_id=#{leaveId}
+    </update>
 
 
     <select id="getLeaveList" parameterType="map" resultType="cn.njcit.domain.leave.Leave">
@@ -239,12 +290,12 @@
         </if>
 
     </select>
-    <select id="teacherGetLeaveStatistics" parameterType="cn.njcit.controller.leave.LeaveStatisticsQueryForm" resultType="java.util.Map">
-        SELECT class_id classId,class_name className,
+    <select id="teacherGetLeaveStatistics" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT tl.user_no studentNum,tl.student_name studentName,
         sum(
             (
                 CASE
-                when tl.leave_type='0' and (tl.course_index=1 or tl.course_index=3 or tl.course_index=5 or tl.course_index=9) then 1
+                when tl.leave_type='0' and (tl.course_index=1 or tl.course_index=3 or tl.course_index=5 or tl.course_index=9 or tl.course_index=17) then 1
                 ELSE 0
                 END
             )
@@ -252,7 +303,7 @@
         sum(
             (
                 CASE
-                when tl.leave_type='0' and (tl.course_index=2 or tl.course_index=3 or tl.course_index=6 or tl.course_index=10) then 1
+                when tl.leave_type='0' and (tl.course_index=2 or tl.course_index=3 or tl.course_index=6 or tl.course_index=10 or tl.course_index=18) then 1
                 ELSE 0
                 END
             )
@@ -260,7 +311,7 @@
         sum(
             (
                 CASE
-                when tl.leave_type='0' and (tl.course_index=5 or tl.course_index=6 or tl.course_index=4 or tl.course_index=12) then 1
+                when tl.leave_type='0' and (tl.course_index=5 or tl.course_index=6 or tl.course_index=4 or tl.course_index=12 or tl.course_index=20) then 1
                 ELSE 0
                 END
             )
@@ -268,11 +319,19 @@
         sum(
             (
                 CASE
-                when tl.leave_type='0' and (tl.course_index=9 or tl.course_index=10 or tl.course_index=12 or tl.course_index=8) then 1
+                when tl.leave_type='0' and (tl.course_index=9 or tl.course_index=10 or tl.course_index=12 or tl.course_index=8 or tl.course_index=24) then 1
                 ELSE 0
                 END
             )
         ) fourthClassTimes,
+        sum(
+            (
+                CASE
+                when tl.leave_type='0' and (tl.course_index=17 or tl.course_index=18 or tl.course_index=20 or tl.course_index=24 or tl.course_index=16) then 1
+                ELSE 0
+                END
+            )
+        ) fifthClassTimes,
         sum(
             (
                 CASE
@@ -283,9 +342,6 @@
         ) leaveDays
         from tb_leave tl
         where 1=1
-        <if test="className!=null and className!=''">
-            and tl.class_name = #{className}
-        </if>
         <if test="classIdList!=null and classIdList!=''">
             and tl.class_id in
             <foreach collection="classIdList" item="item" separator="," open="(" close=")">
@@ -298,17 +354,20 @@
         <if test="studentNum!=null and studentNum!=''">
             and tl.user_no = #{studentNum}
         </if>
-        <if test="studentName!=null and studentName!=''">
-              and tl.student_name=#{studentName}
-        </if>
-        <if test="courseIndex!=null and courseIndex!=''">
-              and tl.course_index=#{courseIndex}
-        </if>
         <if test="colleageId!=null and colleageId!=''">
             and tl.colleage_id=#{colleageId}
         </if>
         <include refid="studentStatisticsWhereStatement"/>
-        group by class_id,class_name
+        group by tl.student_id,tl.student_name
+        order by studentNum
+        <choose>
+            <when test="start!=null and end!=null ">
+                limit #{start},#{end}
+            </when>
+            <otherwise>
+                limit 20
+            </otherwise>
+        </choose>
     </select>
     <sql id="studentStatisticsWhereStatement">
         <if test="startTime!=null and startTime!=''">

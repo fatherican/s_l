@@ -69,6 +69,7 @@ public interface LeaveDao {
 
     int statisticsLeaveCourseTimes(Map queryMap);
 
-    List<Map> teacherGetLeaveStatistics(LeaveStatisticsQueryForm leaveQueryForm);
+    List<Map> teacherGetLeaveStatistics(Map leaveQueryForm);
 
+    int editLeave(Map reqMap);
 }

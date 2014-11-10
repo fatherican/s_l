@@ -76,34 +76,19 @@
                     <td style="width:10%"> </td>
                 </tr>
                 <tr>
-                    <td style="width:10%">统计课程</td>
-                    <td style="width:10%">courseIndex</td>
-                    <td style="width:10%"> </td>
-                    <td style="width:10%">空  统计全部  1  第一节课 2第二节课  4第三节课 8 第四节课</td>
-                </tr>
-                <tr>
                     <td style="width:10%">秘钥</td>
                     <td style="width:10%">token</td>
                     <td style="width:10%"> </td>
                     <td style="width:10%">秘钥的生成方式见 API URL token=</td>
                 </tr>
-               <tr>
-                    <td style="width:10%">学生姓名</td>
-                    <td style="width:10%">studentName</td>
-                    <td style="width:10%">杨凯</td>
-                    <td style="width:10%"></td>
-                </tr>
-               <tr>
-                    <td style="width:10%">学号</td>
-                    <td style="width:10%">studentNum</td>
-                    <td style="width:10%">90916p39</td>
-                    <td style="width:10%"></td>
+                <tr>
+                    <td style="width:10%">统计类型</td>
+                    <td style="width:10%">statisticType</td>
+                    <td style="width:10%">1</td>
+                    <td style="width:10%">1：班级  2 时间  3学号</td>
                 </tr>
                 <tr>
-                    <td style="width:10%">班级</td>
-                    <td style="width:10%">classId</td>
-                    <td style="width:10%"></td>
-                    <td style="width:10%">班级Id，请调用 老师获取负责班级接口  获得</td>
+                    <td colspan="4"  style="background:green;text-align: center;">，下面的字段只针对 按照时间查询有效   </td>
                 </tr>
                 <tr>
                     <td style="width:10%">查询开始时间</td>
@@ -116,6 +101,15 @@
                     <td style="width:10%">endTime</td>
                     <td style="width:10%">2014-09-03  00:00:00</td>
                     <td style="width:10%">格式yyyy-MM-dd hh:mm:ss</td>
+                </tr>
+                <tr>
+                    <td colspan="4"  style="background:green;text-align: center;">，下面的字段只针对 按照  班级  查询有效   </td>
+                </tr>
+                <tr>
+                    <td style="width:10%">班级</td>
+                    <td style="width:10%">classId</td>
+                    <td style="width:10%"></td>
+                    <td style="width:10%">班级Id，请调用 老师获取负责班级接口  获得</td>
                 </tr>
 			</thead>
 		</table>
@@ -131,33 +125,43 @@
 			<div class="input-prepend">
 			<p>
 				<span class="add-on">userId</span>
-					<input class="span2" type="text" name="userId" value='201407261644000001'/>
+					<input class="span2" type="text" name="userId" value='201410060034000001'/>
                 <span class="add-on">token</span>
-                    <input class="span2" type="text" name="token" value='0b7403611d4ad964cc4c2b6cffbc87f1' />
+                    <input class="span2" type="text" name="token" value='b6d1af66b866266eb94bd3b75a25ff75' />
                 <span class="add-on">courseIndex</span>
-                    <select  id="courseIndex" name="courseIndex">
-                        <option value="">统计全部(值是 空)</option>
-                        <option value="1">1  第一节课 </option>
-                        <option value="2">2  第二节课</option>
-                        <option value="4">4  第三节课</option>
-                        <option value="8">8  第四节课</option>
+                <%--1：班级  2 时间  3学号--%>
+                    <select  id="statisticType" name="statisticType">
+                        <option value="1">1  班级 </option>
+                        <option value="2">2  时间</option>
+                        <option value="3">4  学号</option>
                     </select>
-                <span class="add-on">studentName</span>
-                     <input class="span2" type="text" name="studentName" value='杨凯' />
-                </br>
-                <span class="add-on">studentNum</span>
-                     <input class="span2" type="text" name="studentNum" value='90916p39' />
-                <span class="add-on">classId</span>
-                    <select  id="classId" name="classId">
-                        <option value="">统计全部(值是 空)</option>
-                        <option value="1">90916p  (1) </option>
-                        <option value="2">90917p  （2）</option>
-                        <option value="3">...等等..</option>
-                    </select>
-                <span class="add-on">startTime</span>
-                    <input class="span2" type="text" name="startTime" value='2014-09-03  00:00:00' />
-                <span class="add-on">endTime</span>
-                    <input class="span2" type="text" name="endTime" value='2014-09-03  00:00:00' />
+
+                <script type="text/javascript">
+                    $('#statisticType').change(function() {
+                        var checkIndex=$(this).get(0).selectedIndex;
+                        if(checkIndex==0){
+                            $("#classP").show();
+                            $("#timeP").hide();
+                        }else if(checkIndex==1){
+                            $("#classP").hide();
+                            $("#timeP").show();
+
+                        }else if(checkIndex==2){
+                            $("#classP").hide();
+                            $("#timeP").hide();
+                        }
+                    });
+                </script>
+                <p id="classP" style="display: block;">
+                    <span class="add-on">classId</span>
+                        <input class="span2" type="text" name="classId" value='36' />
+                </p>
+                <p id="timeP" style="display: none;">
+                    <span class="add-on">startTime</span>
+                        <input class="span2" type="text" name="startTime" value='2014-09-03  00:00:00' />
+                    <span class="add-on">endTime</span>
+                        <input class="span2" type="text" name="endTime" value='2014-12-03  00:00:00' />
+                </p>
             </p>
                 <p><input type="button" value="提交"  id="submitBT" class="btn" /></p>
 			</div>

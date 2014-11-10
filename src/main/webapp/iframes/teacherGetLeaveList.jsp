@@ -104,6 +104,13 @@
                     <td style="width:10%"></td>
                 </tr>
                 <tr>
+                    <td style="width:10%">假条的状态</td>
+                    <td style="width:10%">approved</td>
+                    <td style="width:10%">2</td>
+                    <td style="width:10%">-1 未审批0 未通过 1通过 2辅导员已审批等待学管处审批</td>
+                </tr>
+
+                <tr>
                     <td colspan="4" style="background:red;">上面的字段对 所有的请求列表数据类型  都适用 </td>
                 </tr>
                 <tr>
@@ -171,6 +178,14 @@
                     <input class="span2" type="text" name="pageNum" value='1' />
                 <span class="add-on">pageSize</span>
                  <input class="span2" type="text" name="pageSize" value='10' />
+                <span class="add-on">approved</span>
+                    <select  id="approved" name="approved">
+                        <option value="">--请选择--</option>
+                        <option value="-1">未审批 [-1]</option>
+                        <option value="0">未通过[0]</option>
+                        <option value="1">通过[1]</option>
+                        <option value="2">辅导员已审批等待学管处审批[2]</option>
+                    </select>
             </p>
             <%--按时间查询--%>
             <p id="oeruidP" style="display: block;">

@@ -112,6 +112,12 @@
                     <td colspan="4"  style="background:green;text-align: center;">，下面的字段只针对 3（审批列表时间段查询）有效</td>
                 </tr>
                 <tr>
+                    <td style="width:10%">审批状态</td>
+                    <td style="width:10%">approved</td>
+                    <td style="width:10%">-1</td>
+                    <td style="width:10%">-1 未审批0 未通过 1通过 2辅导员已审批等待学管处审批</td>
+                </tr>
+                <tr>
                     <td style="width:10%">查询开始时间</td>
                     <td style="width:10%">startTime</td>
                     <td style="width:10%">2014-03-03 00:00:00</td>
@@ -167,6 +173,13 @@
                  <input class="span2" type="text" name="pageSize" value='10' />
             </p>
             <p id="oeruidP" style="display: none;">
+                <span class="add-on">approved</span>
+                <select  id="approved" name="approved">
+                    <option value="-1">未审批 [-1]</option>
+                    <option value="0">未通过[0]</option>
+                    <option value="1">通过[1]</option>
+                    <option value="2">辅导员已审批等待学管处审批[2]</option>
+                </select>
                 <span class="add-on">startTime</span>
                     <input class="span2" type="text" name="startTime" value='2014-03-03 00:00:00'/>
                 <span class="add-on">endTime</span>
