@@ -113,6 +113,7 @@ public class LeaveServiceImpl implements LeaveService {
     public int updateLeaveApprovedState(Map reqMap) {
         String userId = (String) reqMap.get("userId");
         String leaveId = (String) reqMap.get("leaveId");
+        String approvedState =(String) reqMap.get("approvedState");//审批状态 0 不同意 1  同意
         User user = redisInstance.getUserInfo(userId);
         ObjectMapper objectMapper = new ObjectMapper();
         int count = 0 ;
@@ -120,28 +121,49 @@ public class LeaveServiceImpl implements LeaveService {
             reqMap.put("role",AppConstants.INSTRUCTOR__ROLE);
             //修改辅导员 审批状态
                 // 判断 请假天数，如果请假天数超过两天，那么要修改 总审批状态（approved）为“待学管处审批",并添加上备注信息
-                reqMap.put("instructorApproved",1);
+
                 Leave leaveItem = leaveDao.getUniqueLeave(leaveId);
                 String days = leaveItem.getLeaveDays();
                 String leaveType = leaveItem.getLeaveType();//请假类型
                 if(leaveType.equals(String.valueOf(AppConstants.LEAVE_DAY))){//天次请假
                     if(Integer.parseInt(days)>Integer.parseInt(AppConstants.appConfig.getProperty("leave.needSecondApprovedDays"))){
-                        reqMap.put("approved",2);//辅导员已审批，学管处未审批
+                        if("0".equals(approvedState)){
+                            reqMap.put("approved",0);//最终状态为0 不同意
+                            reqMap.put("instructorApproved",0);//辅导员审批状态为0  不同意
+                        }else if("1".equals(approvedState)){//同意
+                            reqMap.put("approved",2);//最终状态为2 待学馆处审批
+                            reqMap.put("instructorApproved",1);//辅导员审批状态为1 同意
+                        }
                     }else{
+                        setInstructorApprovedState(reqMap, approvedState);
                         reqMap.put("approved",1);//辅导员已审批，无需学管处审批
                     }
-                }else{
-                    reqMap.put("approved",1);//辅导员已审批，无需学管处审批
+                }else{//课程请假，则此时的审批状态，就是最终的审批状态
+                    setInstructorApprovedState(reqMap, approvedState);
                 }
             count = leaveDao.updateLeaveApprovedState(reqMap);
         }else  if(user.getRole().equals(AppConstants.STUDENT_PIPE_ROLE)){//学管处角色
             reqMap.put("role",AppConstants.STUDENT_PIPE_ROLE);
-            //修改   学管处审批状态 和  总审批状态,并添加上备注信息
-            reqMap.put("studentPipeApproved",true);
-            reqMap.put("approved",1);//学管处审批
+            if("0".equals(approvedState)){
+                reqMap.put("studentPipeApproved",0);//学管处审批状态为0  不同意
+                reqMap.put("approved",0);//最终状态为0 不同意
+            }else if("1".equals(approvedState)){//同意
+                reqMap.put("studentPipeApproved",true);//学管处审批状态1 同意
+                reqMap.put("approved",1);//最终状态为1 同意
+            }
             count = leaveDao.updateLeaveApprovedState(reqMap);
         }
         return count;
+    }
+
+    private void setInstructorApprovedState(Map reqMap, String approvedState) {
+        if("0".equals(approvedState)){
+            reqMap.put("approved",0);//最终状态为0 不同意
+            reqMap.put("instructorApproved",0);//辅导员审批状态为1  不同意
+        }else if("1".equals(approvedState)){//同意
+            reqMap.put("approved",1);//最终状态为1
+            reqMap.put("instructorApproved",1);//辅导员审批状态为1 同意
+        }
     }
 
     @Override
