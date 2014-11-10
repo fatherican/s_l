@@ -90,6 +90,12 @@
                     <td style="width:10%"> </td>
                     <td style="width:10%">秘钥的生成方式见 API URL token=</td>
                 </tr>
+                <tr>
+                    <td style="width:10%">审批结果</td>
+                    <td style="width:10%">approvedState</td>
+                    <td style="width:10%">0</td>
+                    <td style="width:10%">0 不同意   1  同意</td>
+                </tr>
 
                 <tr>
                     <td style="width:10%">备注信息</td>
@@ -116,8 +122,10 @@
                     <input class="span2" type="text" name="token" value='eeafb716f93fa090d7716749a6eefa72' />
                 <span class="add-on">leaveId</span>
                     <input class="span2" type="text" name="leaveId" value='2' />
+                <span class="add-on">approvedState</span>
+                    <input class="span2" type="text" name="approvedState" value='0' />
                 <span class="add-on">note</span>
-                 <input class="span2" type="text" name="note" value='朕，允许了' />
+                 <input class="span2" type="text" name="note" value='请填写审批说明' />
             </p>
                 <p><input type="button" value="提交"  id="submitBT" class="btn" /></p>
 			</div>
