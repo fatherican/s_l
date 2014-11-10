@@ -302,7 +302,8 @@ public class LeaveController {
                 reqMap.put("studentId", userId);
                 queryResultList = leaveService.queryLeaveList(reqMap);
                 break;
-            case 2://最新审批（最近一周的审批结果，包括已审批和未审批）
+            case 2://最新审批（最近一周的审批结果，包括已审批和打回，和 需二次审批）
+                reqMap.put("approvedStates", new String[]{"0","1", "2"});//-10 未通过 1通过 2辅导员已审批等待学管处审批
                 reqMap.put("studentId", userId);
                 reqMap.put("createTimeStart", DateFormatUtils.format(DateUtils.addWeeks(new Date(), -1), "yyyy-MM-dd HH:mm:ss"));
                 reqMap.put("createTimeEnd", DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss"));
@@ -394,6 +395,7 @@ public class LeaveController {
         String userId = request.getParameter("userId");
         String leaveId = request.getParameter("leaveId");
         String note = request.getParameter("note");//备注信息
+        String approvedState = request.getParameter("approvedState");//审批状态  0 不同意 1同意
         reqMap.put("userId", userId);
         reqMap.put("leaveId", leaveId);
         reqMap.put("note", note);
@@ -410,6 +412,10 @@ public class LeaveController {
         }
         if (StringUtils.isEmpty(leaveId)) {
             errorMessage.append("请假条目ID为空\t");
+            return CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
+        }
+        if(StringUtils.isEmpty(approvedState)  || !("0".equals(approvedState)||"1".equals(approvedState))){
+            errorMessage.append("审批状态为空或不合法\t");
             return CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
         }
         int count = leaveService.updateLeaveApprovedState(reqMap);
