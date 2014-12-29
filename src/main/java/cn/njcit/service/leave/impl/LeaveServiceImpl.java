@@ -229,7 +229,7 @@ public class LeaveServiceImpl implements LeaveService {
             }else if(user.getRole()==AppConstants.STUDENT_PIPE_ROLE){//学管处角色
                 Integer colleageId = user.getColleageId();
                 reqMap.put("colleageId",colleageId);//只查看自己负责的学院
-                reqMap.put("approved",2);//只查看，需要学管处 审批的列表
+//                reqMap.put("approved",2);//只查看，需要学管处 审批的列表
             }
 
         }else if("2".equals(viewType)){//按照班级查看

@@ -320,13 +320,13 @@ public class LeaveController {
                     errorMessage.append("开始时间不允许为空\t");
                     return CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
                 }else{
-                    reqMap.put("createTimeStart", DateFormatUtils.format(DateUtils.addWeeks(DateUtils.parseDate(startTime, new String[]{"yyyy-MM-dd HH:mm:ss"}), -1), "yyyy-MM-dd HH:mm:ss"));
+                    reqMap.put("leaveDateStart", DateFormatUtils.format(DateUtils.parseDate(startTime.trim(), new String[]{"yyyy-MM-dd HH:mm:ss"}), "yyyy-MM-dd HH:mm:ss"));
                 }
                 if (StringUtils.isEmpty(endTime)) {
                     errorMessage.append("结束时间不允许为空\t");
                     return CommonUtil.ajaxReturn(AppConstants.OTHER_ERROR, "", errorMessage.toString());
                 }else{
-                    reqMap.put("createTimeEnd", DateFormatUtils.format(DateUtils.parseDate(endTime, new String[]{"yyyy-MM-dd HH:mm:ss"}), "yyyy-MM-dd HH:mm:ss"));
+                    reqMap.put("leaveDateEnd", DateFormatUtils.format(DateUtils.parseDate(endTime.split(" ")[0].trim()+" 23:59:59", new String[]{"yyyy-MM-dd HH:mm:ss"}), "yyyy-MM-dd HH:mm:ss"));
                 }
                 queryResultList = leaveService.queryLeaveList(reqMap);
                 break;

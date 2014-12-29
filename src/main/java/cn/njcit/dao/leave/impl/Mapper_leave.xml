@@ -65,7 +65,13 @@
         <if test="createTimeEnd!=null and createTimeEnd!=''">
             and #{createTimeEnd}>=create_time
         </if>
-        order by create_time desc
+        <if test="leaveDateStart!=null and leaveDateStart!=''">
+            and leave_date >= #{leaveDateStart}
+        </if>
+        <if test="leaveDateEnd!=null and leaveDateEnd!=''">
+            and #{leaveDateEnd}>=leave_date
+        </if>
+        order by leave_date desc
         <choose>
             <when test="begin!=null   and  end!=null ">
                 limit #{begin},#{end}
@@ -164,7 +170,7 @@
                 leave_date=#{leaveDate},
             </if>
             <if test="className!=null and className!=''">
-                class_name=#{},
+                class_name=#{className},
             </if>
             <if test="updateTime!=null and updateTime!=''">
                 update_time=#{updateTime},
@@ -186,6 +192,9 @@
         leave_date as leaveDate
         from tb_leave
         where 1=1
+        <if test="approved!=null and approved!=''">
+            and approved=#{approved}
+        </if>
         <if test="classId!=null and classId!=''">
             and class_id=#{classId}
         </if>
@@ -198,8 +207,8 @@
                 #{item}
             </foreach>
         </if>
-        <if test="beginTime!=null and beginTime!=''">
-            and create_time>=#{beginTime}
+        <if test="startTime!=null and startTime!=''">
+            and create_time>=#{startTime}
         </if>
         <if test="endTime!=null and endTime!=''">
             and #{endTime}>=create_time
