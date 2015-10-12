@@ -141,10 +141,9 @@
             <version>5.1.31</version>
         </dependency>
         <dependency>
-            <groupId>jackson</groupId>
-            <artifactId>jackson-all</artifactId>
-            <version>1.8.5</version>
-            <classifier>jackson</classifier>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>1.9.11</version>
         </dependency>
 
 

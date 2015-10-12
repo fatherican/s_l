@@ -303,7 +303,7 @@ public class LeaveController {
                 queryResultList = leaveService.queryLeaveList(reqMap);
                 break;
             case 2://最新审批（最近一周的审批结果，包括已审批和打回，和 需二次审批）
-                reqMap.put("approvedStates", new String[]{"0","1", "2"});//-10 未通过 1通过 2辅导员已审批等待学管处审批
+                reqMap.put("approvedStates", new String[]{"0","1", "2"});//-1未审批 0 未通过 1通过 2辅导员已审批等待学管处审批
                 reqMap.put("studentId", userId);
                 reqMap.put("createTimeStart", DateFormatUtils.format(DateUtils.addWeeks(new Date(), -1), "yyyy-MM-dd HH:mm:ss"));
                 reqMap.put("createTimeEnd", DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss"));

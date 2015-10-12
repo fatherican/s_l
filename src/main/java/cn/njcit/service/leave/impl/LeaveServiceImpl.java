@@ -2,7 +2,6 @@ package cn.njcit.service.leave.impl;
 
 import cn.njcit.common.constants.AppConstants;
 import cn.njcit.common.exception.ServiceException;
-import cn.njcit.controller.leave.LeaveStatisticsQueryForm;
 import cn.njcit.core.redis.RedisInstance;
 import cn.njcit.dao.leave.LeaveDao;
 import cn.njcit.dao.user.UserDao;
@@ -17,8 +16,6 @@ import org.apache.commons.lang.time.DateUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -159,7 +156,7 @@ public class LeaveServiceImpl implements LeaveService {
     private void setInstructorApprovedState(Map reqMap, String approvedState) {
         if("0".equals(approvedState)){
             reqMap.put("approved",0);//最终状态为0 不同意
-            reqMap.put("instructorApproved",0);//辅导员审批状态为1  不同意
+            reqMap.put("instructorApproved",0);//辅导员审批状态为0  不同意
         }else if("1".equals(approvedState)){//同意
             reqMap.put("approved",1);//最终状态为1
             reqMap.put("instructorApproved",1);//辅导员审批状态为1 同意
