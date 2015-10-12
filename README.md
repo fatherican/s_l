@@ -12,5 +12,5 @@ redis (所以请先安装配置redis)
 
 ##项目的结构
 
-    ### resources/META-INF 是Spring 相关配置文件信息
-    ### resources/config 是数据库、redis、以及项目的常量配置
+###resources/META-INF 是Spring 相关配置文件信息
+###resources/config 是数据库、redis、以及项目的常量配置
